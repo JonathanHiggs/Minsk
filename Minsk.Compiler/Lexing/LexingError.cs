@@ -1,5 +1,7 @@
 using System;
 
+using Minsk.Compiler.Core;
+
 namespace Minsk.Compiler.Lexing
 {
     public class LexingError : CompilerError

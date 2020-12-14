@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 
+using Minsk.Compiler.Core;
 using Minsk.Compiler.Diagnostic;
 using Minsk.Compiler.Parsing;
 
@@ -12,6 +13,58 @@ namespace Minsk.Compiler
         static void Main(string[] args)
         {
             REPL();
+        }
+
+        static void REPL()
+        {
+            while (true)
+            {
+                Console.Write("> ");
+                var line = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                if (line.ToLower() == "clear")
+                {
+                    Console.Clear();
+                    continue;
+                }
+                
+                if (line.ToLower() == "exit")
+                    return;
+
+                var parser = new Parser(line);
+                var tree = parser.Parse();
+
+                if (tree.Errors.Any())
+                {
+                    Console.WriteLine("\n--- Errors");
+                    var foreground = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+
+                    foreach (var error in tree.Errors)
+                        Console.WriteLine(error);
+
+                    Console.ForegroundColor = foreground;
+                }
+
+                Console.WriteLine("\n--- Expression Tree");
+                tree.Root.PrettyPrint();
+
+                Console.WriteLine("\n--- Visual Tree");
+                var visualTree = tree.ToVisualTree();
+                visualTree.Print();
+
+                if (!tree.Errors.Any())
+                {
+                    Console.WriteLine("--- Value");
+                    if (Evaluator.Eval(tree.Root, out var result))
+                        Console.WriteLine(result);
+                }
+                    
+                Console.WriteLine();
+            }
         }
 
         static void Test()
@@ -31,55 +84,25 @@ namespace Minsk.Compiler
             var settings = new VisualTreeSettings();
 
             var tree = 
-                new BinaryVisualNode("Hello",
-                    new BinaryVisualNode("Left", 
-                        new UnaryVisualNode("1",
-                            new TerminalVisualNode("End", settings),
+                new BinaryVisualNode("Hello", "Node",
+                    new BinaryVisualNode("Left", "Node",
+                        new UnaryVisualNode("1", "Node",
+                            new TerminalVisualNode("End", "Node", settings),
                             settings),
-                        new BinaryVisualNode("Something really long to unbalance in a really really bad way",
-                            new TerminalVisualNode("End", settings),
-                            new TerminalVisualNode("End", settings),
+                        new BinaryVisualNode("Something really long to unbalance in a really really bad way", "Node",
+                            new TerminalVisualNode("End", "Node", settings),
+                            new TerminalVisualNode("End", "Node", settings),
                             settings),
                         settings),
-                    new BinaryVisualNode("Right",
-                        new TerminalVisualNode("2", settings),
-                        new TerminalVisualNode("345", settings),
+                    new BinaryVisualNode("Right", "Node",
+                        new TerminalVisualNode("2", "Node", settings),
+                        new TerminalVisualNode("345", "Node", settings),
                         settings),
                     settings);
 
             tree.Print();
 
             Console.ReadLine();
-        }
-
-        static void REPL()
-        {
-            while (true)
-            {
-                Console.Write("> ");
-                var line = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(line) || line == "Exit" || line == "exit")
-                    return;
-
-                var parser = new Parser(line);
-                var tree = parser.Parse();
-
-                if (tree.Errors.Any())
-                {
-                    var foreground = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
-
-                    foreach (var error in tree.Errors)
-                        Console.WriteLine(error);
-                        
-                    Console.ForegroundColor = foreground;
-                }
-
-                var visualTree = tree.ToVisualTree();
-
-                visualTree.Print();
-            }
         }
     }
 }

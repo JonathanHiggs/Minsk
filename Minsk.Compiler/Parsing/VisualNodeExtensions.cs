@@ -24,10 +24,17 @@ namespace Minsk.Compiler.Parsing
             return node switch
             {
                 BinaryExpressionNode binary 
-                    => new BinaryVisualNode(binary.Text, binary.Left.ToVisualTree(settings), binary.Right.ToVisualTree(settings), settings),
+                    => new BinaryVisualNode(
+                        binary.Text, 
+                        binary.OperatorNode.NodeType.ToString(), 
+                        binary.Left.ToVisualTree(settings), 
+                        binary.Right.ToVisualTree(settings), settings),
 
                 NumberSyntaxNode numberNode
-                    => new TerminalVisualNode(numberNode.Text ?? "<empty>", settings),
+                    => new TerminalVisualNode(
+                        numberNode.Text ?? "<empty>", 
+                        numberNode.NumberToken.TokenType.ToString(),
+                        settings),
 
                 OperatorSyntaxNode operatorNode
                     => throw new InvalidOperationException(),

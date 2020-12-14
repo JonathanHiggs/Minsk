@@ -45,7 +45,10 @@ namespace Minsk.Compiler.Lexing
 
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
-                int.TryParse(tokenText, out var value);
+                
+                if (!int.TryParse(tokenText, out var value))
+                    errors.Add(new LexingError(start, length, tokenText, "Unable to parse number to Int32"));
+
                 return new SyntaxToken(TokenType.Number, start, tokenText, value);
             }
 
@@ -90,6 +93,7 @@ namespace Minsk.Compiler.Lexing
         private char Current => (position >= text.Length) ? '\0' : text[position];
 
         private char Peek => (position + 1 >= text.Length) ? '\0' : text[position + 1];
+
         private void Next()
         {
             position++;

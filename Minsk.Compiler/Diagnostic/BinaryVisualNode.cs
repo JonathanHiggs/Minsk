@@ -5,16 +5,17 @@ namespace Minsk.Compiler.Diagnostic
     public sealed class BinaryVisualNode : VisualNode
     {
         public BinaryVisualNode(
-            string text, 
+            string text,
+            string nodeType,
             VisualNode leftChild, 
             VisualNode rightChild, 
             VisualTreeSettings settings
         ) 
-            : base(text, settings)
+            : base(text, nodeType, settings)
         {
             LeftChild = leftChild ?? throw new ArgumentNullException(nameof(leftChild));
             RightChild = rightChild ?? throw new ArgumentNullException(nameof(rightChild));
-            
+
             LeftChild.Parent = this;
             RightChild.Parent = this;
         }

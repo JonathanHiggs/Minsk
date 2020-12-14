@@ -14,5 +14,7 @@ namespace Minsk.Compiler.Diagnostic
         public ConsoleColor NodeForeground = ConsoleColor.White;
         public ConsoleColor LinkForeground = ConsoleColor.Green;
         public ConsoleColor LinkBackground = ConsoleColor.Black;
+
+        public bool VerboseNodes = true;
     }
 }

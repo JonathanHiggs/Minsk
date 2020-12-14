@@ -1,4 +1,4 @@
-namespace Minsk.Compiler
+namespace Minsk.Compiler.Core
 {
     public abstract class CompilerError
     { 

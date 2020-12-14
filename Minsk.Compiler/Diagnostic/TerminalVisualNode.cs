@@ -2,8 +2,8 @@ namespace Minsk.Compiler.Diagnostic
 {
     public sealed class TerminalVisualNode : VisualNode
     {
-        public TerminalVisualNode(string text, VisualTreeSettings settings) 
-            : base(text, settings)
+        public TerminalVisualNode(string text, string nodeType, VisualTreeSettings settings) 
+            : base(text, nodeType, settings)
         {  }
 
         public override int CombinedWidth => Width;

@@ -4,19 +4,22 @@ namespace Minsk.Compiler.Diagnostic
 {
     public abstract class VisualNode
     {
-        protected VisualNode(string text, VisualTreeSettings settings)
+        protected VisualNode(string text, string nodeType, VisualTreeSettings settings)
         {
             Text = text ?? throw new ArgumentNullException(nameof(text));
+            NodeType = nodeType ?? throw new ArgumentNullException(nameof(nodeType));
             Settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
         public string Text { get; }
+        public string NodeType { get; }
+        public string DisplayText => Settings.VerboseNodes ? $"{NodeType}: {Text}" : Text;
         public int TopPosition { get; set; }
         public int LeftPosition { get; set; }
         public VisualNode Parent { get; set; }
         public VisualTreeSettings Settings { get; }
 
-        public int Width => Text.Length + Settings.TextPadding * 2;
+        public int Width => DisplayText.Length + Settings.TextPadding * 2;
 
         public int RightPosition
         {
@@ -53,7 +56,9 @@ namespace Minsk.Compiler.Diagnostic
             Console.SetCursorPosition(left, top);
             for (var i = 0; i < Settings.TextPadding; i++)
                 Console.Write(" ");
-            Console.Write(Text);
+
+            Console.Write(DisplayText);
+
             for (var i = 0; i < Settings.TextPadding; i++)
                 Console.Write(" ");
         }
