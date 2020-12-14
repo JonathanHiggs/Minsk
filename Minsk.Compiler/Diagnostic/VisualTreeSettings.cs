@@ -10,9 +10,9 @@ namespace Minsk.Compiler.Diagnostic
         public int TextPadding = 1;
         public int ChildPadding = 1;
 
-        public ConsoleColor NodeBackground = ConsoleColor.White;
-        public ConsoleColor NodeForeground = ConsoleColor.Black;
-        public ConsoleColor LinkForeground = ConsoleColor.Red;
+        public ConsoleColor NodeBackground = ConsoleColor.DarkGreen;
+        public ConsoleColor NodeForeground = ConsoleColor.White;
+        public ConsoleColor LinkForeground = ConsoleColor.Green;
         public ConsoleColor LinkBackground = ConsoleColor.Black;
     }
 }

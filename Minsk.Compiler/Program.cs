@@ -1,5 +1,9 @@
 ﻿using System;
+
 using Minsk.Compiler.Diagnostic;
+using Minsk.Compiler.Lexing;
+using Minsk.Compiler.Parsing;
+
 
 namespace Minsk.Compiler
 {
@@ -25,13 +29,17 @@ namespace Minsk.Compiler
         static void Test2()
         {
             var settings = new VisualTreeSettings();
+
             var tree = 
                 new BinaryVisualNode("Hello",
                     new BinaryVisualNode("Left", 
-                        new UnaryVisualNode("Child",
+                        new UnaryVisualNode("1",
                             new TerminalVisualNode("End", settings),
                             settings),
-                        new TerminalVisualNode("Something really long to unbalance in a really really bad way", settings),
+                        new BinaryVisualNode("Something really long to unbalance in a really really bad way",
+                            new TerminalVisualNode("End", settings),
+                            new TerminalVisualNode("End", settings),
+                            settings),
                         settings),
                     new BinaryVisualNode("Right",
                         new TerminalVisualNode("2", settings),
@@ -40,6 +48,8 @@ namespace Minsk.Compiler
                     settings);
 
             tree.Print();
+
+            Console.ReadLine();
         }
 
         static void REPL()

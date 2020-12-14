@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Minsk.Compiler
+namespace Minsk.Compiler.Lexing
 {
     public class Lexer
     {

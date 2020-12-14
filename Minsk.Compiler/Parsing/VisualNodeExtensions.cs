@@ -1,8 +1,10 @@
 using System;
 
-namespace Minsk.Compiler.Diagnostic
+using Minsk.Compiler.Diagnostic;
+
+namespace Minsk.Compiler.Parsing
 {
-    public static class VisualNodeExtensions
+    public static class SyntaxNodeExtensions
     {
         public static VisualNode ToVisualTree(this SyntaxNode node)
         {

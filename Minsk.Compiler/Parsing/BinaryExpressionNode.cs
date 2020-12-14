@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Minsk.Compiler
+namespace Minsk.Compiler.Parsing
 {
     public sealed class BinaryExpressionNode : ExpressionSyntaxNode
     {

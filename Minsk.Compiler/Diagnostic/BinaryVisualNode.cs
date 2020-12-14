@@ -46,12 +46,12 @@ namespace Minsk.Compiler.Diagnostic
             }
             else
             {
-                var leftPad = (combinedWidth - Width) / 2;
-                LeftPosition = left + leftPad;
-                TopPosition = top;
-                
                 LeftChild.Arange(left, top + 2);
                 RightChild.Arange(left + LeftChild.CombinedWidth + Settings.ChildPadding, top + 2);
+
+                var childrenWidth = (RightChild.RightPosition - LeftChild.LeftPosition);
+                LeftPosition = LeftChild.LeftPosition + childrenWidth / 2 - Width / 2;
+                TopPosition = top;
             }
         }
 
@@ -60,9 +60,9 @@ namespace Minsk.Compiler.Diagnostic
             PrintText(LeftPosition, TopPosition);
 
             PrintLeftLink(LeftChild.LeftPosition + LeftChild.Width / 2, LeftPosition, TopPosition + 1);
-            PrintRightLink(LeftPosition + Width - 1, RightChild.LeftPosition + RightChild.Width / 2, TopPosition + 1);
-
             LeftChild.PrintNode();
+
+            PrintRightLink(LeftPosition + Width - 1, RightChild.LeftPosition + RightChild.Width / 2, TopPosition + 1);
             RightChild.PrintNode();
         }
     }

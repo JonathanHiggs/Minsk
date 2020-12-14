@@ -36,7 +36,7 @@ namespace Minsk.Compiler.Diagnostic
 
             var top = Console.CursorTop + Settings.TopPadding;
 
-            Arange(0, top);
+            Arange(Settings.LeftPadding, top);
             PrintNode();
 
             Console.ForegroundColor = foreground;
@@ -51,7 +51,11 @@ namespace Minsk.Compiler.Diagnostic
             Console.ForegroundColor = Settings.NodeForeground;
             Console.BackgroundColor = Settings.NodeBackground;
             Console.SetCursorPosition(left, top);
-            Console.Write($" {Text} ");
+            for (var i = 0; i < Settings.TextPadding; i++)
+                Console.Write(" ");
+            Console.Write(Text);
+            for (var i = 0; i < Settings.TextPadding; i++)
+                Console.Write(" ");
         }
 
         protected void PrintVerticalLink(int left, int top)
@@ -66,22 +70,20 @@ namespace Minsk.Compiler.Diagnostic
         {
             if (left == right)
                 PrintVerticalLink(left, top);
+            else if (left > right)
+                PrintVerticalLink(left, top);
             else
-            {
-                (left, right) = Order(left, right);
                 PrintLink("┌", "─", "┘", left, right, top);
-            }
         }
 
         protected void PrintRightLink(int left, int right, int top)
         {
             if (left == right)
                 PrintVerticalLink(left, top);
+            else if (left > right)
+                PrintVerticalLink(right, top);
             else
-            {
-                (left, right) = Order(left, right);
                 PrintLink("└", "─", "┐", left, right, top);
-            }
         }
 
         protected void PrintLink(string left, string space, string right, int leftPos, int rightPos, int top)
@@ -94,8 +96,5 @@ namespace Minsk.Compiler.Diagnostic
                 Console.Write(space);
             Console.Write(right);
         }
-
-        private (int, int) Order(int a, int b)
-            => a > b ? (b, a) : (a, b);
     }
 }

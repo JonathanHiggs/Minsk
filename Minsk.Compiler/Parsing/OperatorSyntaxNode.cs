@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Minsk.Compiler
+using Minsk.Compiler.Lexing;
+
+namespace Minsk.Compiler.Parsing
 {
     public sealed class OperatorSyntaxNode : SyntaxNode
     {

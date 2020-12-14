@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Minsk.Compiler
+using Minsk.Compiler.Lexing;
+
+namespace Minsk.Compiler.Parsing
 {
     public class Parser
     {
@@ -55,7 +57,7 @@ namespace Minsk.Compiler
         }
 
 
-        public SyntaxNode Parse()
+        public ExpressionSyntaxNode Parse()
         {
             var primary = ParsePrimaryExpression();
 
@@ -64,12 +66,12 @@ namespace Minsk.Compiler
             {
                 var left = primary;
                 var operatorNode = ParseOperatorNode();
-                var right = ParsePrimaryExpression();
+                var right = Parse();
 
-                return new BinaryExpressionNode(left, operatorNode, right);
+                primary = new BinaryExpressionNode(left, operatorNode, right);
             }
 
-            throw new InvalidOperationException();
+            return primary;
         }
 
         public ExpressionSyntaxNode ParsePrimaryExpression()
