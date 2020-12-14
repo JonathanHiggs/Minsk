@@ -6,8 +6,8 @@ namespace Minsk.Compiler.Diagnostic
     {
         protected VisualNode(string text, VisualTreeSettings settings)
         {
-            Text = text;
-            Settings = settings;
+            Text = text ?? throw new ArgumentNullException(nameof(text));
+            Settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
         public string Text { get; }

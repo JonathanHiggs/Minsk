@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace Minsk.Compiler.Parsing
     {
         public NumberSyntaxNode(SyntaxToken numberToken)
         {
-            NumberToken = numberToken;
+            NumberToken = numberToken ?? throw new ArgumentNullException(nameof(numberToken));
         }
 
         public override NodeType NodeType => NodeType.NumberExpression;

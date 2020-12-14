@@ -12,9 +12,10 @@ namespace Minsk.Compiler.Diagnostic
         ) 
             : base(text, settings)
         {
-            LeftChild = leftChild;
+            LeftChild = leftChild ?? throw new ArgumentNullException(nameof(leftChild));
+            RightChild = rightChild ?? throw new ArgumentNullException(nameof(rightChild));
+            
             LeftChild.Parent = this;
-            RightChild = rightChild;
             RightChild.Parent = this;
         }
 

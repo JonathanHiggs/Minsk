@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace Minsk.Compiler.Parsing
     {
         public OperatorSyntaxNode(SyntaxToken token)
         {
-            Token = token;
+            Token = token ?? throw new ArgumentNullException(nameof(token));
         }
 
         public SyntaxToken Token { get; }

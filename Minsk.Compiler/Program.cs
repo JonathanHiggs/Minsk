@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 
 using Minsk.Compiler.Diagnostic;
-using Minsk.Compiler.Lexing;
 using Minsk.Compiler.Parsing;
 
 
@@ -20,7 +20,7 @@ namespace Minsk.Compiler
             Console.WriteLine($"> {line}");
 
             var parser = new Parser(line);
-            var tree = parser.Parse();
+            var tree = parser.ParseExpression();
             
             tree.ToVisualTree().Print();
             Console.WriteLine("Done");
@@ -64,6 +64,17 @@ namespace Minsk.Compiler
 
                 var parser = new Parser(line);
                 var tree = parser.Parse();
+
+                if (tree.Errors.Any())
+                {
+                    var foreground = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+
+                    foreach (var error in tree.Errors)
+                        Console.WriteLine(error);
+                        
+                    Console.ForegroundColor = foreground;
+                }
 
                 var visualTree = tree.ToVisualTree();
 

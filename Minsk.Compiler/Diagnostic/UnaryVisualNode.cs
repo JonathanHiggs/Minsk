@@ -7,7 +7,7 @@ namespace Minsk.Compiler.Diagnostic
         public UnaryVisualNode(string text, VisualNode child, VisualTreeSettings settings) 
             : base(text, settings)
         {
-            Child = child;
+            Child = child ?? throw new ArgumentNullException(nameof(child));
             Child.Parent = this;
         }
 

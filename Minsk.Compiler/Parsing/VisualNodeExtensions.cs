@@ -27,7 +27,7 @@ namespace Minsk.Compiler.Parsing
                     => new BinaryVisualNode(binary.Text, binary.Left.ToVisualTree(settings), binary.Right.ToVisualTree(settings), settings),
 
                 NumberSyntaxNode numberNode
-                    => new TerminalVisualNode(numberNode.Text, settings),
+                    => new TerminalVisualNode(numberNode.Text ?? "<empty>", settings),
 
                 OperatorSyntaxNode operatorNode
                     => throw new InvalidOperationException(),

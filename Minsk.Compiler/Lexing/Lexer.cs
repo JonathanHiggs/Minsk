@@ -1,5 +1,5 @@
 using System;
-
+using System.Collections.Generic;
 
 namespace Minsk.Compiler.Lexing
 {
@@ -7,23 +7,22 @@ namespace Minsk.Compiler.Lexing
     {
         private readonly string text;
         private int position;
+        private List<LexingError> errors = new List<LexingError>();
 
         public Lexer(string text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+                throw new ArgumentNullException(nameof(text));
+
             this.text = text;
             position = 0;
         }
 
-        private char Current => (position >= text.Length) ? '\0' : text[position];
-
-        private char Peek => (position + 1 >= text.Length) ? '\0' : text[position + 1];
-
-        private void Next()
-        {
-            position++;
-        }
-
         public bool HasNext => position <= text.Length;
+
+        public bool HasErrors => errors.Count > 0;
+
+        public IEnumerable<LexingError> Errors => errors;
 
         public SyntaxToken NextToken()
         {
@@ -81,8 +80,19 @@ namespace Minsk.Compiler.Lexing
 
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
+
+                errors.Add(new LexingError(start, length, tokenText, "Unexpected characters"));
+
                 return new SyntaxToken(TokenType.Unknown, start, tokenText);
             }
+        }
+
+        private char Current => (position >= text.Length) ? '\0' : text[position];
+
+        private char Peek => (position + 1 >= text.Length) ? '\0' : text[position + 1];
+        private void Next()
+        {
+            position++;
         }
     }
 }

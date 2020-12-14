@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Minsk.Compiler.Parsing
@@ -6,9 +7,9 @@ namespace Minsk.Compiler.Parsing
     {
         public BinaryExpressionNode(ExpressionSyntaxNode left, OperatorSyntaxNode operatorNode, ExpressionSyntaxNode right)
         {
-            Left = left;
-            OperatorNode = operatorNode;
-            Right = right;
+            Left = left ?? throw new ArgumentNullException(nameof(left));
+            OperatorNode = operatorNode ?? throw new ArgumentNullException(nameof(operatorNode));
+            Right = right ?? throw new ArgumentNullException(nameof(right));
 
             Left.Parent = this;
             OperatorNode.Parent = this;
