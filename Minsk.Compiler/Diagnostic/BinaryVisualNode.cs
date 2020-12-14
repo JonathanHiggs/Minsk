@@ -1,0 +1,69 @@
+using System;
+
+namespace Minsk.Compiler.Diagnostic
+{
+    public sealed class BinaryVisualNode : VisualNode
+    {
+        public BinaryVisualNode(
+            string text, 
+            VisualNode leftChild, 
+            VisualNode rightChild, 
+            VisualTreeSettings settings
+        ) 
+            : base(text, settings)
+        {
+            LeftChild = leftChild;
+            LeftChild.Parent = this;
+            RightChild = rightChild;
+            RightChild.Parent = this;
+        }
+
+        public VisualNode LeftChild { get; }
+        public VisualNode RightChild { get; }
+
+        public override int CombinedWidth
+            => Math.Max(Width, LeftChild.CombinedWidth + Settings.ChildPadding + RightChild.CombinedWidth);
+
+        public override int CombinedHeight
+            => 2 + Math.Max(LeftChild.CombinedHeight, RightChild.CombinedHeight);
+
+        public override void Arange(int left, int top)
+        {
+            var combinedWidth = CombinedWidth;
+
+            if (Width == combinedWidth)
+            {
+                // Node is wider than child sub-trees
+                LeftPosition = left;
+                TopPosition = top;
+
+                var leftCombinedWidth = LeftChild.CombinedWidth;
+                var rightCombinedWidth = RightChild.CombinedWidth;
+                var leftPad = (combinedWidth - leftCombinedWidth - Settings.ChildPadding - rightCombinedWidth) / 2;
+
+                LeftChild.Arange(left + leftPad, top + 2);
+                RightChild.Arange(left + leftPad + leftCombinedWidth + Settings.ChildPadding, top + 2);
+            }
+            else
+            {
+                var leftPad = (combinedWidth - Width) / 2;
+                LeftPosition = left + leftPad;
+                TopPosition = top;
+                
+                LeftChild.Arange(left, top + 2);
+                RightChild.Arange(left + LeftChild.CombinedWidth + Settings.ChildPadding, top + 2);
+            }
+        }
+
+        public override void PrintNode()
+        {
+            PrintText(LeftPosition, TopPosition);
+
+            PrintLeftLink(LeftChild.LeftPosition + LeftChild.Width / 2, LeftPosition, TopPosition + 1);
+            PrintRightLink(LeftPosition + Width - 1, RightChild.LeftPosition + RightChild.Width / 2, TopPosition + 1);
+
+            LeftChild.PrintNode();
+            RightChild.PrintNode();
+        }
+    }
+}
