@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Minsk.CodeAnalysis;
+using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
@@ -21,8 +22,8 @@ namespace Minsk.Compiler
 
         private ConsoleColor errorColor = ConsoleColor.DarkRed;
 
-        private Dictionary<string, object> variables
-            = new Dictionary<string, object>();
+        private Dictionary<VariableSymbol, object> variables
+            = new Dictionary<VariableSymbol, object>();
 
         public void Run()
         {

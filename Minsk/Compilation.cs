@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis
@@ -15,7 +16,7 @@ namespace Minsk.CodeAnalysis
 
         public SyntaxTree Syntax { get; }
 
-        public EvaluationResult Evaluate(Dictionary<string, object> variables)
+        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
             var diagnostics = Syntax.Diagnostics;
             var binder = new Binder(diagnostics, variables);

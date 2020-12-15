@@ -2,43 +2,22 @@ using System;
 using System.Collections.Generic;
 
 using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis.Common;
 
 namespace Minsk.CodeAnalysis
 {
     internal sealed class Evaluator
     {
         private readonly BoundExpression root;
-        private readonly Dictionary<string, object> variables;
+        private readonly Dictionary<VariableSymbol, object> variables;
 
-        public Evaluator(BoundExpression root, Dictionary<string, object> variables)
+        public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
         {
             this.root = root ?? throw new ArgumentNullException(nameof(root));
 
             this.variables = variables
                 ?? throw new ArgumentNullException(nameof(variables));
         }
-
-        // public static bool Eval(BoundExpression root, out object value)
-        // {
-        //     try
-        //     {
-        //         var evaluator = new Evaluator(root);
-        //         value = evaluator.Evaluate();
-        //         return true;
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         var foreground = Console.ForegroundColor;
-        //         Console.ForegroundColor = ConsoleColor.DarkRed;
-
-        //         Console.WriteLine(ex.Message);
-
-        //         Console.ForegroundColor = foreground;
-        //     }
-
-        //     value = 0;
-        //     return false;
-        // }
 
         public object Evaluate()
             => EvaluateExpression(root);
@@ -69,7 +48,7 @@ namespace Minsk.CodeAnalysis
         private object EvaluateAssignmentExpression(BoundAssignmentExpression node)
         {
             var value = EvaluateExpression(node.Expression);
-            variables[node.Name] = value;
+            variables[node.Variable] = value;
             return value;
         }
 
@@ -101,7 +80,7 @@ namespace Minsk.CodeAnalysis
             => node.Value;
 
         private object EvaluateNameExpression(BoundVariableExpression node)
-            => variables[node.Name];
+            => variables[node.Variable];
 
         private object EvaluateUnaryExpression(BoundUnaryExpression node)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
@@ -9,9 +10,9 @@ namespace Minsk.CodeAnalysis.Binding
     internal sealed class Binder
     {
         private readonly DiagnosticBag diagnostics;
-        private readonly Dictionary<string, object> variables;
+        private readonly Dictionary<VariableSymbol, object> variables;
 
-        public Binder(DiagnosticBag diagnostics, Dictionary<string, object> variables)
+        public Binder(DiagnosticBag diagnostics, Dictionary<VariableSymbol, object> variables)
         {
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
@@ -52,16 +53,21 @@ namespace Minsk.CodeAnalysis.Binding
             var name = assignment.IdentifierToken.Text;
             var expression = BindExpression(assignment.Expression);
 
-            var defaultValue = 
-                expression.Type == typeof(int)
-                ? (object)default(int)
-                : expression.Type == typeof(bool)
-                ? (object)default(bool)
-                : throw new Exception($"Unsupported variable type '{expression.Type}'");
+            var variable = variables.Keys.FirstOrDefault(v => v.Name == name);
 
-            variables[name] = default;
-
-            return new BoundAssignmentExpression(name, expression);
+            if (!(variable is null) && variable.Type != expression.Type)
+            {
+                variables.Remove(variable);
+                variable = new VariableSymbol(name, expression.Type);
+                variables[variable] = null;
+            }
+            else if (variable is null)
+            {
+                variable = new VariableSymbol(name, expression.Type);
+                variables[variable] = null;
+            }
+            
+            return new BoundAssignmentExpression(variable, expression);
         }
 
         private BoundExpression BindBinaryExpression(BinaryExpression binaryExpression)
@@ -99,13 +105,16 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundExpression BindNameExpression(NameExpression nameExpression)
         {
             var name = nameExpression.IdentifierToken.Text;
-            if (!variables.TryGetValue(name, out var value))
+
+            var variable = variables.Keys.FirstOrDefault(key => key.Name == name);
+
+            if (variable is null)
             {
                 diagnostics.Binding.UndefinedIdentifier(nameExpression);
+                return new BoundLiteralExpression(0);
             }
 
-            var type = value?.GetType() ?? typeof(object);
-            return new BoundVariableExpression(name, type);
+            return new BoundVariableExpression(variable);
         }
 
 
