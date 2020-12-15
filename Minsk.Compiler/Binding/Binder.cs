@@ -18,7 +18,7 @@ namespace Minsk.Compiler.Binding
             switch (expression.NodeType)
             {
                 case NodeType.NumberLiteral:
-                    return BindLiteralExpression(expression as NumberLiteral);
+                    return BindLiteralExpression(expression as LiteralExpression);
 
                 case NodeType.UnaryExpression:
                     return BindUnaryExpression(expression as UnaryExpression);
@@ -31,9 +31,9 @@ namespace Minsk.Compiler.Binding
             }
         }
 
-        private BoundLiteralExpression BindLiteralExpression(NumberLiteral literalExpression)
+        private BoundLiteralExpression BindLiteralExpression(LiteralExpression literalExpression)
         {
-            var value = literalExpression.NumberToken.Value as int? ?? 0;
+            var value = literalExpression.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 

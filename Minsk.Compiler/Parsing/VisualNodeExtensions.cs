@@ -39,7 +39,7 @@ namespace Minsk.Compiler.Parsing
                         binary.Right.ToVisualTree(settings), 
                         settings),
 
-                NumberLiteral numberNode
+                LiteralExpression numberNode
                     => new TerminalVisualNode(
                         numberNode.Text ?? "<empty>", 
                         numberNode.NumberToken.TokenType.ToString(),

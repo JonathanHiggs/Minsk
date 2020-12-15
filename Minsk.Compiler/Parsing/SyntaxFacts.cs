@@ -1,3 +1,4 @@
+using System;
 using Minsk.Compiler.Lexing;
 
 namespace Minsk.Compiler.Parsing
@@ -32,6 +33,16 @@ namespace Minsk.Compiler.Parsing
                 default:
                     return 0;
             }
+        }
+
+        internal static TokenType KeywordKind(string tokenText)
+        {
+            return tokenText switch {
+                "true" => TokenType.TrueKeyword,
+                "false" => TokenType.FalseKeyword,
+
+                _ => TokenType.Identifier
+            };
         }
     }
 }

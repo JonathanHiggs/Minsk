@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Minsk.Compiler.Parsing;
 
 namespace Minsk.Compiler.Lexing
 {
@@ -61,6 +62,18 @@ namespace Minsk.Compiler.Lexing
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
                 return new SyntaxToken(TokenType.Whitespace, start, tokenText);
+            }
+
+            // true, false, keywords, identifiers
+            if (char.IsLetter(Current))
+            {
+                while (char.IsLetter(Current))
+                    Next();
+
+                var length = position - start;
+                var tokenText = text.Substring(start, length);
+                var kind = SyntaxFacts.KeywordKind(tokenText);
+                return new SyntaxToken(kind, start, tokenText);
             }
 
             // <operators> + - * ? ( )

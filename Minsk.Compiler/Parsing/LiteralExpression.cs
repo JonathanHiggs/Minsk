@@ -6,17 +6,25 @@ using Minsk.Compiler.Lexing;
 
 namespace Minsk.Compiler.Parsing
 {
-    public sealed class NumberLiteral : Expression
+    public sealed class LiteralExpression : Expression
     {
-        public NumberLiteral(SyntaxToken literalToken)
+        public LiteralExpression(SyntaxToken literalToken)
+            : this(literalToken, literalToken.Value)
+        { }
+
+        public LiteralExpression(SyntaxToken literalToken, object value)
         {
             NumberToken = literalToken 
                 ?? throw new ArgumentNullException(nameof(literalToken));
+
+            Value = value;
         }
 
         public override NodeType NodeType => NodeType.NumberLiteral;
 
         public SyntaxToken NumberToken { get; }
+
+        public object Value { get; }
 
         public override string Text => NumberToken.Text;
 

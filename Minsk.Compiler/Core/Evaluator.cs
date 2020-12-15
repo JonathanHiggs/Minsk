@@ -15,7 +15,7 @@ namespace Minsk.Compiler.Core
             this.root = root ?? throw new ArgumentNullException(nameof(root));
         }
 
-        public static bool Eval(BoundExpression root, out int value)
+        public static bool Eval(BoundExpression root, out object value)
         {
             try
             {
@@ -37,27 +37,27 @@ namespace Minsk.Compiler.Core
             return false;
         }
 
-        public int Evaluate()
+        public object Evaluate()
         {
             return EvaluateExpression(root);
         }
 
-        private int EvaluateExpression(BoundExpression node)
+        private object EvaluateExpression(BoundExpression node)
         {
             // ToDo: switch on node.Kind to avoid multiple casts
             return node switch {
                 BoundUnaryExpression unary           => EvaluateUnaryExpression(unary),
                 BoundBinaryExpression binary         => EvaluateBinaryExpression(binary),
-                BoundLiteralExpression literal       => (int)literal.Value,
+                BoundLiteralExpression literal       => literal.Value,
 
                 _ => throw new NotImplementedException(
                     $"{node.Kind} not implemented in EvaluateExpression")
             };
         }
 
-        private int EvaluateUnaryExpression(BoundUnaryExpression node)
+        private object EvaluateUnaryExpression(BoundUnaryExpression node)
         {
-            var value = EvaluateExpression(node.Operand);
+            var value = (int)EvaluateExpression(node.Operand);
             var op = node.OperatorKind;
 
             return op switch {
@@ -69,10 +69,10 @@ namespace Minsk.Compiler.Core
             };
         }
 
-        private int EvaluateBinaryExpression(BoundBinaryExpression node)
+        private object EvaluateBinaryExpression(BoundBinaryExpression node)
         {
-            var leftValue = EvaluateExpression(node.Left);
-            var rightValue = EvaluateExpression(node.Right);
+            var leftValue  = (int)EvaluateExpression(node.Left);
+            var rightValue = (int)EvaluateExpression(node.Right);
 
             var op = node.OperatorKind;
 

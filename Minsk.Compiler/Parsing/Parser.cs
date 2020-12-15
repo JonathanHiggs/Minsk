@@ -74,17 +74,30 @@ namespace Minsk.Compiler.Parsing
 
         private Expression ParsePrimaryExpression()
         {
-            if (Current.TokenType == TokenType.OpenParenthesis)
+            switch (Current.TokenType)
             {
-                var left = NextToken();
-                var expression = ParseExpression();
-                var right = MatchToken(TokenType.CloseParenthesis);
+                case TokenType.OpenParenthesis:
+                {
+                    var left = NextToken();
+                    var expression = ParseExpression();
+                    var right = MatchToken(TokenType.CloseParenthesis);
 
-                return new ParenthesizedExpression(left, expression, right);
+                    return new ParenthesizedExpression(left, expression, right);
+                }
+
+                case TokenType.FalseKeyword:
+                case TokenType.TrueKeyword:
+                {
+                    var value = Current.TokenType == TokenType.TrueKeyword;
+                    return new LiteralExpression(NextToken(), value);
+                }
+
+                default:
+                {
+                    var numberToken = MatchToken(TokenType.Number);
+                    return new LiteralExpression(numberToken);
+                }
             }
-
-            var numberToken = MatchToken(TokenType.Number);
-            return new NumberLiteral(numberToken);
         }
 
         private SyntaxToken PeekToken(int offset)
