@@ -2,9 +2,11 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public enum SyntaxKind
     {
-        UnaryExpression,
+        AssignmentExpression,
         BinaryExpression,
         LiteralExpression,
-        ParenthesesExpression
+        NameExpression,
+        ParenthesesExpression,
+        UnaryExpression
     }
 }

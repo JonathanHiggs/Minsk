@@ -23,13 +23,17 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             switch (node.Kind)
             {
-                case SyntaxKind.UnaryExpression:
+                case SyntaxKind.AssignmentExpression:
                 {
-                    var unary = node as UnaryExpression;
-                    return new UnaryVisualNode(
-                        unary.Text,
-                        unary.OperatorToken.Kind.ToString(),
-                        unary.Operand.ToVisualTree(settings),
+                    var assignment = node as AssignmentExpression;
+                    return new BinaryVisualNode(
+                        assignment.Text,
+                        assignment.Kind.ToString(),
+                        new TerminalVisualNode(
+                            assignment.IdentifierToken.Value?.ToString() ?? "<unknown>",
+                            assignment.IdentifierToken.Kind.ToString(),
+                            settings),
+                        assignment.Expression.ToVisualTree(settings),
                         settings);
                 }
 
@@ -53,10 +57,29 @@ namespace Minsk.CodeAnalysis.Parsing
                         settings);
                 }
 
+                case SyntaxKind.NameExpression:
+                {
+                    var name = node as NameExpression;
+                    return new TerminalVisualNode(
+                        name.IdentifierToken.Value?.ToString() ?? "<unknown>",
+                        name.Kind.ToString(),
+                        settings);
+                }
+
                 case SyntaxKind.ParenthesesExpression:
                 {
                     var parens = node as ParenthesizedExpression;
                     return parens.Expression.ToVisualTree(settings);
+                }
+
+                case SyntaxKind.UnaryExpression:
+                {
+                    var unary = node as UnaryExpression;
+                    return new UnaryVisualNode(
+                        unary.Text,
+                        unary.OperatorToken.Kind.ToString(),
+                        unary.Operand.ToVisualTree(settings),
+                        settings);
                 }
 
                 default:

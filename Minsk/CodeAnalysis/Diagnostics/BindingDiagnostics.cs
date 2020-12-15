@@ -15,5 +15,11 @@ namespace Minsk.CodeAnalysis.Diagnostics
 
         public void UndefinedOperator(SyntaxNode node, TextSpan span, string message)
             => bag.Report(new BindError(node, span, message));
+
+        public void UndefinedIdentifier(NameExpression nameExpression)
+            => bag.Report(new BindError(
+                nameExpression, 
+                nameExpression.IdentifierToken.Span,
+                $"Undefined indentifer {nameExpression.IdentifierToken.Text}"));
     }
 }

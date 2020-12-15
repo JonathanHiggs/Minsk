@@ -103,7 +103,8 @@ namespace Minsk.CodeAnalysis.Lexing
                 {
                     if (Peek(1) == '=')
                         return new LexToken(TokenKind.EqualsEquals, cursor.Consume(2), "==");
-                } break;
+                    return new LexToken(TokenKind.Equals, cursor.Consume(1), "=");
+                }
 
                 case '|':
                 {

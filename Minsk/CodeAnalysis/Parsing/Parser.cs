@@ -38,7 +38,27 @@ namespace Minsk.CodeAnalysis.Parsing
             return new SyntaxTree(expression, eof, diagnostics);
         }
 
-        private Expression ParseExpression(int parentPrecedence = 0)
+        private Expression ParseExpression()
+        {
+            return ParseAssignmentExpression();
+        }
+
+        private Expression ParseAssignmentExpression()
+        {
+            if (PeekToken(0).Kind == TokenKind.Identifier
+                && PeekToken(1).Kind == TokenKind.Equals)
+            {
+                var identifierToken = NextToken();
+                var equalsToken = NextToken();
+                var expression = ParseExpression();
+
+                return new AssignmentExpression(identifierToken, equalsToken, expression);
+            }
+
+            return ParseBinaryExpression();
+        }
+
+        private Expression ParseBinaryExpression(int parentPrecedence = 0)
         {
             Expression left;
             var unaryPrecedence = Current.Kind.UnaryOperatorPrecedence();
@@ -46,7 +66,7 @@ namespace Minsk.CodeAnalysis.Parsing
             if (unaryPrecedence != 0 && unaryPrecedence >= parentPrecedence)
             {
                 var operatorToken = NextToken();
-                var operand = ParseExpression(unaryPrecedence);
+                var operand = ParseBinaryExpression(unaryPrecedence);
                 left = new UnaryExpression(operatorToken, operand);
             }
             else
@@ -61,7 +81,7 @@ namespace Minsk.CodeAnalysis.Parsing
                     break;
 
                 var operatorToken = NextToken();
-                var right = ParseExpression(binaryPrecendence);
+                var right = ParseBinaryExpression(binaryPrecendence);
                 
                 left = new BinaryExpression(left, operatorToken, right);
             }
@@ -87,6 +107,12 @@ namespace Minsk.CodeAnalysis.Parsing
                 {
                     var value = Current.Kind == TokenKind.TrueKeyword;
                     return new LiteralExpression(NextToken(), value);
+                }
+
+                case TokenKind.Identifier:
+                {
+                    var identifierToke = NextToken();
+                    return new NameExpression(identifierToke);
                 }
 
                 default:
