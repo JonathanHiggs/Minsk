@@ -13,7 +13,7 @@ namespace Minsk.Compiler.Diagnostic
 
         public VisualNode Child { get; }
 
-        public override int CombinedWidth => Math.Max(Width, Child.Width);
+        public override int CombinedWidth => Math.Max(Width, Child.CombinedWidth);
 
         public override int CombinedHeight => 2 + Child.CombinedHeight;
 

@@ -23,7 +23,7 @@ namespace Minsk.Compiler.Parsing
             Console.Write(marker);
             Console.WriteLine($"{NodeType} : {Text}");
 
-            indent += isLast ? "    " : "│   ";
+            indent += isLast ? "   " : "│  ";
 
             var lastChild = Children.LastOrDefault();
 
