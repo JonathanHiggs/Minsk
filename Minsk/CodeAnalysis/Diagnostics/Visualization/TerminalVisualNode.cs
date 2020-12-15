@@ -1,4 +1,4 @@
-namespace Minsk.CodeAnalysis.Diagnostic.Visualization
+namespace Minsk.CodeAnalysis.Diagnostics.Visualization
 {
     public sealed class TerminalVisualNode : VisualNode
     {

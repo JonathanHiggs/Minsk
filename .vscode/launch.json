@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Minsk/bin/Debug/net5.0/Minsk.dll",
+            "program": "${workspaceFolder}/Minsk.Compiler/bin/Debug/net5.0/Minsk.Compiler.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Minsk",
+            "cwd": "${workspaceFolder}/Minsk.Compiler",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "externalTerminal",
             "stopAtEntry": false

@@ -1,18 +1,21 @@
 using System;
-using System.Collections.Generic;
 
+using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis.Lexing
 {
     public sealed class Lexer
     {
+        private readonly DiagnosticBag diagnostics;
         private readonly string text;
         private int position;
-        private List<LexingError> errors = new List<LexingError>();
 
-        public Lexer(string text)
+        public Lexer(DiagnosticBag diagnostics, string text)
         {
+            this.diagnostics = diagnostics
+                ?? throw new ArgumentNullException(nameof(diagnostics));
+
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentNullException(nameof(text));
 
@@ -21,10 +24,6 @@ namespace Minsk.CodeAnalysis.Lexing
         }
 
         public bool HasNext => position <= text.Length;
-
-        public bool HasErrors => errors.Count > 0;
-
-        public IEnumerable<LexingError> Errors => errors;
 
         public LexToken NextToken()
         {
@@ -49,7 +48,7 @@ namespace Minsk.CodeAnalysis.Lexing
                 var tokenText = text.Substring(start, length);
                 
                 if (!int.TryParse(tokenText, out var value))
-                    errors.Add(new LexingError(start, length, tokenText, "Unable to parse number to Int32"));
+                    diagnostics.Lex.InvalidNumber(start, length, tokenText, $"Unable to parse '{tokenText}' to Int32");
 
                 return new LexToken(TokenKind.Number, start, tokenText, value);
             }
@@ -129,7 +128,7 @@ namespace Minsk.CodeAnalysis.Lexing
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
 
-                errors.Add(new LexingError(start, length, tokenText, "Unexpected characters"));
+                diagnostics.Lex.UnexpectedCharacters(start, length, tokenText, $"Unexpected characters '{tokenText}'");
 
                 return new LexToken(TokenKind.Unknown, start, tokenText);
             }

@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
 
-using Minsk.CodeAnalysis.Diagnostic;
+using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
 
 namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class Parser
     {
-        private int position = 0;
+        public readonly DiagnosticBag diagnostics;
         private List<LexToken> tokens;
-        private List<CompilerError> errors = new List<CompilerError>();
+        private int position = 0;
 
-        public Parser(string text)
+        public Parser(DiagnosticBag diagnostics, string text)
         {
+            this.diagnostics = diagnostics
+                ?? throw new ArgumentNullException(nameof(diagnostics));
+
             tokens = new List<LexToken>(text.Length / 4);
-            var lexer = new Lexer(text);
+            var lexer = new Lexer(diagnostics, text);
 
             while(lexer.HasNext)
             {
@@ -26,19 +29,13 @@ namespace Minsk.CodeAnalysis.Parsing
 
                 tokens.Add(token);
             }
-
-            errors.AddRange(lexer.Errors);
         }
-
-        public bool HasErrors => errors.Count > 0;
-
-        public IEnumerable<CompilerError> Errors => errors;
 
         public SyntaxTree Parse()
         {
             var expression = ParseExpression();
             var eof = MatchToken(TokenKind.EoF);
-            return new SyntaxTree(expression, eof, errors);
+            return new SyntaxTree(expression, eof, diagnostics);
         }
 
         private Expression ParseExpression(int parentPrecedence = 0)
@@ -127,14 +124,9 @@ namespace Minsk.CodeAnalysis.Parsing
             if (Current.Kind == tokenType)
                 return NextToken();
 
-            AddError(Current, $"Unexpected token. Expected '{tokenType}' but was '{Current.Kind}'");
+            diagnostics.Syntax.UnexpectedToken(Current, $"Expected '{tokenType}' but was '{Current.Kind}'");
             
             return new LexToken(tokenType, Current.Position, null, null);
-        }
-
-        private void AddError(LexToken token, string message)
-        {
-            errors.Add(new SyntaxError(token, message));
         }
     }
 }

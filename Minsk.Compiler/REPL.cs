@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 
-using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Parsing;
 
-namespace Minsk.CodeAnalysis
+namespace Minsk.Compiler
 {
     public class REPL
     {
@@ -82,26 +82,23 @@ namespace Minsk.CodeAnalysis
 
         public void Evaluate(string line)
         {
-            var binder = new Binder();
             var tree = SyntaxTree.Parse(line);
-            var boundExpression = binder.BindExpression(tree.Root);
+            var compilation = new Compilation(tree);
+            var result = compilation.Evaluate();
 
-            var errors = tree.Errors.Concat(binder.Errors).ToList();
-
-            if (errors.Any())
+            if (result.Diagnostics.Any())
             {
                 Console.ForegroundColor = errorColor;
                 Console.WriteLine("\n--- Errors");
 
-                foreach (var error in errors)
+                foreach (var error in result.Diagnostics)
                     Console.WriteLine(error);
 
                 Console.ForegroundColor = foreground;
             }
             else
             {
-                if (Evaluator.Eval(boundExpression, out var result))
-                    Console.WriteLine(result);
+                Console.WriteLine(result.Value);
                 Console.WriteLine();
             }
 

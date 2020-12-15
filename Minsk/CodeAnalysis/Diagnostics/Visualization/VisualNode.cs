@@ -1,6 +1,6 @@
 using System;
 
-namespace Minsk.CodeAnalysis.Diagnostic.Visualization
+namespace Minsk.CodeAnalysis.Diagnostics.Visualization
 {
     public abstract class VisualNode
     {

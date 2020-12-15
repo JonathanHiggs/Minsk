@@ -11,8 +11,7 @@ namespace Minsk.CodeAnalysis.Lexing
         }
 
         public TokenKind Kind { get; }
-        public int Position { get;} 
-        // ToDo: add a lenght property?
+        public int Position { get;}
         public string Text { get; }
         public object Value { get; }
 

@@ -1,24 +1,28 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
-using Minsk.CodeAnalysis.Diagnostic;
+using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
 
 namespace Minsk.CodeAnalysis.Parsing
 {
     public class SyntaxTree
     {
-        public SyntaxTree(Expression root, LexToken eofToken, IEnumerable<CompilerError> errors)
+        public SyntaxTree(Expression root, LexToken eofToken, DiagnosticBag diagnostics)
         {
-            Root = root ?? throw new ArgumentNullException(nameof(root));
-            EoFToken = eofToken ?? throw new ArgumentNullException(nameof(eofToken));
-            Errors = errors?.ToList() ?? throw new ArgumentNullException(nameof(errors));
+            Root = root 
+                ?? throw new ArgumentNullException(nameof(root));
+
+            EoFToken = eofToken 
+                ?? throw new ArgumentNullException(nameof(eofToken));
+
+            Diagnostics = diagnostics
+                ?? throw new ArgumentNullException(nameof(diagnostics));
         }
 
         public static SyntaxTree Parse(string line)
         {
-            var parser = new Parser(line);
+            var diagnostics = new DiagnosticBag();
+            var parser = new Parser(diagnostics, line);
             return parser.Parse();
         }
 
@@ -26,6 +30,6 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public LexToken EoFToken { get; }
 
-        public IReadOnlyList<CompilerError> Errors { get; }
+        public DiagnosticBag Diagnostics { get; }
     }
 }

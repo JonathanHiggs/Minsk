@@ -1,16 +1,19 @@
 using System;
-using System.Collections.Generic;
 
-using Minsk.CodeAnalysis.Diagnostic;
+using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis.Binding
 {
     internal sealed class Binder
     {
-        private List<CompilerError> errors = new List<CompilerError>();
+        private readonly DiagnosticBag diagnostics;
 
-        public IEnumerable<CompilerError> Errors => errors;
+        public Binder(DiagnosticBag diagnostics)
+        {
+            this.diagnostics = diagnostics
+                ?? throw new ArgumentNullException(nameof(diagnostics));
+        }
 
         public BoundExpression BindExpression(Expression expression)
         {
@@ -51,9 +54,9 @@ namespace Minsk.CodeAnalysis.Binding
 
             if (op is null)
             {
-                errors.Add(new BinderError(
+                diagnostics.Binding.UndefinedOperator(
                     unaryExpression, 
-                    $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}"));
+                    $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}");
 
                 return operand;
             }
@@ -75,9 +78,9 @@ namespace Minsk.CodeAnalysis.Binding
 
             if (op is null)
             {
-                errors.Add(new BinderError(
+                diagnostics.Binding.UndefinedOperator(
                     binaryExpression, 
-                    $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}"));
+                    $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}");
 
                 return left;
             }

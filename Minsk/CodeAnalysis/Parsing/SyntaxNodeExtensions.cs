@@ -1,6 +1,6 @@
 using System;
 
-using Minsk.CodeAnalysis.Diagnostic.Visualization;
+using Minsk.CodeAnalysis.Diagnostics.Visualization;
 
 namespace Minsk.CodeAnalysis.Parsing
 {
