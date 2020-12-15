@@ -5,7 +5,6 @@ namespace Minsk.Compiler.Parsing
         UnaryExpression,
         BinaryExpression,
         LiteralExpression,
-        ParenthesesExpression,
-        OperatorNode,
+        ParenthesesExpression
     }
 }

@@ -43,7 +43,7 @@ namespace Minsk.Compiler.Binding
         {
             var operand = BindExpression(unaryExpression.Operand);
 
-            var opToken = unaryExpression.OperatorNode.Token;
+            var opToken = unaryExpression.OperatorToken;
 
             var op = BoundUnaryOperator.Bind(
                 opToken.Kind,
@@ -66,7 +66,7 @@ namespace Minsk.Compiler.Binding
             var left = BindExpression(binaryExpression.Left);
             var right = BindExpression(binaryExpression.Right);
 
-            var opToken = binaryExpression.OperatorNode.Token;
+            var opToken = binaryExpression.OperatorToken;
 
             var op = BoundBinaryOperator.Bind(
                 opToken.Kind,

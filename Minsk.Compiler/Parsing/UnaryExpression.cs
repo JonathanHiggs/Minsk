@@ -1,37 +1,34 @@
 using System;
 using System.Collections.Generic;
 
+using Minsk.Compiler.Lexing;
+
 namespace Minsk.Compiler.Parsing
 {
     public sealed class UnaryExpression : Expression
     {
-        public UnaryExpression(OperatorNode operatorNode, Expression operand)
+        public UnaryExpression(LexToken operatorToken, Expression operand)
         {
-            OperatorNode = operatorNode
-                ?? throw new ArgumentNullException(nameof(operatorNode));
+            OperatorToken = operatorToken
+                ?? throw new ArgumentNullException(nameof(operatorToken));
 
             Operand = operand
                 ?? throw new ArgumentNullException(nameof(operand));
 
-            OperatorNode.Parent = this;
             Operand.Parent = this;
         }
 
 
-        public OperatorNode OperatorNode { get; }
+        public LexToken OperatorToken { get; }
         public Expression Operand { get; }
 
         public override SyntaxKind Kind => SyntaxKind.UnaryExpression;
 
-        public override string Text => OperatorNode.Text;
+        public override string Text => OperatorToken.Text;
 
         public override IEnumerable<SyntaxNode> Children 
         {
-            get
-            {
-                yield return OperatorNode;
-                yield return Operand;
-            }
+            get { yield return Operand; }
         }
     }
 }

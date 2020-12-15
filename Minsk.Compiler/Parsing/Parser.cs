@@ -48,9 +48,9 @@ namespace Minsk.Compiler.Parsing
 
             if (unaryPrecedence != 0 && unaryPrecedence >= parentPrecedence)
             {
-                var operatorNode = new OperatorNode(NextToken());
+                var operatorToken = NextToken();
                 var operand = ParseExpression(unaryPrecedence);
-                left = new UnaryExpression(operatorNode, operand);
+                left = new UnaryExpression(operatorToken, operand);
             }
             else
             {
@@ -63,10 +63,10 @@ namespace Minsk.Compiler.Parsing
                 if (binaryPrecendence == 0 || binaryPrecendence <= parentPrecedence)
                     break;
 
-                var operatorNode = new OperatorNode(NextToken());
+                var operatorToken = NextToken();
                 var right = ParseExpression(binaryPrecendence);
                 
-                left = new BinaryExpression(left, operatorNode, right);
+                left = new BinaryExpression(left, operatorToken, right);
             }
 
             return left;
