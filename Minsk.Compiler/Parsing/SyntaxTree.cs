@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Minsk.Compiler.Core;
+using Minsk.Compiler.Diagnostic;
 using Minsk.Compiler.Lexing;
 
 namespace Minsk.Compiler.Parsing

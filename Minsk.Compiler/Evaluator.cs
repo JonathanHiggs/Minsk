@@ -1,10 +1,8 @@
 using System;
 
 using Minsk.Compiler.Binding;
-using Minsk.Compiler.Lexing;
-using Minsk.Compiler.Parsing;
 
-namespace Minsk.Compiler.Core
+namespace Minsk.Compiler
 {
     internal sealed class Evaluator
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Minsk.Compiler.Diagnostic
+namespace Minsk.Compiler.Diagnostic.Visualization
 {
     public sealed class BinaryVisualNode : VisualNode
     {

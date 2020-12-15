@@ -1,6 +1,6 @@
 using System;
 
-using Minsk.Compiler.Diagnostic;
+using Minsk.Compiler.Diagnostic.Visualization;
 
 namespace Minsk.Compiler.Parsing
 {

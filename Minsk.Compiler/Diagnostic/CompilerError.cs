@@ -1,6 +1,6 @@
 using System;
 
-namespace Minsk.Compiler.Core
+namespace Minsk.Compiler.Diagnostic
 {
     public abstract class CompilerError
     { 

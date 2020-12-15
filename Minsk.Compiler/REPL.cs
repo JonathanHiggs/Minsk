@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
+
 using Minsk.Compiler.Binding;
-using Minsk.Compiler.Core;
 using Minsk.Compiler.Parsing;
 
 namespace Minsk.Compiler

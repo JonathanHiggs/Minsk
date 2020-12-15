@@ -1,6 +1,6 @@
 using System;
 
-using Minsk.Compiler.Core;
+using Minsk.Compiler.Diagnostic;
 
 namespace Minsk.Compiler.Lexing
 {

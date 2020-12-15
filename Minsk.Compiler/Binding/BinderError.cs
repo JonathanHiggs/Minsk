@@ -1,5 +1,5 @@
 using System;
-using Minsk.Compiler.Core;
+using Minsk.Compiler.Diagnostic;
 using Minsk.Compiler.Parsing;
 
 namespace Minsk.Compiler.Binding

@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-using Minsk.Compiler.Core;
-using Minsk.Compiler.Lexing;
+using Minsk.Compiler.Diagnostic;
 using Minsk.Compiler.Parsing;
 
 namespace Minsk.Compiler.Binding
