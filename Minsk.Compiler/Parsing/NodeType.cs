@@ -3,7 +3,7 @@ namespace Minsk.Compiler.Parsing
     public enum NodeType
     {
         BinaryExpression,
-        NumberExpression,
+        NumberLiteral,
         ParenthesesExpression,
         OperatorNode,
     }

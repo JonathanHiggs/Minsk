@@ -8,9 +8,10 @@ namespace Minsk.Compiler.Parsing
 {
     public sealed class NumberLiteral : Expression
     {
-        public NumberLiteral(SyntaxToken numberToken)
+        public NumberLiteral(SyntaxToken literalToken)
         {
-            NumberToken = numberToken ?? throw new ArgumentNullException(nameof(numberToken));
+            NumberToken = literalToken 
+                ?? throw new ArgumentNullException(nameof(literalToken));
         }
 
         public override NodeType NodeType => NodeType.NumberExpression;
@@ -19,7 +20,7 @@ namespace Minsk.Compiler.Parsing
 
         public override string Text => NumberToken.Text;
 
-        public override IEnumerable<SyntaxNode> Children => Enumerable.Empty<SyntaxNode>();
-
+        public override IEnumerable<SyntaxNode> Children 
+            => Enumerable.Empty<SyntaxNode>();
     }
 }

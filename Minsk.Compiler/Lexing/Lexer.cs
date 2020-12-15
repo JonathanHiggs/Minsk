@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Minsk.Compiler.Lexing
 {
-    public class Lexer
+    public sealed class Lexer
     {
         private readonly string text;
         private int position;

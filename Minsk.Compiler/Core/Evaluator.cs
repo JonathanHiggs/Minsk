@@ -4,7 +4,7 @@ using Minsk.Compiler.Parsing;
 
 namespace Minsk.Compiler.Core
 {
-    public class Evaluator
+    public sealed class Evaluator
     {
         private Expression root;
 

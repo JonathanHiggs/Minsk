@@ -8,17 +8,19 @@ namespace Minsk.Compiler.Parsing
 {
     public sealed class OperatorNode : SyntaxNode
     {
-        public OperatorNode(SyntaxToken token)
+        public OperatorNode(SyntaxToken operatorToken)
         {
-            Token = token ?? throw new ArgumentNullException(nameof(token));
+            Token = operatorToken 
+                ?? throw new ArgumentNullException(nameof(operatorToken));
         }
 
         public SyntaxToken Token { get; }
 
-        public override NodeType NodeType => NodeType.OperatorNode;
+        public override NodeType NodeType => NodeType.Operator;
 
         public override string Text => Token.Text;
 
-        public override IEnumerable<SyntaxNode> Children => Enumerable.Empty<SyntaxNode>();
+        public override IEnumerable<SyntaxNode> Children 
+            => Enumerable.Empty<SyntaxNode>();
     }
 }

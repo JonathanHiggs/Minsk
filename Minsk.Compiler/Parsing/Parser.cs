@@ -6,7 +6,7 @@ using Minsk.Compiler.Lexing;
 
 namespace Minsk.Compiler.Parsing
 {
-    public class Parser
+    public sealed class Parser
     {
         private int position = 0;
         private List<SyntaxToken> tokens;
@@ -37,7 +37,7 @@ namespace Minsk.Compiler.Parsing
         public SyntaxTree Parse()
         {
             var expression = ParseExpression();
-            var eof = Match(TokenType.EoF);
+            var eof = MatchToken(TokenType.EoF);
             return new SyntaxTree(expression, eof, errors);
         }
 
@@ -86,12 +86,12 @@ namespace Minsk.Compiler.Parsing
             {
                 var left = NextToken();
                 var expression = ParseExpression();
-                var right = Match(TokenType.CloseParenthesis);
+                var right = MatchToken(TokenType.CloseParenthesis);
 
                 return new ParenthesizedExpression(left, expression, right);
             }
 
-            var numberToken = Match(TokenType.Number);
+            var numberToken = MatchToken(TokenType.Number);
             return new NumberLiteral(numberToken);
         }
 
@@ -100,12 +100,12 @@ namespace Minsk.Compiler.Parsing
             var token = NextToken();
 
             if (!token.TokenType.IsOperator())
-                errors.Add(new SyntaxError(token, "Operator required"));
+                AddError(token, "Operator required");
 
             return new OperatorNode(token);
         }
 
-        private SyntaxToken Peek(int offset)
+        private SyntaxToken PeekToken(int offset)
         {
             var index = position + offset;   
 
@@ -118,7 +118,7 @@ namespace Minsk.Compiler.Parsing
             return tokens[index];
         }
 
-        private SyntaxToken Current => Peek(0);
+        private SyntaxToken Current => PeekToken(0);
 
         private SyntaxToken NextToken()
         {
@@ -127,13 +127,19 @@ namespace Minsk.Compiler.Parsing
             return current;
         }
 
-        private SyntaxToken Match(TokenType tokenType)
+        private SyntaxToken MatchToken(TokenType tokenType)
         {
             if (Current.TokenType == tokenType)
                 return NextToken();
 
-            errors.Add(new SyntaxError(Current, $"Unexpected token. Expected '{tokenType}' but was '{Current.TokenType}'"));
+            AddError(Current, $"Unexpected token. Expected '{tokenType}' but was '{Current.TokenType}'");
+            
             return new SyntaxToken(tokenType, Current.Position, null, null);
+        }
+
+        private void AddError(SyntaxToken token, string message)
+        {
+            errors.Add(new SyntaxError(token, message));
         }
     }
 }
