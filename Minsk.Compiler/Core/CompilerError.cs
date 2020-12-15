@@ -1,7 +1,14 @@
+using System;
+
 namespace Minsk.Compiler.Core
 {
     public abstract class CompilerError
     { 
-        public abstract string Message { get; }
+        protected CompilerError(string message)
+        {
+            Message = message ?? throw new ArgumentNullException(nameof(message));
+        }
+
+        public string Message { get; }
     }
 }

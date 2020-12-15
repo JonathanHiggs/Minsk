@@ -6,6 +6,7 @@ namespace Minsk.Compiler.Parsing
 {
     public abstract class SyntaxNode
     {
+        // ToDo: rename to Kind
         public abstract NodeType NodeType { get; }
 
         public abstract string Text { get; }

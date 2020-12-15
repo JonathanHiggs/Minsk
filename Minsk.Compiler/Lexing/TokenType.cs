@@ -1,5 +1,6 @@
 namespace Minsk.Compiler.Lexing
 {
+    // ToDo: rename to TokenKind
     public enum TokenType
     {
         // Special tokens

@@ -1,10 +1,11 @@
 namespace Minsk.Compiler.Parsing
 {
+    // ToDo: rename to NodeKind
     public enum NodeType
     {
         UnaryExpression,
         BinaryExpression,
-        NumberLiteral,
+        NumberLiteral,  // ToDo: rename LiteralExpression
         ParenthesesExpression,
         Operator,
     }

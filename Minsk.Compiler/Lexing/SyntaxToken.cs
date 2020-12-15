@@ -1,5 +1,6 @@
 namespace Minsk.Compiler.Lexing
 {
+    // ToDo: rename LexToken or TextToken
     public class SyntaxToken
     {
         public SyntaxToken(TokenType tokenType, int position, string text, object value = null)
@@ -10,6 +11,7 @@ namespace Minsk.Compiler.Lexing
             Value = value;
         }
 
+        // ToDo: Rename to Kind
         public TokenType TokenType { get; }
         public int Position { get;} 
         public string Text { get; }

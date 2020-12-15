@@ -1,19 +1,21 @@
 using System;
+
+using Minsk.Compiler.Binding;
 using Minsk.Compiler.Lexing;
 using Minsk.Compiler.Parsing;
 
 namespace Minsk.Compiler.Core
 {
-    public sealed class Evaluator
+    internal sealed class Evaluator
     {
-        private Expression root;
+        private BoundExpression root;
 
-        public Evaluator(Expression root)
+        public Evaluator(BoundExpression root)
         {
             this.root = root ?? throw new ArgumentNullException(nameof(root));
         }
 
-        public static bool Eval(Expression root, out int value)
+        public static bool Eval(BoundExpression root, out int value)
         {
             try
             {
@@ -40,50 +42,48 @@ namespace Minsk.Compiler.Core
             return EvaluateExpression(root);
         }
 
-        private int EvaluateExpression(Expression node)
+        private int EvaluateExpression(BoundExpression node)
         {
-            // ToDo: switch on node.NodeType to avoid multiple casts
+            // ToDo: switch on node.Kind to avoid multiple casts
             return node switch {
-                UnaryExpression unary           => EvaluateUnaryExpression(unary),
-                BinaryExpression binary         => EvaluateBinaryExpression(binary),
-                NumberLiteral number            => (int)number.NumberToken.Value,
-                ParenthesizedExpression parens  => EvaluateExpression(parens.Expression),
+                BoundUnaryExpression unary           => EvaluateUnaryExpression(unary),
+                BoundBinaryExpression binary         => EvaluateBinaryExpression(binary),
+                BoundLiteralExpression literal       => (int)literal.Value,
 
                 _ => throw new NotImplementedException(
-                    $"{node.NodeType.ToString()} not implemented in EvaluateExpression")
+                    $"{node.Kind} not implemented in EvaluateExpression")
             };
         }
 
-        private int EvaluateUnaryExpression(UnaryExpression node)
+        private int EvaluateUnaryExpression(BoundUnaryExpression node)
         {
             var value = EvaluateExpression(node.Operand);
-            var op = node.OperatorNode.Token.TokenType;
+            var op = node.OperatorKind;
 
             return op switch {
-                TokenType.Plus  => value,
-                TokenType.Minus => -value,
+                BoundUnaryOperatorKind.Identity => value,
+                BoundUnaryOperatorKind.Negation => -value,
 
                 _ => throw new NotImplementedException(
-                    $"{op} not implemented in EvaluateUnaryExpression")
+                    $"'{op}' not implemented in EvaluateUnaryExpression")
             };
         }
 
-
-        private int EvaluateBinaryExpression(BinaryExpression node)
+        private int EvaluateBinaryExpression(BoundBinaryExpression node)
         {
             var leftValue = EvaluateExpression(node.Left);
             var rightValue = EvaluateExpression(node.Right);
 
-            var op = node.OperatorNode.Token.TokenType;
+            var op = node.OperatorKind;
 
             return op switch {
-                TokenType.Plus          => leftValue + rightValue,
-                TokenType.Minus         => leftValue - rightValue,
-                TokenType.Star          => leftValue * rightValue,
-                TokenType.ForwardSlash  => leftValue / rightValue,
+                BoundBinaryOperatorKind.Addition        => leftValue + rightValue,
+                BoundBinaryOperatorKind.Subtraction     => leftValue - rightValue,
+                BoundBinaryOperatorKind.Multiplication  => leftValue * rightValue,
+                BoundBinaryOperatorKind.Division        => leftValue / rightValue,
 
                 _ => throw new NotImplementedException(
-                    $"{op} not implemented in EvaluateBinaryExpression")
+                    $"'{op}' not implemented in EvaluateBinaryExpression")
             };
         }
 

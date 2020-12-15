@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-
+using Minsk.Compiler.Binding;
 using Minsk.Compiler.Core;
 using Minsk.Compiler.Parsing;
 
@@ -82,21 +82,25 @@ namespace Minsk.Compiler
 
         public void Evaluate(string line)
         {
+            var binder = new Binder();
             var tree = SyntaxTree.Parse(line);
+            var boundExpression = binder.BindExpression(tree.Root);
 
-            if (tree.Errors.Any())
+            var errors = tree.Errors.Concat(binder.Errors).ToList();
+
+            if (errors.Any())
             {
                 Console.ForegroundColor = errorColor;
                 Console.WriteLine("\n--- Errors");
 
-                foreach (var error in tree.Errors)
+                foreach (var error in errors)
                     Console.WriteLine(error);
 
                 Console.ForegroundColor = foreground;
             }
             else
             {
-                if (Evaluator.Eval(tree.Root, out var result))
+                if (Evaluator.Eval(boundExpression, out var result))
                     Console.WriteLine(result);
                 Console.WriteLine();
             }
