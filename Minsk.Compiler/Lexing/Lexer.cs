@@ -76,19 +76,41 @@ namespace Minsk.Compiler.Lexing
                 return new SyntaxToken(kind, start, tokenText);
             }
 
-            // <operators> + - * ? ( )
-            if (Current == '+')
-                return new SyntaxToken(TokenType.Plus, position++, "+", null);
-            if (Current == '-')
-                return new SyntaxToken(TokenType.Minus, position++, "-", null);
-            if (Current == '*')
-                return new SyntaxToken(TokenType.Star, position++, "*", null);
-            if (Current == '/')
-                return new SyntaxToken(TokenType.ForwardSlash, position++, "/", null);
-            if (Current == '(')
-                return new SyntaxToken(TokenType.OpenParenthesis, position++, "(", null);
-            if (Current == ')')
-                return new SyntaxToken(TokenType.CloseParenthesis, position++, ")", null);
+            // <operators> + - * ? ( ) etc
+            switch (Current)
+            {
+                case '+':
+                    return new SyntaxToken(TokenType.Plus, position++, "+", null);
+                case '-':
+                    return new SyntaxToken(TokenType.Minus, position++, "-", null);
+                case '*':
+                    return new SyntaxToken(TokenType.Star, position++, "*", null);
+                case '/':
+                    return new SyntaxToken(TokenType.ForwardSlash, position++, "/", null);
+                case '(':
+                    return new SyntaxToken(TokenType.OpenParenthesis, position++, "(", null);
+                case ')':
+                    return new SyntaxToken(TokenType.CloseParenthesis, position++, ")", null);
+                case '!':
+                    return new SyntaxToken(TokenType.Bang, position++, "!", null);
+
+                case '&':
+                {
+                    if (Peek(1) == '&')
+                        return new SyntaxToken(TokenType.AmpersandAmperand, position += 2, "&&", null);
+                    //return new SyntaxToken(TokenType.Ampersand, position++, "&", null);
+                    break;
+                }
+
+                case '|':
+                {
+                    if (Peek(1) == '|')
+                        return new SyntaxToken(TokenType.PipePipe, position += 2, "||", null);
+                    //return new SyntaxToken(TokenType.Pipe, position++, "|", null);
+                    break;
+                }
+            }
+
 
             {
                 while (!char.IsWhiteSpace(Current) && Current != '\0')
@@ -105,7 +127,8 @@ namespace Minsk.Compiler.Lexing
 
         private char Current => (position >= text.Length) ? '\0' : text[position];
 
-        private char Peek => (position + 1 >= text.Length) ? '\0' : text[position + 1];
+        private char Peek(int offset) 
+            => (position + offset >= text.Length) ? '\0' : text[position + offset];
 
         private void Next()
         {

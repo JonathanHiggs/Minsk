@@ -15,6 +15,10 @@ namespace Minsk.Compiler.Lexing
         Minus,
         Star,
         ForwardSlash,
+        Bang,
+        AmpersandAmperand,
+        PipePipe,
+        
         OpenParenthesis,
         CloseParenthesis,
         OpenBrace,
@@ -30,6 +34,6 @@ namespace Minsk.Compiler.Lexing
         Number,
         String,
 
-        Identifier
+        Identifier,
     }
 }

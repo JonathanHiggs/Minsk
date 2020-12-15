@@ -81,30 +81,61 @@ namespace Minsk.Compiler.Binding
 
         private BoundUnaryOperatorKind? BindUnaryOperatorKind(TokenType tokenType, Type operandType)
         {
-            if (operandType != typeof(int))
-                return null;
+            if (operandType == typeof(int))
+            {
+                switch (tokenType)
+                {
+                    case TokenType.Plus:
+                        return BoundUnaryOperatorKind.Identity;
 
-            return tokenType switch {
-                TokenType.Plus => BoundUnaryOperatorKind.Identity,
-                TokenType.Minus => BoundUnaryOperatorKind.Negation,
+                    case TokenType.Minus:
+                        return BoundUnaryOperatorKind.Negation;
+                };
+            }
+            else if (operandType == typeof(bool))
+            {
+                switch(tokenType)
+                {
+                    case TokenType.Bang:
+                        return BoundUnaryOperatorKind.LogicalNegation;
+                }
+            }
 
-                _ => throw new Exception($"Unexpected unary operator '{tokenType}'")
-            };
+            return null;
         }
 
         private BoundBinaryOperatorKind? BindBinaryOperatorKind(TokenType tokenType, Type leftType, Type rightType)
         {
-            if (leftType != typeof(int) || rightType != typeof(int))
-                return null;
+            if (leftType == typeof(int) && rightType == typeof(int))
+            {
+                switch (tokenType)
+                {
+                    case TokenType.Plus:
+                        return BoundBinaryOperatorKind.Addition;
 
-            return tokenType switch {
-                TokenType.Plus          => BoundBinaryOperatorKind.Addition,
-                TokenType.Minus         => BoundBinaryOperatorKind.Subtraction,
-                TokenType.Star          => BoundBinaryOperatorKind.Multiplication,
-                TokenType.ForwardSlash  => BoundBinaryOperatorKind.Division,
+                    case TokenType.Minus:
+                        return BoundBinaryOperatorKind.Subtraction;
 
-                _ => throw new Exception($"Unexpected binary operator '{tokenType}'")
-            };
+                    case TokenType.Star:
+                        return BoundBinaryOperatorKind.Multiplication;
+
+                    case TokenType.ForwardSlash:
+                        return BoundBinaryOperatorKind.Division;
+                };
+            }
+            else if (leftType == typeof(bool) && rightType == typeof(bool))
+            { 
+                switch (tokenType)
+                {
+                    case TokenType.AmpersandAmperand:
+                        return BoundBinaryOperatorKind.LogicalAnd;
+
+                    case TokenType.PipePipe:
+                        return BoundBinaryOperatorKind.LogicalOr;
+                }
+            }
+
+            return null;
         }
     }
 }

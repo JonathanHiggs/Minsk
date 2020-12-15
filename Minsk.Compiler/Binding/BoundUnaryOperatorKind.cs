@@ -2,7 +2,11 @@ namespace Minsk.Compiler.Binding
 {
     internal enum BoundUnaryOperatorKind
     {
+        // Numerical 
         Identity,
-        Negation
+        Negation,
+
+        // Logical
+        LogicalNegation
     }
 }

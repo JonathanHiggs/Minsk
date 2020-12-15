@@ -57,12 +57,14 @@ namespace Minsk.Compiler.Core
 
         private object EvaluateUnaryExpression(BoundUnaryExpression node)
         {
-            var value = (int)EvaluateExpression(node.Operand);
+            var value = EvaluateExpression(node.Operand);
             var op = node.OperatorKind;
 
             return op switch {
-                BoundUnaryOperatorKind.Identity => value,
-                BoundUnaryOperatorKind.Negation => -value,
+                BoundUnaryOperatorKind.Identity => (int)value,
+                BoundUnaryOperatorKind.Negation => -(int)value,
+
+                BoundUnaryOperatorKind.LogicalNegation => !(bool)value,
 
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateUnaryExpression")
@@ -71,16 +73,19 @@ namespace Minsk.Compiler.Core
 
         private object EvaluateBinaryExpression(BoundBinaryExpression node)
         {
-            var leftValue  = (int)EvaluateExpression(node.Left);
-            var rightValue = (int)EvaluateExpression(node.Right);
+            var left  = EvaluateExpression(node.Left);
+            var right = EvaluateExpression(node.Right);
 
             var op = node.OperatorKind;
 
             return op switch {
-                BoundBinaryOperatorKind.Addition        => leftValue + rightValue,
-                BoundBinaryOperatorKind.Subtraction     => leftValue - rightValue,
-                BoundBinaryOperatorKind.Multiplication  => leftValue * rightValue,
-                BoundBinaryOperatorKind.Division        => leftValue / rightValue,
+                BoundBinaryOperatorKind.Addition        => (int)left + (int)right,
+                BoundBinaryOperatorKind.Subtraction     => (int)left - (int)right,
+                BoundBinaryOperatorKind.Multiplication  => (int)left * (int)right,
+                BoundBinaryOperatorKind.Division        => (int)left / (int)right,
+
+                BoundBinaryOperatorKind.LogicalAnd      => (bool)left && (bool)right,
+                BoundBinaryOperatorKind.LogicalOr       => (bool)left || (bool)right,
 
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateBinaryExpression")

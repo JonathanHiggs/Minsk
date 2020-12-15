@@ -11,7 +11,8 @@ namespace Minsk.Compiler.Parsing
             {
                 case TokenType.Plus:
                 case TokenType.Minus:
-                    return 3;   // Bind higher than the binary operators
+                case TokenType.Bang:
+                    return 5;   // Bind higher than the binary operators
 
                 default:
                     return 0;
@@ -24,10 +25,16 @@ namespace Minsk.Compiler.Parsing
             {
                 case TokenType.Star:
                 case TokenType.ForwardSlash:
-                    return 2;
+                    return 4;
 
                 case TokenType.Plus:
                 case TokenType.Minus:
+                    return 3;
+
+                case TokenType.AmpersandAmperand:
+                    return 2;
+
+                case TokenType.PipePipe:
                     return 1;
 
                 default:

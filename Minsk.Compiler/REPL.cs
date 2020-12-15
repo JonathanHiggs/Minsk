@@ -27,7 +27,7 @@ namespace Minsk.Compiler
                 var line = Console.ReadLine();
                 if (line.Length > 1 && line[0] == '#')
                     HandleCommand(line.Substring(1));
-                else
+                else if (line.Length > 0)
                     Evaluate(line);
             }
         }
