@@ -6,14 +6,14 @@ namespace Minsk.Compiler.Core
 {
     public class Evaluator
     {
-        private ExpressionSyntaxNode root;
+        private Expression root;
 
-        public Evaluator(ExpressionSyntaxNode root)
+        public Evaluator(Expression root)
         {
             this.root = root ?? throw new ArgumentNullException(nameof(root));
         }
 
-        public static bool Eval(ExpressionSyntaxNode root, out int value)
+        public static bool Eval(Expression root, out int value)
         {
             try
             {
@@ -40,18 +40,19 @@ namespace Minsk.Compiler.Core
             return EvaluateExpression(root);
         }
 
-        private int EvaluateExpression(ExpressionSyntaxNode node)
+        private int EvaluateExpression(Expression node)
         {
             return node switch {
-                BinaryExpressionNode binary => EvaluateBinaryExpression(binary),
-                NumberSyntaxNode number     => (int)number.NumberToken.Value,
+                BinaryExpression binary         => EvaluateBinaryExpression(binary),
+                NumberLiteral number            => (int)number.NumberToken.Value,
+                ParenthesizedExpression parens  => EvaluateExpression(parens.Expression),
 
                 _ => throw new NotImplementedException(
                     $"{node.NodeType.ToString()} not implemented in EvaluateExpression")
             };
         }
 
-        private int EvaluateBinaryExpression(BinaryExpressionNode node)
+        private int EvaluateBinaryExpression(BinaryExpression node)
         {
             var leftValue = EvaluateExpression(node.Left);
             var rightValue = EvaluateExpression(node.Right);
@@ -59,8 +60,10 @@ namespace Minsk.Compiler.Core
             var op = node.OperatorNode.Token.TokenType;
 
             return op switch {
-                TokenType.Plus  => leftValue + rightValue,
-                TokenType.Minus => leftValue - rightValue,
+                TokenType.Plus          => leftValue + rightValue,
+                TokenType.Minus         => leftValue - rightValue,
+                TokenType.Star          => leftValue * rightValue,
+                TokenType.ForwardSlash  => leftValue / rightValue,
 
                 _ => throw new NotImplementedException(
                     $"{op} not implemented in EvaluateBinaryExpression")

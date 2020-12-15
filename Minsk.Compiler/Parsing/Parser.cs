@@ -41,37 +41,68 @@ namespace Minsk.Compiler.Parsing
             return new SyntaxTree(expression, eof, errors);
         }
 
-        public ExpressionSyntaxNode ParseExpression()
+        private Expression ParseExpression()
         {
-            var primary = ParsePrimaryExpression();
+            return ParseTermExpression();
+        }
+
+        private Expression ParseTermExpression()
+        {
+            var primary = ParseFactorExpression();
 
             while (Current.TokenType == TokenType.Plus 
                 || Current.TokenType == TokenType.Minus)
             {
                 var left = primary;
                 var operatorNode = ParseOperatorNode();
-                var right = ParseExpression();
+                var right = ParseFactorExpression();
 
-                primary = new BinaryExpressionNode(left, operatorNode, right);
+                primary = new BinaryExpression(left, operatorNode, right);
             }
 
             return primary;
         }
 
-        public ExpressionSyntaxNode ParsePrimaryExpression()
+        private Expression ParseFactorExpression()
         {
-            var numberToken = Match(TokenType.Number);
-            return new NumberSyntaxNode(numberToken);
+            var primary = ParsePrimaryExpression();
+
+            while (Current.TokenType == TokenType.Star
+                || Current.TokenType == TokenType.ForwardSlash)
+            {
+                var left = primary;
+                var operatorNode = ParseOperatorNode();
+                var right = ParsePrimaryExpression();
+
+                primary = new BinaryExpression(left, operatorNode, right);
+            }
+
+            return primary;
         }
 
-        public OperatorSyntaxNode ParseOperatorNode()
+        private Expression ParsePrimaryExpression()
         {
-            return Current.TokenType switch
+            if (Current.TokenType == TokenType.OpenParenthesis)
             {
-                TokenType.Plus  => new OperatorSyntaxNode(NextToken()),
-                TokenType.Minus => new OperatorSyntaxNode(NextToken()),
-                _               => throw new InvalidOperationException()
-            };
+                var left = NextToken();
+                var expression = ParseExpression();
+                var right = Match(TokenType.CloseParenthesis);
+
+                return new ParenthesizedExpression(left, expression, right);
+            }
+
+            var numberToken = Match(TokenType.Number);
+            return new NumberLiteral(numberToken);
+        }
+
+        private OperatorNode ParseOperatorNode()
+        {
+            var token = NextToken();
+
+            if (!token.TokenType.IsOperator())
+                errors.Add(new SyntaxError(token, "Operator required"));
+
+            return new OperatorNode(token);
         }
 
         private SyntaxToken Peek(int offset)

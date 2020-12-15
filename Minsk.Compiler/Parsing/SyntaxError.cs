@@ -18,6 +18,6 @@ namespace Minsk.Compiler.Parsing
         
 
         public override string ToString()
-            => $"SyntaxError: {Token.Position}:{Token.Text}    {Message}";
+            => $"SyntaxError  {Token.Position}  \"{Token.Text}\"  {Message}";
     }
 }

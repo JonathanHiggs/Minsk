@@ -21,6 +21,6 @@ namespace Minsk.Compiler.Lexing
 
 
         public override string ToString()
-            => $"LexingError: {Position}:{Text}    {Message}";
+            => $"LexingError  {Position}  \"{Text}\"  {Message}";
     }
 }

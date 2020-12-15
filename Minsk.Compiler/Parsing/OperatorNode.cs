@@ -6,9 +6,9 @@ using Minsk.Compiler.Lexing;
 
 namespace Minsk.Compiler.Parsing
 {
-    public sealed class OperatorSyntaxNode : SyntaxNode
+    public sealed class OperatorNode : SyntaxNode
     {
-        public OperatorSyntaxNode(SyntaxToken token)
+        public OperatorNode(SyntaxToken token)
         {
             Token = token ?? throw new ArgumentNullException(nameof(token));
         }

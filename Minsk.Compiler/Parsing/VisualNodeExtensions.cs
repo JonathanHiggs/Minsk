@@ -23,20 +23,23 @@ namespace Minsk.Compiler.Parsing
         {
             return node switch
             {
-                BinaryExpressionNode binary 
+                BinaryExpression binary 
                     => new BinaryVisualNode(
                         binary.Text, 
                         binary.OperatorNode.NodeType.ToString(), 
                         binary.Left.ToVisualTree(settings), 
                         binary.Right.ToVisualTree(settings), settings),
 
-                NumberSyntaxNode numberNode
+                NumberLiteral numberNode
                     => new TerminalVisualNode(
                         numberNode.Text ?? "<empty>", 
                         numberNode.NumberToken.TokenType.ToString(),
                         settings),
 
-                OperatorSyntaxNode operatorNode
+                ParenthesizedExpression parensExpression
+                    => parensExpression.Expression.ToVisualTree(settings),
+
+                OperatorNode operatorNode
                     => throw new InvalidOperationException(),
 
                 _ => throw new InvalidOperationException()

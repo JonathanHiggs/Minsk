@@ -17,54 +17,8 @@ namespace Minsk.Compiler
 
         static void REPL()
         {
-            while (true)
-            {
-                Console.Write("> ");
-                var line = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                if (line.ToLower() == "clear")
-                {
-                    Console.Clear();
-                    continue;
-                }
-                
-                if (line.ToLower() == "exit")
-                    return;
-
-                var parser = new Parser(line);
-                var tree = parser.Parse();
-
-                if (tree.Errors.Any())
-                {
-                    Console.WriteLine("\n--- Errors");
-                    var foreground = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-
-                    foreach (var error in tree.Errors)
-                        Console.WriteLine(error);
-
-                    Console.ForegroundColor = foreground;
-                }
-
-                Console.WriteLine("\n--- Expression Tree");
-                tree.Root.PrettyPrint();
-
-                Console.WriteLine("\n--- Visual Tree");
-                var visualTree = tree.ToVisualTree();
-                visualTree.Print();
-
-                if (!tree.Errors.Any())
-                {
-                    Console.WriteLine("--- Value");
-                    if (Evaluator.Eval(tree.Root, out var result))
-                        Console.WriteLine(result);
-                }
-                    
-                Console.WriteLine();
-            }
+            var repl = new REPL();
+            repl.Run();
         }
 
         static void Test()
@@ -73,7 +27,7 @@ namespace Minsk.Compiler
             Console.WriteLine($"> {line}");
 
             var parser = new Parser(line);
-            var tree = parser.ParseExpression();
+            var tree = parser.Parse();
             
             tree.ToVisualTree().Print();
             Console.WriteLine("Done");

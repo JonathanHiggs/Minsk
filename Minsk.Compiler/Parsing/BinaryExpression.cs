@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Minsk.Compiler.Parsing
 {
-    public sealed class BinaryExpressionNode : ExpressionSyntaxNode
+    public sealed class BinaryExpression : Expression
     {
-        public BinaryExpressionNode(ExpressionSyntaxNode left, OperatorSyntaxNode operatorNode, ExpressionSyntaxNode right)
+        public BinaryExpression(Expression left, OperatorNode operatorNode, Expression right)
         {
             Left = left ?? throw new ArgumentNullException(nameof(left));
             OperatorNode = operatorNode ?? throw new ArgumentNullException(nameof(operatorNode));
@@ -17,9 +17,9 @@ namespace Minsk.Compiler.Parsing
         }
 
 
-        public OperatorSyntaxNode OperatorNode { get; }
-        public ExpressionSyntaxNode Left { get; }
-        public ExpressionSyntaxNode Right { get; }
+        public OperatorNode OperatorNode { get; }
+        public Expression Left { get; }
+        public Expression Right { get; }
 
         public override NodeType NodeType => NodeType.BinaryExpression;
 
