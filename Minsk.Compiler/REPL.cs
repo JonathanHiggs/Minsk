@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Minsk.CodeAnalysis;
@@ -10,11 +11,18 @@ namespace Minsk.Compiler
     public class REPL
     {
         private bool shouldExit = false;
-        private bool showTree = true;
-        private bool showVisualTree = true;
+
+        private bool showTree = false;
+        private bool showVisualTree = false;
+        private bool showHeaders = false;
+        private bool showErrorCarrot = false;
+
         private string prompt = ">";
 
         private ConsoleColor errorColor = ConsoleColor.DarkRed;
+
+        private Dictionary<string, object> variables
+            = new Dictionary<string, object>();
 
         public void Run()
         {
@@ -83,14 +91,17 @@ namespace Minsk.Compiler
         {
             var tree = SyntaxTree.Parse(line);
             var compilation = new Compilation(tree);
-            var result = compilation.Evaluate();
+            var result = compilation.Evaluate(variables);
 
             if (result.Diagnostics.Any())
             {
-                Console.WriteLine("\n--- Errors");
+                if (showHeaders)
+                    Console.WriteLine("\n--- Errors");
 
+                Console.WriteLine();
                 foreach (var diagnostic in result.Diagnostics)
                     WriteDiagnostic(diagnostic, line);
+                Console.WriteLine();
             }
             else
             {
@@ -100,13 +111,15 @@ namespace Minsk.Compiler
 
             if (showTree)
             {
-                Console.WriteLine("--- Expression Tree");
+                if (showHeaders)
+                    Console.WriteLine("--- Expression Tree");
                 tree.Root.PrettyPrint();
             }
 
             if (showVisualTree)
             {
-                Console.WriteLine("\n--- Visual Tree");
+                if (showHeaders)
+                    Console.WriteLine("\n--- Visual Tree");
                 var visualTree = tree.ToVisualTree();
                 visualTree.Print();
             }
@@ -122,6 +135,7 @@ namespace Minsk.Compiler
             var error = line.Substring(diagnostic.Source.Start, diagnostic.Source.Length);
             var suffix = line.Substring(diagnostic.Source.End);
 
+            Console.Write("    ");
             Console.Write(prefix);
 
             Console.ForegroundColor = errorColor;
@@ -130,13 +144,15 @@ namespace Minsk.Compiler
             Console.ResetColor();
             Console.WriteLine(suffix);
 
-            Console.Write(new string(' ', prefix.Length));
+            if (showErrorCarrot)
+            {
+                Console.Write(new string(' ', prefix.Length + 4));
 
-            Console.ForegroundColor = errorColor;
-            Console.WriteLine(new string('^', error.Length));
+                Console.ForegroundColor = errorColor;
+                Console.WriteLine(new string('^', error.Length));
+            }
 
             Console.ResetColor();
-            Console.WriteLine();
         }
     }
 }

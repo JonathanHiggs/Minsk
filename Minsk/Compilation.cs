@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using Minsk.CodeAnalysis.Binding;
@@ -14,16 +15,16 @@ namespace Minsk.CodeAnalysis
 
         public SyntaxTree Syntax { get; }
 
-        public EvaluationResult Evaluate()
+        public EvaluationResult Evaluate(Dictionary<string, object> variables)
         {
             var diagnostics = Syntax.Diagnostics;
-            var binder = new Binder(diagnostics);
+            var binder = new Binder(diagnostics, variables);
             var boundExpression = binder.BindExpression(Syntax.Root);
 
             if (diagnostics.Any())
                 return new EvaluationResult(diagnostics, null);
 
-            var evaluator = new Evaluator(boundExpression);
+            var evaluator = new Evaluator(boundExpression, variables);
             var value = evaluator.Evaluate();
 
             return new EvaluationResult(diagnostics, value);

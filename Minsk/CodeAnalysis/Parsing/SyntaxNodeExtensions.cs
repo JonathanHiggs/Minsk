@@ -27,10 +27,10 @@ namespace Minsk.CodeAnalysis.Parsing
                 {
                     var assignment = node as AssignmentExpression;
                     return new BinaryVisualNode(
-                        assignment.Text,
+                        assignment.EqualsToken.Text,
                         assignment.Kind.ToString(),
                         new TerminalVisualNode(
-                            assignment.IdentifierToken.Value?.ToString() ?? "<unknown>",
+                            assignment.IdentifierToken.Text.ToString(),
                             assignment.IdentifierToken.Kind.ToString(),
                             settings),
                         assignment.Expression.ToVisualTree(settings),

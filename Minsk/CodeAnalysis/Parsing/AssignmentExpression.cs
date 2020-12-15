@@ -20,7 +20,7 @@ namespace Minsk.CodeAnalysis.Parsing
         public override SyntaxKind Kind 
             => SyntaxKind.AssignmentExpression;
 
-        public override string Text => EqualsToken.Text;
+        public override string Text => $"{IdentifierToken.Text} {EqualsToken.Text}";
         
         public override string LongText => Text;
 

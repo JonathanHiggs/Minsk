@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Minsk.CodeAnalysis.Binding;
 
@@ -6,66 +7,70 @@ namespace Minsk.CodeAnalysis
 {
     internal sealed class Evaluator
     {
-        private BoundExpression root;
+        private readonly BoundExpression root;
+        private readonly Dictionary<string, object> variables;
 
-        public Evaluator(BoundExpression root)
+        public Evaluator(BoundExpression root, Dictionary<string, object> variables)
         {
             this.root = root ?? throw new ArgumentNullException(nameof(root));
+
+            this.variables = variables
+                ?? throw new ArgumentNullException(nameof(variables));
         }
 
-        public static bool Eval(BoundExpression root, out object value)
-        {
-            try
-            {
-                var evaluator = new Evaluator(root);
-                value = evaluator.Evaluate();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                var foreground = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.DarkRed;
+        // public static bool Eval(BoundExpression root, out object value)
+        // {
+        //     try
+        //     {
+        //         var evaluator = new Evaluator(root);
+        //         value = evaluator.Evaluate();
+        //         return true;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         var foreground = Console.ForegroundColor;
+        //         Console.ForegroundColor = ConsoleColor.DarkRed;
 
-                Console.WriteLine(ex.Message);
+        //         Console.WriteLine(ex.Message);
 
-                Console.ForegroundColor = foreground;
-            }
+        //         Console.ForegroundColor = foreground;
+        //     }
 
-            value = 0;
-            return false;
-        }
+        //     value = 0;
+        //     return false;
+        // }
 
         public object Evaluate()
-        {
-            return EvaluateExpression(root);
-        }
+            => EvaluateExpression(root);
 
         private object EvaluateExpression(BoundExpression node)
         {
             return node.Kind switch {
-                BoundNodeKind.UnaryExpression       => EvaluateUnaryExpression(node as BoundUnaryExpression),
-                BoundNodeKind.BinaryExpression      => EvaluateBinaryExpression(node as BoundBinaryExpression),
-                BoundNodeKind.LiteralExpression     => (node as BoundLiteralExpression).Value,
+                BoundNodeKind.AssignmentExpression
+                    => EvaluateAssignmentExpression(node as BoundAssignmentExpression),
 
-                _ => throw new NotImplementedException(
-                    $"{node.Kind} not implemented in EvaluateExpression")
+                BoundNodeKind.BinaryExpression
+                    => EvaluateBinaryExpression(node as BoundBinaryExpression),
+
+                BoundNodeKind.LiteralExpression
+                    => EvaluateLiteralExpression(node as BoundLiteralExpression),
+
+                BoundNodeKind.VariableExpression
+                    => EvaluateNameExpression(node as BoundVariableExpression),
+
+                BoundNodeKind.UnaryExpression
+                    => EvaluateUnaryExpression(node as BoundUnaryExpression),
+
+                _   => throw new NotImplementedException(
+                        $"{node.Kind} not implemented in EvaluateExpression")
             };
         }
 
-        private object EvaluateUnaryExpression(BoundUnaryExpression node)
+        private object EvaluateAssignmentExpression(BoundAssignmentExpression node)
         {
-            var value = EvaluateExpression(node.Operand);
-            var op = node.Op.Kind;
-
-            return op switch {
-                BoundUnaryOperatorKind.Identity => (int)value,
-                BoundUnaryOperatorKind.Negation => -(int)value,
-
-                BoundUnaryOperatorKind.LogicalNegation => !(bool)value,
-
-                _ => throw new NotImplementedException(
-                    $"'{op}' not implemented in EvaluateUnaryExpression")
-            };
+            var value = EvaluateExpression(node.Expression);
+            variables[node.Name] = value;
+            return value;
         }
 
         private object EvaluateBinaryExpression(BoundBinaryExpression node)
@@ -89,6 +94,28 @@ namespace Minsk.CodeAnalysis
 
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateBinaryExpression")
+            };
+        }
+
+        private object EvaluateLiteralExpression(BoundLiteralExpression node)
+            => node.Value;
+
+        private object EvaluateNameExpression(BoundVariableExpression node)
+            => variables[node.Name];
+
+        private object EvaluateUnaryExpression(BoundUnaryExpression node)
+        {
+            var value = EvaluateExpression(node.Operand);
+            var op = node.Op.Kind;
+
+            return op switch {
+                BoundUnaryOperatorKind.Identity => (int)value,
+                BoundUnaryOperatorKind.Negation => -(int)value,
+
+                BoundUnaryOperatorKind.LogicalNegation => !(bool)value,
+
+                _ => throw new NotImplementedException(
+                    $"'{op}' not implemented in EvaluateUnaryExpression")
             };
         }
 

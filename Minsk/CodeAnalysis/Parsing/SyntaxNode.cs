@@ -26,7 +26,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
             Console.Write(indent);
             Console.Write(marker);
-            Console.WriteLine($"{Kind} : {Text}");
+            Console.WriteLine($"{Kind}  {Text}");
 
             indent += isLast ? "   " : "│  ";
 
