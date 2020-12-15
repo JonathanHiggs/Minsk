@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 
 using Minsk.CodeAnalysis;
+using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.Compiler
@@ -13,8 +14,6 @@ namespace Minsk.Compiler
         private bool showVisualTree = true;
         private string prompt = ">";
 
-        private ConsoleColor foreground = ConsoleColor.White;
-        //private ConsoleColor backround = ConsoleColor.Black;
         private ConsoleColor errorColor = ConsoleColor.DarkRed;
 
         public void Run()
@@ -88,13 +87,10 @@ namespace Minsk.Compiler
 
             if (result.Diagnostics.Any())
             {
-                Console.ForegroundColor = errorColor;
                 Console.WriteLine("\n--- Errors");
 
-                foreach (var error in result.Diagnostics)
-                    Console.WriteLine(error);
-
-                Console.ForegroundColor = foreground;
+                foreach (var diagnostic in result.Diagnostics)
+                    WriteDiagnostic(diagnostic, line);
             }
             else
             {
@@ -114,6 +110,33 @@ namespace Minsk.Compiler
                 var visualTree = tree.ToVisualTree();
                 visualTree.Print();
             }
+        }
+
+        public void WriteDiagnostic(Diagnostic diagnostic, string line)
+        {
+            Console.ForegroundColor = errorColor;
+            Console.WriteLine(diagnostic);
+            Console.ResetColor();
+
+            var prefix = line.Substring(0, diagnostic.Source.Start);
+            var error = line.Substring(diagnostic.Source.Start, diagnostic.Source.Length);
+            var suffix = line.Substring(diagnostic.Source.End);
+
+            Console.Write(prefix);
+
+            Console.ForegroundColor = errorColor;
+            Console.Write(error);
+
+            Console.ResetColor();
+            Console.WriteLine(suffix);
+
+            Console.Write(new string(' ', prefix.Length));
+
+            Console.ForegroundColor = errorColor;
+            Console.WriteLine(new string('^', error.Length));
+
+            Console.ResetColor();
+            Console.WriteLine();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Minsk.CodeAnalysis.Parsing
     public class SyntaxError : Diagnostic
     {
         public SyntaxError(LexToken token, string message)
-            : base(token.Position, token.Text?.Length ?? 0, message)
+            : base(token.Span, message)
         {
             Token = token
                 ?? throw new ArgumentNullException(nameof(token));

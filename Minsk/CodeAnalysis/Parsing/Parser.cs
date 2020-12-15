@@ -126,7 +126,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
             diagnostics.Syntax.UnexpectedToken(Current, $"Expected '{tokenType}' but was '{Current.Kind}'");
             
-            return new LexToken(tokenType, Current.Position, null, null);
+            return new LexToken(tokenType, Current.Span, null, null);
         }
     }
 }

@@ -56,6 +56,7 @@ namespace Minsk.CodeAnalysis.Binding
             {
                 diagnostics.Binding.UndefinedOperator(
                     unaryExpression, 
+                    opToken.Span,
                     $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}");
 
                 return operand;
@@ -80,6 +81,7 @@ namespace Minsk.CodeAnalysis.Binding
             {
                 diagnostics.Binding.UndefinedOperator(
                     binaryExpression, 
+                    opToken.Span,
                     $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}");
 
                 return left;

@@ -1,5 +1,6 @@
 using System;
 
+using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
@@ -35,7 +36,7 @@ namespace Minsk.CodeAnalysis.Lexing
             if (position == text.Length)
             {
                 Next();
-                return new LexToken(TokenKind.EoF, start, string.Empty);
+                return new LexToken(TokenKind.EoF, start, 1, string.Empty);
             }
 
             // <numbers> [0-9]+
@@ -48,9 +49,10 @@ namespace Minsk.CodeAnalysis.Lexing
                 var tokenText = text.Substring(start, length);
                 
                 if (!int.TryParse(tokenText, out var value))
-                    diagnostics.Lex.InvalidNumber(start, length, tokenText, $"Unable to parse '{tokenText}' to Int32");
+                    diagnostics.Lex.InvalidNumber(
+                        start, length, tokenText, $"Unable to parse '{tokenText}' to Int32");
 
-                return new LexToken(TokenKind.Number, start, tokenText, value);
+                return new LexToken(TokenKind.Number, start, length, tokenText, value);
             }
 
             // <whitespace>
@@ -61,7 +63,7 @@ namespace Minsk.CodeAnalysis.Lexing
 
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
-                return new LexToken(TokenKind.Whitespace, start, tokenText);
+                return new LexToken(TokenKind.Whitespace, start, length, tokenText);
             }
 
             // true, false, keywords, identifiers
@@ -73,64 +75,66 @@ namespace Minsk.CodeAnalysis.Lexing
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
                 var kind = SyntaxFacts.KeywordKind(tokenText);
-                return new LexToken(kind, start, tokenText);
+                return new LexToken(kind, start, length, tokenText);
             }
 
             // <operators> + - * ? ( ) etc
             switch (Current)
             {
                 case '+':
-                    return new LexToken(TokenKind.Plus, position++, "+");
+                    return new LexToken(TokenKind.Plus, Consume(1), "+");
                 case '-':
-                    return new LexToken(TokenKind.Minus, position++, "-");
+                    return new LexToken(TokenKind.Minus, Consume(1), "-");
                 case '*':
-                    return new LexToken(TokenKind.Star, position++, "*");
+                    return new LexToken(TokenKind.Star, Consume(1), "*");
                 case '/':
-                    return new LexToken(TokenKind.ForwardSlash, position++, "/");
+                    return new LexToken(TokenKind.ForwardSlash, Consume(1), "/");
                 case '(':
-                    return new LexToken(TokenKind.OpenParenthesis, position++, "(");
+                    return new LexToken(TokenKind.OpenParenthesis, Consume(1), "(");
                 case ')':
-                    return new LexToken(TokenKind.CloseParenthesis, position++, ")");
+                    return new LexToken(TokenKind.CloseParenthesis, Consume(1), ")");
 
                 case '&':
                 {
                     if (Peek(1) == '&')
-                        return new LexToken(TokenKind.AmpersandAmperand, position += 2, "&&");
-                    //return new SyntaxToken(TokenType.Ampersand, position++, "&");
+                        return new LexToken(TokenKind.AmpersandAmperand, Consume(2), "&&");
+                    //return new SyntaxToken(TokenType.Ampersand, Consume(1), "&");
                 } break;
 
                 case '!':
                 {
                     if (Peek(1) == '=')
-                        return new LexToken(TokenKind.BangEquals, position += 2, "!=");
-                    return new LexToken(TokenKind.Bang, position++, "!");
+                        return new LexToken(TokenKind.BangEquals, Consume(2), "!=");
+                    return new LexToken(TokenKind.Bang, Consume(1), "!");
                 }
 
                 case '=':
                 {
                     if (Peek(1) == '=')
-                        return new LexToken(TokenKind.EqualsEquals, position += 2, "==");
+                        return new LexToken(TokenKind.EqualsEquals, Consume(2), "==");
                 } break;
 
                 case '|':
                 {
                     if (Peek(1) == '|')
-                        return new LexToken(TokenKind.PipePipe, position += 2, "||");
-                    //return new SyntaxToken(TokenType.Pipe, position++, "|");
+                        return new LexToken(TokenKind.PipePipe, Consume(2), "||");
+                    //return new SyntaxToken(TokenType.Pipe, Consume(1), "|");
                 } break;
             }
 
 
             {
+                // Note: Might want to spit out single characters rather than clobber everything
                 while (!char.IsWhiteSpace(Current) && Current != '\0')
                     Next();
 
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
 
-                diagnostics.Lex.UnexpectedCharacters(start, length, tokenText, $"Unexpected characters '{tokenText}'");
+                diagnostics.Lex.InvalidCharacters(
+                    start, length, tokenText, $"Unexpected characters '{tokenText}'");
 
-                return new LexToken(TokenKind.Unknown, start, tokenText);
+                return new LexToken(TokenKind.Unknown, start, length, tokenText);
             }
         }
 
@@ -143,5 +147,12 @@ namespace Minsk.CodeAnalysis.Lexing
         {
             position++;
         }
+
+        private TextSpan Consume(int length)
+        {
+            var start = position;
+            position += length;
+            return new TextSpan(start, length);
+        }    
     }
 }

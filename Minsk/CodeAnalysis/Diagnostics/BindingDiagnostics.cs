@@ -1,6 +1,7 @@
 using System;
 
 using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis.Diagnostics
@@ -12,7 +13,7 @@ namespace Minsk.CodeAnalysis.Diagnostics
         internal BindingDiagnostics(DiagnosticBag bag)
             => this.bag = bag ?? throw new ArgumentNullException(nameof(bag));
 
-        public void UndefinedOperator(SyntaxNode node, string message)
-            => bag.Report(new BindError(node, message));
+        public void UndefinedOperator(SyntaxNode node, TextSpan span, string message)
+            => bag.Report(new BindError(node, span, message));
     }
 }

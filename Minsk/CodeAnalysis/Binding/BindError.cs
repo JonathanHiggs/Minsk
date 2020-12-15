@@ -1,5 +1,6 @@
 using System;
 
+using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
@@ -7,11 +8,8 @@ namespace Minsk.CodeAnalysis.Binding
 {
     public sealed class BindError : Diagnostic
     {
-        public BindError(SyntaxNode node, string message)
-            : base(
-                node.FirstToken.Position,
-                node.LastToken.Position + (node.LastToken.Text?.Length ?? 0) - node.FirstToken.Position,
-                message)
+        public BindError(SyntaxNode node, TextSpan span, string message)
+            : base(span, message)
         {
             Node = node ?? throw new ArgumentNullException(nameof(node));
         }

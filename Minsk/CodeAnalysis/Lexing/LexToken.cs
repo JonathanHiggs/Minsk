@@ -1,17 +1,23 @@
+using Minsk.CodeAnalysis.Common;
+
 namespace Minsk.CodeAnalysis.Lexing
 {
     public class LexToken
     {
-        public LexToken(TokenKind tokenType, int position, string text, object value = null)
+        public LexToken(TokenKind tokenKind, int position, int length, string text, object value = null)
+            : this(tokenKind, new TextSpan(position, length), text, value)
+        { }
+
+        public LexToken(TokenKind tokenKind, TextSpan span, string text, object value = null)
         {
-            Kind = tokenType;
-            Position = position;
+            Kind = tokenKind;
+            Span = span;
             Text = text;
             Value = value;
         }
 
         public TokenKind Kind { get; }
-        public int Position { get;}
+        public TextSpan Span { get; }
         public string Text { get; }
         public object Value { get; }
 

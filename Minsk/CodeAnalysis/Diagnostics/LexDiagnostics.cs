@@ -14,7 +14,7 @@ namespace Minsk.CodeAnalysis.Diagnostics
         public void InvalidNumber(int start, int length, string text, string message)
             => bag.Report(new LexError(start, length, text, message));
 
-        public void UnexpectedCharacters(int start, int length, string text, string message)
+        public void InvalidCharacters(int start, int length, string text, string message)
             => bag.Report(new LexError(start, length, text, message));
     }
 }
