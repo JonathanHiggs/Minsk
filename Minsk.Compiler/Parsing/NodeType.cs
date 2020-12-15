@@ -5,6 +5,6 @@ namespace Minsk.Compiler.Parsing
         BinaryExpression,
         NumberLiteral,
         ParenthesesExpression,
-        OperatorNode,
+        Operator,
     }
 }

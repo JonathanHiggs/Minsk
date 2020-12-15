@@ -41,43 +41,23 @@ namespace Minsk.Compiler.Parsing
             return new SyntaxTree(expression, eof, errors);
         }
 
-        private Expression ParseExpression()
+        private Expression ParseExpression(int parentPrecedence = 0)
         {
-            return ParseTermExpression();
-        }
+            var left = ParsePrimaryExpression();
 
-        private Expression ParseTermExpression()
-        {
-            var primary = ParseFactorExpression();
-
-            while (Current.TokenType == TokenType.Plus 
-                || Current.TokenType == TokenType.Minus)
+            while (true)
             {
-                var left = primary;
-                var operatorNode = ParseOperatorNode();
-                var right = ParseFactorExpression();
+                var precedence = Current.TokenType.BinaryOperatorPrecedence();
+                if (precedence == 0 || precedence <= parentPrecedence)
+                    break;
 
-                primary = new BinaryExpression(left, operatorNode, right);
+                var operatorNode = new OperatorNode(NextToken());
+                var right = ParseExpression(precedence);
+                
+                left = new BinaryExpression(left, operatorNode, right);
             }
 
-            return primary;
-        }
-
-        private Expression ParseFactorExpression()
-        {
-            var primary = ParsePrimaryExpression();
-
-            while (Current.TokenType == TokenType.Star
-                || Current.TokenType == TokenType.ForwardSlash)
-            {
-                var left = primary;
-                var operatorNode = ParseOperatorNode();
-                var right = ParsePrimaryExpression();
-
-                primary = new BinaryExpression(left, operatorNode, right);
-            }
-
-            return primary;
+            return left;
         }
 
         private Expression ParsePrimaryExpression()
@@ -93,16 +73,6 @@ namespace Minsk.Compiler.Parsing
 
             var numberToken = MatchToken(TokenType.Number);
             return new NumberLiteral(numberToken);
-        }
-
-        private OperatorNode ParseOperatorNode()
-        {
-            var token = NextToken();
-
-            if (!token.TokenType.IsOperator())
-                AddError(token, "Operator required");
-
-            return new OperatorNode(token);
         }
 
         private SyntaxToken PeekToken(int offset)

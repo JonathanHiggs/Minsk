@@ -14,7 +14,7 @@ namespace Minsk.Compiler.Parsing
                 ?? throw new ArgumentNullException(nameof(literalToken));
         }
 
-        public override NodeType NodeType => NodeType.NumberExpression;
+        public override NodeType NodeType => NodeType.NumberLiteral;
 
         public SyntaxToken NumberToken { get; }
 

@@ -2,16 +2,27 @@ namespace Minsk.Compiler.Lexing
 {
     public enum TokenType
     {
+        // Special tokens
         Unknown,
-        Number,
-        String,
+        Error,
+        Whitespace,
+        EoL,
+        EoF,
+       
+        // Operators
         Plus,
         Minus,
         Star,
         ForwardSlash,
         OpenParenthesis,
         CloseParenthesis,
-        Whitespace,
-        EoF
+        OpenBrace,
+        CloseBrace,
+        OpenBracket,
+        CloseBracket,
+        
+        // Literals
+        Number,
+        String,
     }
 }
