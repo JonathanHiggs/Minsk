@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Minsk.Compiler.Lexing;
+
 namespace Minsk.Compiler.Parsing
 {
     public abstract class SyntaxNode
@@ -9,10 +11,14 @@ namespace Minsk.Compiler.Parsing
         public abstract SyntaxKind Kind { get; }
 
         public abstract string Text { get; }
+        public abstract string LongText { get; }
 
         public SyntaxNode Parent { set; get; }
 
         public abstract IEnumerable<SyntaxNode> Children { get; }
+
+        public abstract LexToken FirstToken { get; }
+        public abstract LexToken LastToken { get; }
 
         public void PrettyPrint(string indent = "", bool isLast = true)
         {

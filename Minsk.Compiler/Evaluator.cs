@@ -42,11 +42,10 @@ namespace Minsk.Compiler
 
         private object EvaluateExpression(BoundExpression node)
         {
-            // ToDo: switch on node.Kind to avoid multiple casts
-            return node switch {
-                BoundUnaryExpression unary           => EvaluateUnaryExpression(unary),
-                BoundBinaryExpression binary         => EvaluateBinaryExpression(binary),
-                BoundLiteralExpression literal       => literal.Value,
+            return node.Kind switch {
+                BoundNodeKind.UnaryExpression       => EvaluateUnaryExpression(node as BoundUnaryExpression),
+                BoundNodeKind.BinaryExpression      => EvaluateBinaryExpression(node as BoundBinaryExpression),
+                BoundNodeKind.LiteralExpression     => (node as BoundLiteralExpression).Value,
 
                 _ => throw new NotImplementedException(
                     $"{node.Kind} not implemented in EvaluateExpression")

@@ -1,4 +1,5 @@
 using System;
+
 using Minsk.Compiler.Diagnostic;
 using Minsk.Compiler.Parsing;
 
@@ -14,8 +15,9 @@ namespace Minsk.Compiler.Binding
 
         public SyntaxNode Node { get; }
         
-        // ToDo: Link to token
         public override string ToString()
-            => $"BindingError  \"{Node.Text}\"  {Message}";
+            => $"BindingError  "
+             + $"{Node.FirstToken.Position}-{Node.LastToken.Position + Node.LastToken.Text.Length}  "
+             + $"\"{Node.LongText}\"  {Message}";
     }
 }

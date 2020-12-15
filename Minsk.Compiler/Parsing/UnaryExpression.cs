@@ -26,9 +26,14 @@ namespace Minsk.Compiler.Parsing
 
         public override string Text => OperatorToken.Text;
 
+        public override string LongText => $"{OperatorToken.Text}{Operand.LongText}";
+
         public override IEnumerable<SyntaxNode> Children 
         {
             get { yield return Operand; }
         }
+
+        public override LexToken FirstToken => OperatorToken;
+        public override LexToken LastToken => Operand.LastToken;
     }
 }

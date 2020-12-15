@@ -28,7 +28,12 @@ namespace Minsk.Compiler.Parsing
 
         public override string Text => Token.Text;
 
+        public override string LongText => Token.Text;
+
         public override IEnumerable<SyntaxNode> Children 
             => Enumerable.Empty<SyntaxNode>();
+
+        public override LexToken FirstToken => Token;
+        public override LexToken LastToken => Token;
     }
 }

@@ -12,6 +12,7 @@ namespace Minsk.Compiler.Lexing
 
         public TokenKind Kind { get; }
         public int Position { get;} 
+        // ToDo: add a lenght property?
         public string Text { get; }
         public object Value { get; }
 

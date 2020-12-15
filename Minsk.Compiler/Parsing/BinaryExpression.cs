@@ -31,6 +31,8 @@ namespace Minsk.Compiler.Parsing
 
         public override string Text => OperatorToken.Text;
 
+        public override string LongText => $"{Left.LongText} {OperatorToken.Text} {Right.LongText}";
+
         public override IEnumerable<SyntaxNode> Children 
         {
             get
@@ -39,5 +41,8 @@ namespace Minsk.Compiler.Parsing
                 yield return Right;
             }
         }
+
+        public override LexToken FirstToken => Left.FirstToken;
+        public override LexToken LastToken => Right.LastToken;
     }
 }

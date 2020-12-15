@@ -21,35 +21,47 @@ namespace Minsk.Compiler.Parsing
 
         public static VisualNode ToVisualTree(this SyntaxNode node, VisualTreeSettings settings)
         {
-            // ToDo: switch on node.NodeType
-            return node switch
+            switch (node.Kind)
             {
-                UnaryExpression unary
-                    => new UnaryVisualNode(
+                case SyntaxKind.UnaryExpression:
+                {
+                    var unary = node as UnaryExpression;
+                    return new UnaryVisualNode(
                         unary.Text,
                         unary.OperatorToken.Kind.ToString(),
                         unary.Operand.ToVisualTree(settings),
-                        settings),
+                        settings);
+                }
 
-                BinaryExpression binary 
-                    => new BinaryVisualNode(
+                case SyntaxKind.BinaryExpression:
+                {
+                    var binary = node as BinaryExpression;
+                    return new BinaryVisualNode(
                         binary.Text, 
                         binary.OperatorToken.Kind.ToString(), 
                         binary.Left.ToVisualTree(settings), 
                         binary.Right.ToVisualTree(settings), 
-                        settings),
+                        settings);
+                }
 
-                LiteralExpression numberNode
-                    => new TerminalVisualNode(
-                        numberNode.Text ?? "<empty>", 
-                        numberNode.Token.Kind.ToString(),
-                        settings),
+                case SyntaxKind.LiteralExpression:
+                {
+                    var literal = node as LiteralExpression;
+                    return new TerminalVisualNode(
+                        literal.Text ?? "<empty>", 
+                        literal.Token.Kind.ToString(),
+                        settings);
+                }
 
-                ParenthesizedExpression parensExpression
-                    => parensExpression.Expression.ToVisualTree(settings),
+                case SyntaxKind.ParenthesesExpression:
+                {
+                    var parens = node as ParenthesizedExpression;
+                    return parens.Expression.ToVisualTree(settings);
+                }
 
-                _ => throw new InvalidOperationException()
-            };
+                default:
+                    throw new InvalidOperationException();
+            }
         }
     }
 }

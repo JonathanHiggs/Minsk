@@ -31,9 +31,14 @@ namespace Minsk.Compiler.Parsing
 
         public override string Text => string.Empty;
 
+        public override string LongText => $"{OpenParentheses.Text}{Expression.LongText}{CloseParentheses.Text}";
+
         public override IEnumerable<SyntaxNode> Children
         {
             get { yield return Expression; }
         }
+
+        public override LexToken FirstToken => OpenParentheses;
+        public override LexToken LastToken => CloseParentheses;
     }
 }
