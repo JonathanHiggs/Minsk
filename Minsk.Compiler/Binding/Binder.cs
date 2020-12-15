@@ -26,6 +26,9 @@ namespace Minsk.Compiler.Binding
                 case NodeType.BinaryExpression:
                     return BindBinaryExpression(expression as BinaryExpression);
 
+                case NodeType.ParenthesesExpression:
+                    return BindExpression((expression as ParenthesizedExpression).Expression);
+
                 default:
                     throw new Exception($"Unexpected syntax node '{expression.NodeType}'");
             }
@@ -41,20 +44,22 @@ namespace Minsk.Compiler.Binding
         {
             var operand = BindExpression(unaryExpression.Operand);
 
-            var operatorKind = BoundUnaryOperator.Bind(
-                unaryExpression.OperatorNode.Token.TokenType,
-                operand.Type)?.Kind;
+            var opToken = unaryExpression.OperatorNode.Token;
 
-            if (operatorKind is null)
+            var op = BoundUnaryOperator.Bind(
+                opToken.TokenType,
+                operand.Type);
+
+            if (op is null)
             {
                 errors.Add(new BinderError(
                     unaryExpression, 
-                    $"Unary operator '{unaryExpression.OperatorNode.Token.Text}' is not defined for type {operand.Type}"));
+                    $"Unary operator '{opToken.TokenType}' is not defined for type {operand.Type}"));
 
                 return operand;
             }
 
-            return new BoundUnaryExpression(operatorKind.Value, operand);
+            return new BoundUnaryExpression(op, operand);
         }
 
         private BoundExpression BindBinaryExpression(BinaryExpression binaryExpression)
@@ -62,21 +67,23 @@ namespace Minsk.Compiler.Binding
             var left = BindExpression(binaryExpression.Left);
             var right = BindExpression(binaryExpression.Right);
 
-            var operatorKind = BoundBinaryOperator.Bind(
-                binaryExpression.OperatorNode.Token.TokenType,
-                left.Type,
-                right.Type)?.Kind;
+            var opToken = binaryExpression.OperatorNode.Token;
 
-            if (operatorKind is null)
+            var op = BoundBinaryOperator.Bind(
+                opToken.TokenType,
+                left.Type,
+                right.Type);
+
+            if (op is null)
             {
                 errors.Add(new BinderError(
                     binaryExpression, 
-                    $"Binary operator '{binaryExpression.OperatorNode.Token.Text}' is not defined for types {left.Type} and {right.Type}"));
+                    $"Binary operator '{opToken.TokenType}' is not defined for types {left.Type} and {right.Type}"));
 
                 return left;
             }
 
-            return new BoundBinaryExpression(left, operatorKind.Value, right);
+            return new BoundBinaryExpression(left, op, right);
         }
     }
 }

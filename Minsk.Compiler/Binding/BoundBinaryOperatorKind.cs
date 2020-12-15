@@ -10,6 +10,9 @@ namespace Minsk.Compiler.Binding
 
         // Logical
         LogicalAnd,
-        LogicalOr
+        LogicalOr,
+
+        Equals,
+        NotEquals
     }
 }

@@ -6,7 +6,7 @@ namespace Minsk.Compiler.Binding
     {
         public BoundBinaryExpression(
             BoundExpression left, 
-            BoundBinaryOperatorKind op, 
+            BoundBinaryOperator op, 
             BoundExpression right)
         {
             Left = left;
@@ -15,9 +15,9 @@ namespace Minsk.Compiler.Binding
         }
 
         public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
-        public override Type Type => Right.Type;
+        public override Type Type => Op.Type;
         public BoundExpression Left { get; }
-        public BoundBinaryOperatorKind Op { get; }
+        public BoundBinaryOperator Op { get; }
         public BoundExpression Right { get; }
     }
 }

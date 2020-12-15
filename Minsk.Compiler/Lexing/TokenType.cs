@@ -16,7 +16,9 @@ namespace Minsk.Compiler.Lexing
         Star,
         ForwardSlash,
         Bang,
+        BangEquals,
         AmpersandAmperand,
+        EqualsEquals,
         PipePipe,
         
         OpenParenthesis,

@@ -80,35 +80,44 @@ namespace Minsk.Compiler.Lexing
             switch (Current)
             {
                 case '+':
-                    return new SyntaxToken(TokenType.Plus, position++, "+", null);
+                    return new SyntaxToken(TokenType.Plus, position++, "+");
                 case '-':
-                    return new SyntaxToken(TokenType.Minus, position++, "-", null);
+                    return new SyntaxToken(TokenType.Minus, position++, "-");
                 case '*':
-                    return new SyntaxToken(TokenType.Star, position++, "*", null);
+                    return new SyntaxToken(TokenType.Star, position++, "*");
                 case '/':
-                    return new SyntaxToken(TokenType.ForwardSlash, position++, "/", null);
+                    return new SyntaxToken(TokenType.ForwardSlash, position++, "/");
                 case '(':
-                    return new SyntaxToken(TokenType.OpenParenthesis, position++, "(", null);
+                    return new SyntaxToken(TokenType.OpenParenthesis, position++, "(");
                 case ')':
-                    return new SyntaxToken(TokenType.CloseParenthesis, position++, ")", null);
-                case '!':
-                    return new SyntaxToken(TokenType.Bang, position++, "!", null);
+                    return new SyntaxToken(TokenType.CloseParenthesis, position++, ")");
 
                 case '&':
                 {
                     if (Peek(1) == '&')
-                        return new SyntaxToken(TokenType.AmpersandAmperand, position += 2, "&&", null);
-                    //return new SyntaxToken(TokenType.Ampersand, position++, "&", null);
-                    break;
+                        return new SyntaxToken(TokenType.AmpersandAmperand, position += 2, "&&");
+                    //return new SyntaxToken(TokenType.Ampersand, position++, "&");
+                } break;
+
+                case '!':
+                {
+                    if (Peek(1) == '=')
+                        return new SyntaxToken(TokenType.BangEquals, position += 2, "!=");
+                    return new SyntaxToken(TokenType.Bang, position++, "!");
                 }
+
+                case '=':
+                {
+                    if (Peek(1) == '=')
+                        return new SyntaxToken(TokenType.EqualsEquals, position += 2, "==");
+                } break;
 
                 case '|':
                 {
                     if (Peek(1) == '|')
-                        return new SyntaxToken(TokenType.PipePipe, position += 2, "||", null);
-                    //return new SyntaxToken(TokenType.Pipe, position++, "|", null);
-                    break;
-                }
+                        return new SyntaxToken(TokenType.PipePipe, position += 2, "||");
+                    //return new SyntaxToken(TokenType.Pipe, position++, "|");
+                } break;
             }
 
 

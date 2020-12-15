@@ -24,13 +24,13 @@ namespace Minsk.Compiler.Binding
             TokenKind = tokenKind;
             Kind = kind;
             OperandType = operandType;
-            ResultType = resultType;
+            Type = resultType;
         }
 
         public TokenType TokenKind { get; }
         public BoundUnaryOperatorKind Kind { get; }
         public Type OperandType { get; }
-        public Type ResultType { get; }
+        public Type Type { get; }
 
         public static BoundUnaryOperator Bind(TokenType tokenKind, Type operandType)
             => operators.FirstOrDefault(

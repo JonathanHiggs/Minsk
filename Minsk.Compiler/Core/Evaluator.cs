@@ -58,7 +58,7 @@ namespace Minsk.Compiler.Core
         private object EvaluateUnaryExpression(BoundUnaryExpression node)
         {
             var value = EvaluateExpression(node.Operand);
-            var op = node.Op;
+            var op = node.Op.Kind;
 
             return op switch {
                 BoundUnaryOperatorKind.Identity => (int)value,
@@ -76,7 +76,7 @@ namespace Minsk.Compiler.Core
             var left  = EvaluateExpression(node.Left);
             var right = EvaluateExpression(node.Right);
 
-            var op = node.Op;
+            var op = node.Op.Kind;
 
             return op switch {
                 BoundBinaryOperatorKind.Addition        => (int)left + (int)right,
@@ -86,6 +86,9 @@ namespace Minsk.Compiler.Core
 
                 BoundBinaryOperatorKind.LogicalAnd      => (bool)left && (bool)right,
                 BoundBinaryOperatorKind.LogicalOr       => (bool)left || (bool)right,
+
+                BoundBinaryOperatorKind.Equals          => Equals(left, right),
+                BoundBinaryOperatorKind.NotEquals       => !Equals(left, right),
 
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateBinaryExpression")

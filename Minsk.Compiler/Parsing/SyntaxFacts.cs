@@ -12,7 +12,7 @@ namespace Minsk.Compiler.Parsing
                 case TokenType.Plus:
                 case TokenType.Minus:
                 case TokenType.Bang:
-                    return 5;   // Bind higher than the binary operators
+                    return 6;   // Bind higher than the binary operators
 
                 default:
                     return 0;
@@ -25,10 +25,14 @@ namespace Minsk.Compiler.Parsing
             {
                 case TokenType.Star:
                 case TokenType.ForwardSlash:
-                    return 4;
+                    return 5;
 
                 case TokenType.Plus:
                 case TokenType.Minus:
+                    return 4;
+
+                case TokenType.EqualsEquals:
+                case TokenType.BangEquals:
                     return 3;
 
                 case TokenType.AmpersandAmperand:
