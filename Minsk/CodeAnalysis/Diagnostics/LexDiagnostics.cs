@@ -1,5 +1,6 @@
 using System;
 
+using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Lexing;
 
 namespace Minsk.CodeAnalysis.Diagnostics
@@ -11,10 +12,10 @@ namespace Minsk.CodeAnalysis.Diagnostics
         internal LexDiagnostics(DiagnosticBag bag)
             => this.bag = bag ?? throw new ArgumentNullException(nameof(bag));
 
-        public void InvalidNumber(int start, int length, string text, string message)
-            => bag.Report(new LexError(start, length, text, message));
+        public void InvalidNumber(TextSpan span, string text, string message)
+            => bag.Report(new LexError(span, text, message));
 
-        public void InvalidCharacters(int start, int length, string text, string message)
-            => bag.Report(new LexError(start, length, text, message));
+        public void InvalidCharacters(TextSpan span, string text, string message)
+            => bag.Report(new LexError(span, text, message));
     }
 }
