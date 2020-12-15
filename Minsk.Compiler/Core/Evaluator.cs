@@ -58,7 +58,7 @@ namespace Minsk.Compiler.Core
         private object EvaluateUnaryExpression(BoundUnaryExpression node)
         {
             var value = EvaluateExpression(node.Operand);
-            var op = node.OperatorKind;
+            var op = node.Op;
 
             return op switch {
                 BoundUnaryOperatorKind.Identity => (int)value,
@@ -76,7 +76,7 @@ namespace Minsk.Compiler.Core
             var left  = EvaluateExpression(node.Left);
             var right = EvaluateExpression(node.Right);
 
-            var op = node.OperatorKind;
+            var op = node.Op;
 
             return op switch {
                 BoundBinaryOperatorKind.Addition        => (int)left + (int)right,

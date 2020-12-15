@@ -41,9 +41,9 @@ namespace Minsk.Compiler.Binding
         {
             var operand = BindExpression(unaryExpression.Operand);
 
-            var operatorKind = BindUnaryOperatorKind(
+            var operatorKind = BoundUnaryOperator.Bind(
                 unaryExpression.OperatorNode.Token.TokenType,
-                operand.Type);
+                operand.Type)?.Kind;
 
             if (operatorKind is null)
             {
@@ -62,10 +62,10 @@ namespace Minsk.Compiler.Binding
             var left = BindExpression(binaryExpression.Left);
             var right = BindExpression(binaryExpression.Right);
 
-            var operatorKind = BindBinaryOperatorKind(
+            var operatorKind = BoundBinaryOperator.Bind(
                 binaryExpression.OperatorNode.Token.TokenType,
                 left.Type,
-                right.Type);
+                right.Type)?.Kind;
 
             if (operatorKind is null)
             {
@@ -77,65 +77,6 @@ namespace Minsk.Compiler.Binding
             }
 
             return new BoundBinaryExpression(left, operatorKind.Value, right);
-        }
-
-        private BoundUnaryOperatorKind? BindUnaryOperatorKind(TokenType tokenType, Type operandType)
-        {
-            if (operandType == typeof(int))
-            {
-                switch (tokenType)
-                {
-                    case TokenType.Plus:
-                        return BoundUnaryOperatorKind.Identity;
-
-                    case TokenType.Minus:
-                        return BoundUnaryOperatorKind.Negation;
-                };
-            }
-            else if (operandType == typeof(bool))
-            {
-                switch(tokenType)
-                {
-                    case TokenType.Bang:
-                        return BoundUnaryOperatorKind.LogicalNegation;
-                }
-            }
-
-            return null;
-        }
-
-        private BoundBinaryOperatorKind? BindBinaryOperatorKind(TokenType tokenType, Type leftType, Type rightType)
-        {
-            if (leftType == typeof(int) && rightType == typeof(int))
-            {
-                switch (tokenType)
-                {
-                    case TokenType.Plus:
-                        return BoundBinaryOperatorKind.Addition;
-
-                    case TokenType.Minus:
-                        return BoundBinaryOperatorKind.Subtraction;
-
-                    case TokenType.Star:
-                        return BoundBinaryOperatorKind.Multiplication;
-
-                    case TokenType.ForwardSlash:
-                        return BoundBinaryOperatorKind.Division;
-                };
-            }
-            else if (leftType == typeof(bool) && rightType == typeof(bool))
-            { 
-                switch (tokenType)
-                {
-                    case TokenType.AmpersandAmperand:
-                        return BoundBinaryOperatorKind.LogicalAnd;
-
-                    case TokenType.PipePipe:
-                        return BoundBinaryOperatorKind.LogicalOr;
-                }
-            }
-
-            return null;
         }
     }
 }
