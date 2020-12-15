@@ -15,22 +15,22 @@ namespace Minsk.Compiler.Binding
 
         public BoundExpression BindExpression(Expression expression)
         {
-            switch (expression.NodeType)
+            switch (expression.Kind)
             {
-                case NodeType.NumberLiteral:
+                case SyntaxKind.LiteralExpression:
                     return BindLiteralExpression(expression as LiteralExpression);
 
-                case NodeType.UnaryExpression:
+                case SyntaxKind.UnaryExpression:
                     return BindUnaryExpression(expression as UnaryExpression);
 
-                case NodeType.BinaryExpression:
+                case SyntaxKind.BinaryExpression:
                     return BindBinaryExpression(expression as BinaryExpression);
 
-                case NodeType.ParenthesesExpression:
+                case SyntaxKind.ParenthesesExpression:
                     return BindExpression((expression as ParenthesizedExpression).Expression);
 
                 default:
-                    throw new Exception($"Unexpected syntax node '{expression.NodeType}'");
+                    throw new Exception($"Unexpected syntax node '{expression.Kind}'");
             }
         }
 
@@ -47,14 +47,14 @@ namespace Minsk.Compiler.Binding
             var opToken = unaryExpression.OperatorNode.Token;
 
             var op = BoundUnaryOperator.Bind(
-                opToken.TokenType,
+                opToken.Kind,
                 operand.Type);
 
             if (op is null)
             {
                 errors.Add(new BinderError(
                     unaryExpression, 
-                    $"Unary operator '{opToken.TokenType}' is not defined for type {operand.Type}"));
+                    $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}"));
 
                 return operand;
             }
@@ -70,7 +70,7 @@ namespace Minsk.Compiler.Binding
             var opToken = binaryExpression.OperatorNode.Token;
 
             var op = BoundBinaryOperator.Bind(
-                opToken.TokenType,
+                opToken.Kind,
                 left.Type,
                 right.Type);
 
@@ -78,7 +78,7 @@ namespace Minsk.Compiler.Binding
             {
                 errors.Add(new BinderError(
                     binaryExpression, 
-                    $"Binary operator '{opToken.TokenType}' is not defined for types {left.Type} and {right.Type}"));
+                    $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}"));
 
                 return left;
             }

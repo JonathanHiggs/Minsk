@@ -9,7 +9,7 @@ namespace Minsk.Compiler.Parsing
 {
     public class SyntaxTree
     {
-        public SyntaxTree(Expression root, SyntaxToken eofToken, IEnumerable<CompilerError> errors)
+        public SyntaxTree(Expression root, LexToken eofToken, IEnumerable<CompilerError> errors)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             EoFToken = eofToken ?? throw new ArgumentNullException(nameof(eofToken));
@@ -24,7 +24,7 @@ namespace Minsk.Compiler.Parsing
 
         public Expression Root { get; }
 
-        public SyntaxToken EoFToken { get; }
+        public LexToken EoFToken { get; }
 
         public IReadOnlyList<CompilerError> Errors { get; }
     }

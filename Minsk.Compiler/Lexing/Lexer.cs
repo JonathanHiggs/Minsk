@@ -25,7 +25,7 @@ namespace Minsk.Compiler.Lexing
 
         public IEnumerable<LexingError> Errors => errors;
 
-        public SyntaxToken NextToken()
+        public LexToken NextToken()
         {
             var start = position;
 
@@ -35,7 +35,7 @@ namespace Minsk.Compiler.Lexing
             if (position == text.Length)
             {
                 Next();
-                return new SyntaxToken(TokenType.EoF, start, string.Empty);
+                return new LexToken(TokenKind.EoF, start, string.Empty);
             }
 
             // <numbers> [0-9]+
@@ -50,7 +50,7 @@ namespace Minsk.Compiler.Lexing
                 if (!int.TryParse(tokenText, out var value))
                     errors.Add(new LexingError(start, length, tokenText, "Unable to parse number to Int32"));
 
-                return new SyntaxToken(TokenType.Number, start, tokenText, value);
+                return new LexToken(TokenKind.Number, start, tokenText, value);
             }
 
             // <whitespace>
@@ -61,7 +61,7 @@ namespace Minsk.Compiler.Lexing
 
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
-                return new SyntaxToken(TokenType.Whitespace, start, tokenText);
+                return new LexToken(TokenKind.Whitespace, start, tokenText);
             }
 
             // true, false, keywords, identifiers
@@ -73,49 +73,49 @@ namespace Minsk.Compiler.Lexing
                 var length = position - start;
                 var tokenText = text.Substring(start, length);
                 var kind = SyntaxFacts.KeywordKind(tokenText);
-                return new SyntaxToken(kind, start, tokenText);
+                return new LexToken(kind, start, tokenText);
             }
 
             // <operators> + - * ? ( ) etc
             switch (Current)
             {
                 case '+':
-                    return new SyntaxToken(TokenType.Plus, position++, "+");
+                    return new LexToken(TokenKind.Plus, position++, "+");
                 case '-':
-                    return new SyntaxToken(TokenType.Minus, position++, "-");
+                    return new LexToken(TokenKind.Minus, position++, "-");
                 case '*':
-                    return new SyntaxToken(TokenType.Star, position++, "*");
+                    return new LexToken(TokenKind.Star, position++, "*");
                 case '/':
-                    return new SyntaxToken(TokenType.ForwardSlash, position++, "/");
+                    return new LexToken(TokenKind.ForwardSlash, position++, "/");
                 case '(':
-                    return new SyntaxToken(TokenType.OpenParenthesis, position++, "(");
+                    return new LexToken(TokenKind.OpenParenthesis, position++, "(");
                 case ')':
-                    return new SyntaxToken(TokenType.CloseParenthesis, position++, ")");
+                    return new LexToken(TokenKind.CloseParenthesis, position++, ")");
 
                 case '&':
                 {
                     if (Peek(1) == '&')
-                        return new SyntaxToken(TokenType.AmpersandAmperand, position += 2, "&&");
+                        return new LexToken(TokenKind.AmpersandAmperand, position += 2, "&&");
                     //return new SyntaxToken(TokenType.Ampersand, position++, "&");
                 } break;
 
                 case '!':
                 {
                     if (Peek(1) == '=')
-                        return new SyntaxToken(TokenType.BangEquals, position += 2, "!=");
-                    return new SyntaxToken(TokenType.Bang, position++, "!");
+                        return new LexToken(TokenKind.BangEquals, position += 2, "!=");
+                    return new LexToken(TokenKind.Bang, position++, "!");
                 }
 
                 case '=':
                 {
                     if (Peek(1) == '=')
-                        return new SyntaxToken(TokenType.EqualsEquals, position += 2, "==");
+                        return new LexToken(TokenKind.EqualsEquals, position += 2, "==");
                 } break;
 
                 case '|':
                 {
                     if (Peek(1) == '|')
-                        return new SyntaxToken(TokenType.PipePipe, position += 2, "||");
+                        return new LexToken(TokenKind.PipePipe, position += 2, "||");
                     //return new SyntaxToken(TokenType.Pipe, position++, "|");
                 } break;
             }
@@ -130,7 +130,7 @@ namespace Minsk.Compiler.Lexing
 
                 errors.Add(new LexingError(start, length, tokenText, "Unexpected characters"));
 
-                return new SyntaxToken(TokenType.Unknown, start, tokenText);
+                return new LexToken(TokenKind.Unknown, start, tokenText);
             }
         }
 

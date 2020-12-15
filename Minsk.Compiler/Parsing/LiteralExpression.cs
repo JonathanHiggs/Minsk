@@ -8,25 +8,25 @@ namespace Minsk.Compiler.Parsing
 {
     public sealed class LiteralExpression : Expression
     {
-        public LiteralExpression(SyntaxToken literalToken)
-            : this(literalToken, literalToken.Value)
+        public LiteralExpression(LexToken token)
+            : this(token, token.Value)
         { }
 
-        public LiteralExpression(SyntaxToken literalToken, object value)
+        public LiteralExpression(LexToken token, object value)
         {
-            NumberToken = literalToken 
-                ?? throw new ArgumentNullException(nameof(literalToken));
+            Token = token 
+                ?? throw new ArgumentNullException(nameof(token));
 
             Value = value;
         }
 
-        public override NodeType NodeType => NodeType.NumberLiteral;
+        public override SyntaxKind Kind => SyntaxKind.LiteralExpression;
 
-        public SyntaxToken NumberToken { get; }
+        public LexToken Token { get; }
 
         public object Value { get; }
 
-        public override string Text => NumberToken.Text;
+        public override string Text => Token.Text;
 
         public override IEnumerable<SyntaxNode> Children 
             => Enumerable.Empty<SyntaxNode>();

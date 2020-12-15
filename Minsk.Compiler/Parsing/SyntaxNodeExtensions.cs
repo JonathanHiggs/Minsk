@@ -27,14 +27,14 @@ namespace Minsk.Compiler.Parsing
                 UnaryExpression unary
                     => new UnaryVisualNode(
                         unary.Text,
-                        unary.OperatorNode.NodeType.ToString(),
+                        unary.OperatorNode.Kind.ToString(),
                         unary.Operand.ToVisualTree(settings),
                         settings),
 
                 BinaryExpression binary 
                     => new BinaryVisualNode(
                         binary.Text, 
-                        binary.OperatorNode.NodeType.ToString(), 
+                        binary.OperatorNode.Kind.ToString(), 
                         binary.Left.ToVisualTree(settings), 
                         binary.Right.ToVisualTree(settings), 
                         settings),
@@ -42,7 +42,7 @@ namespace Minsk.Compiler.Parsing
                 LiteralExpression numberNode
                     => new TerminalVisualNode(
                         numberNode.Text ?? "<empty>", 
-                        numberNode.NumberToken.TokenType.ToString(),
+                        numberNode.Token.Kind.ToString(),
                         settings),
 
                 ParenthesizedExpression parensExpression

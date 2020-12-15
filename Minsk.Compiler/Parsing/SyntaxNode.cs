@@ -6,8 +6,7 @@ namespace Minsk.Compiler.Parsing
 {
     public abstract class SyntaxNode
     {
-        // ToDo: rename to Kind
-        public abstract NodeType NodeType { get; }
+        public abstract SyntaxKind Kind { get; }
 
         public abstract string Text { get; }
 
@@ -21,7 +20,7 @@ namespace Minsk.Compiler.Parsing
 
             Console.Write(indent);
             Console.Write(marker);
-            Console.WriteLine($"{NodeType} : {Text}");
+            Console.WriteLine($"{Kind} : {Text}");
 
             indent += isLast ? "   " : "│  ";
 

@@ -6,17 +6,18 @@ using Minsk.Compiler.Lexing;
 
 namespace Minsk.Compiler.Parsing
 {
+    // ToDo: maybe remove
     public sealed class OperatorNode : SyntaxNode
     {
-        public OperatorNode(SyntaxToken operatorToken)
+        public OperatorNode(LexToken token)
         {
-            Token = operatorToken 
-                ?? throw new ArgumentNullException(nameof(operatorToken));
+            Token = token 
+                ?? throw new ArgumentNullException(nameof(token));
         }
 
-        public SyntaxToken Token { get; }
+        public LexToken Token { get; }
 
-        public override NodeType NodeType => NodeType.Operator;
+        public override SyntaxKind Kind => SyntaxKind.OperatorNode;
 
         public override string Text => Token.Text;
 

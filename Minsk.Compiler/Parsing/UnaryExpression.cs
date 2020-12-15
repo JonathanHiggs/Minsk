@@ -21,7 +21,7 @@ namespace Minsk.Compiler.Parsing
         public OperatorNode OperatorNode { get; }
         public Expression Operand { get; }
 
-        public override NodeType NodeType => NodeType.UnaryExpression;
+        public override SyntaxKind Kind => SyntaxKind.UnaryExpression;
 
         public override string Text => OperatorNode.Text;
 

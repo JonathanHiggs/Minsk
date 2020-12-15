@@ -8,7 +8,7 @@ namespace Minsk.Compiler.Binding
     internal sealed class BoundUnaryOperator
     {
         private BoundUnaryOperator(
-            TokenType tokenKind, 
+            TokenKind tokenKind, 
             BoundUnaryOperatorKind kind, 
             Type operandType
         )
@@ -16,7 +16,7 @@ namespace Minsk.Compiler.Binding
         { }
         
         private BoundUnaryOperator(
-            TokenType tokenKind, 
+            TokenKind tokenKind, 
             BoundUnaryOperatorKind kind, 
             Type operandType, 
             Type resultType)
@@ -27,22 +27,22 @@ namespace Minsk.Compiler.Binding
             Type = resultType;
         }
 
-        public TokenType TokenKind { get; }
+        public TokenKind TokenKind { get; }
         public BoundUnaryOperatorKind Kind { get; }
         public Type OperandType { get; }
         public Type Type { get; }
 
-        public static BoundUnaryOperator Bind(TokenType tokenKind, Type operandType)
+        public static BoundUnaryOperator Bind(TokenKind tokenKind, Type operandType)
             => operators.FirstOrDefault(
                 op => op.TokenKind == tokenKind && op.OperandType == operandType);
 
         private static BoundUnaryOperator[] operators = {
             // Logical
-            new BoundUnaryOperator(TokenType.Bang,  BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
+            new BoundUnaryOperator(TokenKind.Bang,  BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
 
             // Numerical
-            new BoundUnaryOperator(TokenType.Plus,  BoundUnaryOperatorKind.Identity,        typeof(int)),
-            new BoundUnaryOperator(TokenType.Minus, BoundUnaryOperatorKind.Negation,        typeof(int)),
+            new BoundUnaryOperator(TokenKind.Plus,  BoundUnaryOperatorKind.Identity,        typeof(int)),
+            new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negation,        typeof(int)),
         };
     }
 }

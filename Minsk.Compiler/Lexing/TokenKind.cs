@@ -1,13 +1,12 @@
 namespace Minsk.Compiler.Lexing
 {
-    // ToDo: rename to TokenKind
-    public enum TokenType
+    public enum TokenKind
     {
         // Special tokens
         Unknown,
-        Error,
+        //Error,
         Whitespace,
-        EoL,
+        //EoL,
         EoF,
        
         // Operators
@@ -23,10 +22,10 @@ namespace Minsk.Compiler.Lexing
         
         OpenParenthesis,
         CloseParenthesis,
-        OpenBrace,
-        CloseBrace,
-        OpenBracket,
-        CloseBracket,
+        //OpenBrace,
+        //CloseBrace,
+        //OpenBracket,
+        //CloseBracket,
 
         // Keywords
         TrueKeyword,

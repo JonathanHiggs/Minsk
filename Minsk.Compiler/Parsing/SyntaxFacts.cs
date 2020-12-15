@@ -5,40 +5,40 @@ namespace Minsk.Compiler.Parsing
 {
     internal static class SyntaxFacts
     {
-        internal static int UnaryOperatorPrecedence(this TokenType type)
+        internal static int UnaryOperatorPrecedence(this TokenKind kind)
         {
-            switch (type)
+            switch (kind)
             {
-                case TokenType.Plus:
-                case TokenType.Minus:
-                case TokenType.Bang:
-                    return 6;   // Bind higher than the binary operators
+                case TokenKind.Plus:
+                case TokenKind.Minus:
+                case TokenKind.Bang:
+                    return 6;
 
                 default:
                     return 0;
             }
         }
 
-        internal static int BinaryOperatorPrecedence(this TokenType type)
+        internal static int BinaryOperatorPrecedence(this TokenKind kind)
         {
-            switch (type)
+            switch (kind)
             {
-                case TokenType.Star:
-                case TokenType.ForwardSlash:
+                case TokenKind.Star:
+                case TokenKind.ForwardSlash:
                     return 5;
 
-                case TokenType.Plus:
-                case TokenType.Minus:
+                case TokenKind.Plus:
+                case TokenKind.Minus:
                     return 4;
 
-                case TokenType.EqualsEquals:
-                case TokenType.BangEquals:
+                case TokenKind.EqualsEquals:
+                case TokenKind.BangEquals:
                     return 3;
 
-                case TokenType.AmpersandAmperand:
+                case TokenKind.AmpersandAmperand:
                     return 2;
 
-                case TokenType.PipePipe:
+                case TokenKind.PipePipe:
                     return 1;
 
                 default:
@@ -46,13 +46,13 @@ namespace Minsk.Compiler.Parsing
             }
         }
 
-        internal static TokenType KeywordKind(string tokenText)
+        internal static TokenKind KeywordKind(string tokenText)
         {
             return tokenText switch {
-                "true" => TokenType.TrueKeyword,
-                "false" => TokenType.FalseKeyword,
+                "true" => TokenKind.TrueKeyword,
+                "false" => TokenKind.FalseKeyword,
 
-                _ => TokenType.Identifier
+                _ => TokenKind.Identifier
             };
         }
     }

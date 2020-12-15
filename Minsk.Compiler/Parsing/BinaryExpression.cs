@@ -26,7 +26,7 @@ namespace Minsk.Compiler.Parsing
         public Expression Left { get; }
         public Expression Right { get; }
 
-        public override NodeType NodeType => NodeType.BinaryExpression;
+        public override SyntaxKind Kind => SyntaxKind.BinaryExpression;
 
         public override string Text => OperatorNode.Text;
 

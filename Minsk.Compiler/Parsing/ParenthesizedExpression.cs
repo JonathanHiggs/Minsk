@@ -7,9 +7,9 @@ namespace Minsk.Compiler.Parsing
     public sealed class ParenthesizedExpression : Expression
     {
         public ParenthesizedExpression(
-            SyntaxToken openParentheses,
+            LexToken openParentheses,
             Expression expression,
-            SyntaxToken closeParenteses)
+            LexToken closeParenteses)
         {
             OpenParentheses = openParentheses
                 ?? throw new ArgumentNullException(nameof(openParentheses));
@@ -23,11 +23,11 @@ namespace Minsk.Compiler.Parsing
             Expression.Parent = this;
         }
 
-        public SyntaxToken OpenParentheses { get; }
+        public LexToken OpenParentheses { get; }
         public Expression Expression { get; }
-        public SyntaxToken CloseParentheses { get; }
+        public LexToken CloseParentheses { get; }
 
-        public override NodeType NodeType => NodeType.ParenthesesExpression;
+        public override SyntaxKind Kind => SyntaxKind.ParenthesesExpression;
 
         public override string Text => string.Empty;
 

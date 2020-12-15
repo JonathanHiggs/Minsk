@@ -9,19 +9,19 @@ namespace Minsk.Compiler.Parsing
     public sealed class Parser
     {
         private int position = 0;
-        private List<SyntaxToken> tokens;
+        private List<LexToken> tokens;
         private List<CompilerError> errors = new List<CompilerError>();
 
         public Parser(string text)
         {
-            tokens = new List<SyntaxToken>(text.Length / 4);
+            tokens = new List<LexToken>(text.Length / 4);
             var lexer = new Lexer(text);
 
             while(lexer.HasNext)
             {
                 var token = lexer.NextToken();
 
-                if (token.TokenType == TokenType.Whitespace)
+                if (token.Kind == TokenKind.Whitespace)
                     continue;
 
                 tokens.Add(token);
@@ -37,14 +37,14 @@ namespace Minsk.Compiler.Parsing
         public SyntaxTree Parse()
         {
             var expression = ParseExpression();
-            var eof = MatchToken(TokenType.EoF);
+            var eof = MatchToken(TokenKind.EoF);
             return new SyntaxTree(expression, eof, errors);
         }
 
         private Expression ParseExpression(int parentPrecedence = 0)
         {
             Expression left;
-            var unaryPrecedence = Current.TokenType.UnaryOperatorPrecedence();
+            var unaryPrecedence = Current.Kind.UnaryOperatorPrecedence();
 
             if (unaryPrecedence != 0 && unaryPrecedence >= parentPrecedence)
             {
@@ -59,7 +59,7 @@ namespace Minsk.Compiler.Parsing
 
             while (true)
             {
-                var binaryPrecendence = Current.TokenType.BinaryOperatorPrecedence();
+                var binaryPrecendence = Current.Kind.BinaryOperatorPrecedence();
                 if (binaryPrecendence == 0 || binaryPrecendence <= parentPrecedence)
                     break;
 
@@ -74,33 +74,33 @@ namespace Minsk.Compiler.Parsing
 
         private Expression ParsePrimaryExpression()
         {
-            switch (Current.TokenType)
+            switch (Current.Kind)
             {
-                case TokenType.OpenParenthesis:
+                case TokenKind.OpenParenthesis:
                 {
                     var left = NextToken();
                     var expression = ParseExpression();
-                    var right = MatchToken(TokenType.CloseParenthesis);
+                    var right = MatchToken(TokenKind.CloseParenthesis);
 
                     return new ParenthesizedExpression(left, expression, right);
                 }
 
-                case TokenType.FalseKeyword:
-                case TokenType.TrueKeyword:
+                case TokenKind.FalseKeyword:
+                case TokenKind.TrueKeyword:
                 {
-                    var value = Current.TokenType == TokenType.TrueKeyword;
+                    var value = Current.Kind == TokenKind.TrueKeyword;
                     return new LiteralExpression(NextToken(), value);
                 }
 
                 default:
                 {
-                    var numberToken = MatchToken(TokenType.Number);
+                    var numberToken = MatchToken(TokenKind.Number);
                     return new LiteralExpression(numberToken);
                 }
             }
         }
 
-        private SyntaxToken PeekToken(int offset)
+        private LexToken PeekToken(int offset)
         {
             var index = position + offset;   
 
@@ -113,26 +113,26 @@ namespace Minsk.Compiler.Parsing
             return tokens[index];
         }
 
-        private SyntaxToken Current => PeekToken(0);
+        private LexToken Current => PeekToken(0);
 
-        private SyntaxToken NextToken()
+        private LexToken NextToken()
         {
             var current = Current;
             position++;
             return current;
         }
 
-        private SyntaxToken MatchToken(TokenType tokenType)
+        private LexToken MatchToken(TokenKind tokenType)
         {
-            if (Current.TokenType == tokenType)
+            if (Current.Kind == tokenType)
                 return NextToken();
 
-            AddError(Current, $"Unexpected token. Expected '{tokenType}' but was '{Current.TokenType}'");
+            AddError(Current, $"Unexpected token. Expected '{tokenType}' but was '{Current.Kind}'");
             
-            return new SyntaxToken(tokenType, Current.Position, null, null);
+            return new LexToken(tokenType, Current.Position, null, null);
         }
 
-        private void AddError(SyntaxToken token, string message)
+        private void AddError(LexToken token, string message)
         {
             errors.Add(new SyntaxError(token, message));
         }
