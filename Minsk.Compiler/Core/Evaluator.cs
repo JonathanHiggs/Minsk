@@ -42,7 +42,9 @@ namespace Minsk.Compiler.Core
 
         private int EvaluateExpression(Expression node)
         {
+            // ToDo: switch on node.NodeType to avoid multiple casts
             return node switch {
+                UnaryExpression unary           => EvaluateUnaryExpression(unary),
                 BinaryExpression binary         => EvaluateBinaryExpression(binary),
                 NumberLiteral number            => (int)number.NumberToken.Value,
                 ParenthesizedExpression parens  => EvaluateExpression(parens.Expression),
@@ -51,6 +53,21 @@ namespace Minsk.Compiler.Core
                     $"{node.NodeType.ToString()} not implemented in EvaluateExpression")
             };
         }
+
+        private int EvaluateUnaryExpression(UnaryExpression node)
+        {
+            var value = EvaluateExpression(node.Operand);
+            var op = node.OperatorNode.Token.TokenType;
+
+            return op switch {
+                TokenType.Plus  => value,
+                TokenType.Minus => -value,
+
+                _ => throw new NotImplementedException(
+                    $"{op} not implemented in EvaluateUnaryExpression")
+            };
+        }
+
 
         private int EvaluateBinaryExpression(BinaryExpression node)
         {

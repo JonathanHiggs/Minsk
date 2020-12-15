@@ -21,14 +21,23 @@ namespace Minsk.Compiler.Parsing
 
         public static VisualNode ToVisualTree(this SyntaxNode node, VisualTreeSettings settings)
         {
+            // ToDo: switch on node.NodeType
             return node switch
             {
+                UnaryExpression unary
+                    => new UnaryVisualNode(
+                        unary.Text,
+                        unary.OperatorNode.NodeType.ToString(),
+                        unary.Operand.ToVisualTree(settings),
+                        settings),
+
                 BinaryExpression binary 
                     => new BinaryVisualNode(
                         binary.Text, 
                         binary.OperatorNode.NodeType.ToString(), 
                         binary.Left.ToVisualTree(settings), 
-                        binary.Right.ToVisualTree(settings), settings),
+                        binary.Right.ToVisualTree(settings), 
+                        settings),
 
                 NumberLiteral numberNode
                     => new TerminalVisualNode(

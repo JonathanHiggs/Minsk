@@ -4,6 +4,19 @@ namespace Minsk.Compiler.Parsing
 {
     internal static class SyntaxFacts
     {
+        internal static int UnaryOperatorPrecedence(this TokenType type)
+        {
+            switch (type)
+            {
+                case TokenType.Plus:
+                case TokenType.Minus:
+                    return 3;   // Bind higher than the binary operators
+
+                default:
+                    return 0;
+            }
+        }
+
         internal static int BinaryOperatorPrecedence(this TokenType type)
         {
             switch (type)

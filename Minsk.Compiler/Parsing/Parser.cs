@@ -43,16 +43,28 @@ namespace Minsk.Compiler.Parsing
 
         private Expression ParseExpression(int parentPrecedence = 0)
         {
-            var left = ParsePrimaryExpression();
+            Expression left;
+            var unaryPrecedence = Current.TokenType.UnaryOperatorPrecedence();
+
+            if (unaryPrecedence != 0 && unaryPrecedence >= parentPrecedence)
+            {
+                var operatorNode = new OperatorNode(NextToken());
+                var operand = ParseExpression(unaryPrecedence);
+                left = new UnaryExpression(operatorNode, operand);
+            }
+            else
+            {
+                left = ParsePrimaryExpression();
+            }
 
             while (true)
             {
-                var precedence = Current.TokenType.BinaryOperatorPrecedence();
-                if (precedence == 0 || precedence <= parentPrecedence)
+                var binaryPrecendence = Current.TokenType.BinaryOperatorPrecedence();
+                if (binaryPrecendence == 0 || binaryPrecendence <= parentPrecedence)
                     break;
 
                 var operatorNode = new OperatorNode(NextToken());
-                var right = ParseExpression(precedence);
+                var right = ParseExpression(binaryPrecendence);
                 
                 left = new BinaryExpression(left, operatorNode, right);
             }

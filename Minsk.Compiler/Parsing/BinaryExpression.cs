@@ -7,9 +7,14 @@ namespace Minsk.Compiler.Parsing
     {
         public BinaryExpression(Expression left, OperatorNode operatorNode, Expression right)
         {
-            Left = left ?? throw new ArgumentNullException(nameof(left));
-            OperatorNode = operatorNode ?? throw new ArgumentNullException(nameof(operatorNode));
-            Right = right ?? throw new ArgumentNullException(nameof(right));
+            Left = left 
+                ?? throw new ArgumentNullException(nameof(left));
+
+            OperatorNode = operatorNode 
+                ?? throw new ArgumentNullException(nameof(operatorNode));
+
+            Right = right 
+                ?? throw new ArgumentNullException(nameof(right));
 
             Left.Parent = this;
             OperatorNode.Parent = this;
