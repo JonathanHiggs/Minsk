@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Minsk.Compiler/Minsk.Compiler.csproj",
+                "${workspaceFolder}/Minsk/Minsk.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Minsk.Compiler/Minsk.Compiler.csproj",
+                "${workspaceFolder}/Minsk/Minsk.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +32,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/Minsk.Compiler/Minsk.Compiler.csproj",
+                "${workspaceFolder}/Minsk/Minsk.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minsk.Compiler", "Minsk.Compiler\Minsk.Compiler.csproj", "{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minsk", "Minsk\Minsk.csproj", "{915C3DDE-836D-4334-91CF-BE1633E4E23C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}.Release|x64.Build.0 = Release|Any CPU
 		{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}.Release|x86.ActiveCfg = Release|Any CPU
 		{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}.Release|x86.Build.0 = Release|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Debug|x64.Build.0 = Debug|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Debug|x86.Build.0 = Debug|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Release|x64.ActiveCfg = Release|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Release|x64.Build.0 = Release|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Release|x86.ActiveCfg = Release|Any CPU
+		{915C3DDE-836D-4334-91CF-BE1633E4E23C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
