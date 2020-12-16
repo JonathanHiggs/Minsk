@@ -44,116 +44,133 @@ namespace Minsk.CodeAnalysis.Lexing
                 throw new InvalidOperationException("EoF");
 
             if (position == text.Length)
-                return new LexToken(TokenKind.EoF, cursor.Consume(1), string.Empty);
+                return EmitToken(TokenKind.EoF, 1);
 
-            if (Current == '\0')
-            {
-                cursor.Advance(text.Length - cursor.End);
-                var tokenText = CurrentText;
-                diagnostics.Lex.UnexpectedNullTerminator(cursor, tokenText);
-                return new LexToken(TokenKind.EoF, cursor.Consume(), tokenText);
-            }
-
-            // <numbers> [0-9]+
-            if (char.IsDigit(Current))
-            {
-                while(char.IsDigit(Current))
-                    cursor.Advance();
-
-                var tokenText = CurrentText;
-
-                if (!int.TryParse(tokenText, out var value))
-                    diagnostics.Lex.InvalidNumber(
-                        cursor, tokenText, $"Unable to parse '{tokenText}' to Int32");
-
-                return new LexToken(TokenKind.Number, cursor.Consume(), tokenText, value);
-            }
-
-            // <whitespace>
-            if (char.IsWhiteSpace(Current))
-            {
-                while (char.IsWhiteSpace(Current))
-                    cursor.Advance();
-
-                var tokenText = CurrentText;
-                return new LexToken(TokenKind.Whitespace, cursor.Consume(), tokenText);
-            }
-
-            // true, false, keywords, identifiers
-            if (char.IsLetter(Current))
-            {
-                while (char.IsLetter(Current))
-                    cursor.Advance();
-
-                var tokenText = CurrentText;
-                var kind = SyntaxFacts.KeywordKind(tokenText);
-                return new LexToken(kind, cursor.Consume(), tokenText);
-            }
-
-            // <operators> + - * ? ( ) etc
             switch (Current)
             {
-                case '+':
-                    return new LexToken(TokenKind.Plus, cursor.Consume(1), "+");
-                case '-':
-                    return new LexToken(TokenKind.Minus, cursor.Consume(1), "-");
-                case '*':
-                    return new LexToken(TokenKind.Star, cursor.Consume(1), "*");
-                case '/':
-                    return new LexToken(TokenKind.ForwardSlash, cursor.Consume(1), "/");
-                case '(':
-                    return new LexToken(TokenKind.OpenParenthesis, cursor.Consume(1), "(");
-                case ')':
-                    return new LexToken(TokenKind.CloseParenthesis, cursor.Consume(1), ")");
+                case '\0':  return ReadNullTerminator();
+
+                case '+':   return EmitToken(TokenKind.Plus, 1);
+                case '-':   return EmitToken(TokenKind.Minus, 1);
+                case '*':   return EmitToken(TokenKind.Star, 1);
+                case '/':   return EmitToken(TokenKind.ForwardSlash, 1);
+                case '(':   return EmitToken(TokenKind.OpenParenthesis, 1);
+                case ')':   return EmitToken(TokenKind.CloseParenthesis, 1);
+
+                case '0': case '1': case '2': case '3': case '4':
+                case '5': case '6': case '7': case '8': case '9':
+                    return ReadNumberToken();
+
+                case ' ': case '\t': case '\r': case '\n':
+                    return ReadWhitespaceToken();
 
                 case '&':
                 {
-                    if (Peek(1) == '&')
-                        return new LexToken(TokenKind.AmpersandAmperand, cursor.Consume(2), "&&");
-                    //return new SyntaxToken(TokenType.Ampersand, cursor.Consume(1), "&");
+                    if (Next == '&')
+                        return EmitToken(TokenKind.AmpersandAmperand, 2);
+                    //return EmitToken(TokenType.Ampersand, 1);
                 } break;
 
                 case '!':
                 {
-                    if (Peek(1) == '=')
-                        return new LexToken(TokenKind.BangEquals, cursor.Consume(2), "!=");
-                    return new LexToken(TokenKind.Bang, cursor.Consume(1), "!");
+                    if (Next == '=')
+                        return EmitToken(TokenKind.BangEquals, 2);
+                    return EmitToken(TokenKind.Bang, 1);
                 }
 
                 case '=':
                 {
-                    if (Peek(1) == '=')
-                        return new LexToken(TokenKind.EqualsEquals, cursor.Consume(2), "==");
-                    return new LexToken(TokenKind.Equals, cursor.Consume(1), "=");
+                    if (Next == '=')
+                        return EmitToken(TokenKind.EqualsEquals, 2);
+                    return EmitToken(TokenKind.Equals, 1);
                 }
 
                 case '|':
                 {
-                    if (Peek(1) == '|')
-                        return new LexToken(TokenKind.PipePipe, cursor.Consume(2), "||");
-                    //return new SyntaxToken(TokenType.Pipe, cursor.Consume(1), "|");
+                    if (Next == '|')
+                        return EmitToken(TokenKind.PipePipe, 2);
+                    //return EmitToken(TokenType.Pipe, 1);
+                } break;
+
+                default:
+                {
+                    if (char.IsLetter(Current))
+                        return ReadKeywordOrIdentifier();
+                    if (char.IsWhiteSpace(Current))
+                        return ReadWhitespaceToken();
                 } break;
             }
 
+            return ReadUnknownToken();
+        }
 
-            {
-                // Note: Might want to spit out single characters rather than clobber everything
-                while (!char.IsWhiteSpace(Current) && Current != '\0')
-                    cursor.Advance();
+        private LexToken ReadNullTerminator()
+        {
+            cursor.Advance(text.Length - cursor.End);
+            diagnostics.Lex.UnexpectedNullTerminator(cursor, CurrentText);
+            return EmitToken(TokenKind.EoF);
+        }
 
-                var tokenText = CurrentText;
+        private LexToken ReadNumberToken()
+        {
+            while (char.IsDigit(Current))
+                cursor.Advance();
 
-                diagnostics.Lex.InvalidCharacters(
-                    cursor, tokenText, $"Unexpected characters '{tokenText}'");
+            if (!int.TryParse(CurrentText, out var value))
+                diagnostics.Lex.InvalidNumber(
+                    cursor, CurrentText, $"Unable to parse '{CurrentText}' to Int32");
 
-                return new LexToken(TokenKind.Unknown, cursor.Consume(), tokenText);
-            }
+            return EmitValueToken(TokenKind.Number, value);
+        }
+
+        private LexToken ReadWhitespaceToken()
+        {
+            while (char.IsWhiteSpace(Current))
+                cursor.Advance();
+
+            return EmitToken(TokenKind.Whitespace);
+        }
+
+        private LexToken ReadKeywordOrIdentifier()
+        {
+            while (char.IsLetter(Current))
+                cursor.Advance();
+
+            return EmitValueToken(SyntaxFacts.KeywordOrIdentifierKind(CurrentText), CurrentText);
+        }
+
+        private LexToken ReadUnknownToken()
+        {
+            // Note: Might want to spit out single characters rather than clobber everything
+            while (!char.IsWhiteSpace(Current) && Current != '\0')
+                cursor.Advance();
+
+            diagnostics.Lex.InvalidCharacters(
+                cursor, CurrentText, $"Unexpected characters '{CurrentText}'");
+
+            return EmitToken(TokenKind.Unknown);
+        }
+
+        private LexToken EmitToken(TokenKind kind, int consume = 0)
+        {
+            var tokenText = CurrentText;
+            return new LexToken(kind, cursor.Consume(consume), tokenText);
+        }
+
+        private LexToken EmitValueToken(TokenKind kind, object value, int consume = 0)
+        {
+            var tokenText = CurrentText;
+            return new LexToken(kind, cursor.Consume(consume), tokenText, value);
         }
 
         private char Current => (position >= text.Length) ? '\0' : text[position];
 
+        private char Next => Peek(1);
+
         private string CurrentText
-            => text.Substring(cursor.Start, cursor.Length);
+            => cursor.Start + cursor.Length <= text.Length
+            ? text.Substring(cursor.Start, cursor.Length)
+            : string.Empty;
 
         private char Peek(int offset)
             => (position + offset >= text.Length) ? '\0' : text[position + offset];

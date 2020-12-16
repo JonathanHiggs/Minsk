@@ -53,6 +53,19 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
         }
 
         [Test]
+        public void Lex_WithSpecialToken_LexesToken(
+            [ValueSource(nameof(SpecialTokens))] Token token)
+        {
+            // Act
+            var tokens = Lexer.Lex(token.Text).ToList();
+
+            // Assert
+            Assert.That(tokens.Count, Is.EqualTo(2));
+            Assert.That(tokens[0].Kind, Is.EqualTo(token.Kind));
+            Assert.That(tokens[1].Kind, Is.EqualTo(TokenKind.EoF));
+        }
+
+        [Test]
         public void Lex_WithTokenPairs_LexesTokens(
             [ValueSource(nameof(TokenPairs))] Pair pair)
         {
@@ -112,6 +125,12 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
                 (TokenKind.Identifier,          "well"),
                 (TokenKind.Identifier,          "HELLO"),
                 (TokenKind.Identifier,          "tHeRe"),
+            };
+
+        private static IEnumerable<Token> SpecialTokens
+            => new List<Token> {
+                (TokenKind.EoF,                 "\0"),
+                (TokenKind.Unknown,             "`"),
             };
 
         private static IEnumerable<Pair> TokenPairs

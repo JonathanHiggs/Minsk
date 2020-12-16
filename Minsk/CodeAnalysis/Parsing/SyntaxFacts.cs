@@ -53,7 +53,7 @@ namespace Minsk.CodeAnalysis.Parsing
             }
         }
 
-        public static TokenKind KeywordKind(string tokenText)
+        public static TokenKind KeywordOrIdentifierKind(string tokenText)
             => tokenText switch {
                 // ToDo: Add Keyword attributes to TokenKind and Debug.Assert false cases
                 "true"  => TokenKind.TrueKeyword,
