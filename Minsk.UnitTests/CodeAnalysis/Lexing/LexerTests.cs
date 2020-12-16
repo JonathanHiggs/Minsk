@@ -44,13 +44,12 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
             [ValueSource(nameof(Tokens))] Token token)
         {
             // Act
-            var tokens = Lexer.Lex(token.Text)
-                .TakeWhile(t => t.Kind != TokenKind.EoF)
-                .ToList();
+            var tokens = Lexer.Lex(token.Text).ToList();
 
             // Assert
-            Assert.That(tokens.Count, Is.EqualTo(1));
+            Assert.That(tokens.Count, Is.EqualTo(2));
             Assert.That(tokens[0].Kind, Is.EqualTo(token.Kind));
+            Assert.That(tokens[1].Kind, Is.EqualTo(TokenKind.EoF));
         }
 
         [Test]
@@ -58,14 +57,13 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
             [ValueSource(nameof(TokenPairs))] Pair pair)
         {
             // Act
-            var tokens = Lexer.Lex(pair.Text)
-                .TakeWhile(t => t.Kind != TokenKind.EoF)
-                .ToList();
+            var tokens = Lexer.Lex(pair.Text).ToList();
 
             // Assert
-            Assert.That(tokens.Count, Is.EqualTo(2));
+            Assert.That(tokens.Count, Is.EqualTo(3));
             Assert.That(tokens[0].Kind, Is.EqualTo(pair.Kind1));
             Assert.That(tokens[1].Kind, Is.EqualTo(pair.Kind2));
+            Assert.That(tokens[2].Kind, Is.EqualTo(TokenKind.EoF));
         }
 
         [Test]
@@ -73,15 +71,14 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
             [ValueSource(nameof(TokenPairsWithSeperator))] Trip trip)
         {
             // Act
-            var tokens = Lexer.Lex(trip.Text)
-                .TakeWhile(t => t.Kind != TokenKind.EoF)
-                .ToList();
+            var tokens = Lexer.Lex(trip.Text).ToList();
 
             // Assert
-            Assert.That(tokens.Count, Is.EqualTo(3));
+            Assert.That(tokens.Count, Is.EqualTo(4));
             Assert.That(tokens[0].Kind, Is.EqualTo(trip.Kind1));
             Assert.That(tokens[1].Kind, Is.EqualTo(trip.Kind2));
             Assert.That(tokens[2].Kind, Is.EqualTo(trip.Kind3));
+            Assert.That(tokens[3].Kind, Is.EqualTo(TokenKind.EoF));
         }
 
         private static IEnumerable<Token> Tokens

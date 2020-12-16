@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace Minsk.CodeAnalysis.Lexing
 {
     public enum TokenKind
@@ -7,30 +9,30 @@ namespace Minsk.CodeAnalysis.Lexing
         //Error,
         Whitespace,
         //EoL,
-        EoF,
+        [Description("\0")]     EoF,
 
         // Operators
-        Plus,
-        Minus,
-        Star,
-        ForwardSlash,
-        Bang,
-        BangEquals,
-        AmpersandAmperand,
-        Equals,
-        EqualsEquals,
-        PipePipe,
+        [Description("+")]      Plus,
+        [Description("-")]      Minus,
+        [Description("*")]      Star,
+        [Description("/")]      ForwardSlash,
+        [Description("!")]      Bang,
+        [Description("!=")]     BangEquals,
+        [Description("&&")]     AmpersandAmperand,
+        [Description("=")]      Equals,
+        [Description("==")]     EqualsEquals,
+        [Description("||")]     PipePipe,
 
-        OpenParenthesis,
-        CloseParenthesis,
+        [Description("(")]      OpenParenthesis,
+        [Description(")")]      CloseParenthesis,
         //OpenBrace,
         //CloseBrace,
         //OpenBracket,
         //CloseBracket,
 
         // Keywords
-        TrueKeyword,
-        FalseKeyword,
+        [Description("true")]   TrueKeyword,
+        [Description("false")]  FalseKeyword,
 
         // Literals
         Number,

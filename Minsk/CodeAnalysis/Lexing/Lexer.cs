@@ -44,6 +44,14 @@ namespace Minsk.CodeAnalysis.Lexing
             if (position == text.Length)
                 return new LexToken(TokenKind.EoF, cursor.Consume(1), string.Empty);
 
+            if (Current == '\0')
+            {
+                cursor.Advance(text.Length - cursor.End);
+                var tokenText = CurrentText;
+                diagnostics.Lex.UnexpectedNullTerminator(cursor, tokenText);
+                return new LexToken(TokenKind.EoF, cursor.Consume(), tokenText);
+            }
+
             // <numbers> [0-9]+
             if (char.IsDigit(Current))
             {
