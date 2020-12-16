@@ -14,8 +14,10 @@ namespace Minsk.CodeAnalysis.Parsing
                 ?? throw new ArgumentNullException(nameof(token));
         }
 
+        public override DiagnosticKind Kind => DiagnosticKind.SyntaxError;
+
         public LexToken Token { get; }
-        
+
         public override string ToString()
             => $"SyntaxError  {Source.Start}  \"{Token.Text ?? ""}\"  {Message}";
     }

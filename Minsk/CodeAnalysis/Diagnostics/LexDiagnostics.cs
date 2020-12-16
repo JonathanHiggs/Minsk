@@ -5,6 +5,7 @@ using Minsk.CodeAnalysis.Lexing;
 
 namespace Minsk.CodeAnalysis.Diagnostics
 {
+    // ToDo: should this live in the Diagnostics or Lexing namespace
     public sealed class LexDiagnostics
     {
         private readonly DiagnosticBag bag;
@@ -13,9 +14,13 @@ namespace Minsk.CodeAnalysis.Diagnostics
             => this.bag = bag ?? throw new ArgumentNullException(nameof(bag));
 
         public void InvalidNumber(TextSpan span, string text, string message)
-            => bag.Report(new LexError(span, text, message));
+            => bag.Report(new LexError(LexErrorKind.InvalidNumber, span, text, message));
 
         public void InvalidCharacters(TextSpan span, string text, string message)
-            => bag.Report(new LexError(span, text, message));
+            => bag.Report(new LexError(LexErrorKind.InvalidCharacter, span, text, message));
+
+        public void UnexpectedNullTerminator(TextSpan span, string text)
+            => bag.Report(new LexError(
+                LexErrorKind.UnexpectedNullTerminator, span, text, "Unexpected null terminator"));
     }
 }

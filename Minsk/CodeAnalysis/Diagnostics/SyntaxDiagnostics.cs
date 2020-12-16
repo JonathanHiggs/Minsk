@@ -5,6 +5,7 @@ using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis.Diagnostics
 {
+    // ToDo: should this live in the Diagnostics or Parsing namespace
     public sealed class SyntaxDiagnostics
     {
         private readonly DiagnosticBag bag;

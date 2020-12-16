@@ -5,7 +5,7 @@ using Minsk.CodeAnalysis.Common;
 namespace Minsk.CodeAnalysis.Diagnostics
 {
     public abstract class Diagnostic
-    { 
+    {
         protected Diagnostic(int start, int length, string message)
             : this(new TextSpan(start, length), message)
         { }
@@ -17,6 +17,7 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 ?? throw new ArgumentNullException(nameof(message));
         }
 
+        public abstract DiagnosticKind Kind { get; }
         public TextSpan Source { get; }
         public string Message { get; }
     }

@@ -14,8 +14,10 @@ namespace Minsk.CodeAnalysis.Binding
             Node = node ?? throw new ArgumentNullException(nameof(node));
         }
 
+        public override DiagnosticKind Kind => DiagnosticKind.BindError;
+
         public SyntaxNode Node { get; }
-        
+
         public override string ToString()
             => $"BindingError  "
              + $"{Source.Start}-{Source.Start + Source.Length}  "

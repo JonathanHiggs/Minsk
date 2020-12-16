@@ -6,6 +6,7 @@ using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis.Diagnostics
 {
+    // ToDo: should this live in the Diagnostics or Binding namespace
     public sealed class BindingDiagnostics
     {
         private readonly DiagnosticBag bag;
@@ -18,8 +19,8 @@ namespace Minsk.CodeAnalysis.Diagnostics
 
         public void UndefinedIdentifier(NameExpression nameExpression)
             => bag.Report(new BindError(
-                nameExpression, 
+                nameExpression,
                 nameExpression.IdentifierToken.Span,
-                $"Undefined indentifer {nameExpression.IdentifierToken.Text}"));
+                $"Undefined identifier {nameExpression.IdentifierToken.Text}"));
     }
 }
