@@ -2,10 +2,14 @@ using Minsk.CodeAnalysis.Lexing;
 
 namespace Minsk.CodeAnalysis.Parsing
 {
-    internal static class SyntaxFacts
+    public static class SyntaxFacts
     {
-        internal static int UnaryOperatorPrecedence(this TokenKind kind)
+        public static bool IsUnaryOperator(this TokenKind kind)
+            => kind.UnaryOperatorPrecedence() > 0;
+
+        public static int UnaryOperatorPrecedence(this TokenKind kind)
         {
+            // ToDo: Add UnaryOperator attributes to TokeKind and DebugAssert false cases
             switch (kind)
             {
                 case TokenKind.Plus:
@@ -18,8 +22,12 @@ namespace Minsk.CodeAnalysis.Parsing
             }
         }
 
-        internal static int BinaryOperatorPrecedence(this TokenKind kind)
+        public static bool IsBinaryOperator(this TokenKind kind)
+            => kind.BinaryOperatorPrecedence() > 0;
+
+        public static int BinaryOperatorPrecedence(this TokenKind kind)
         {
+            // ToDo: Add BinaryOperator attribute to TokenKind and Debug.Assert false cases
             switch (kind)
             {
                 case TokenKind.Star:
@@ -45,15 +53,16 @@ namespace Minsk.CodeAnalysis.Parsing
             }
         }
 
-        internal static TokenKind KeywordKind(string tokenText)
+        public static TokenKind KeywordKind(string tokenText)
             => tokenText switch {
+                // ToDo: Add Keyword attributes to TokenKind and Debug.Assert false cases
                 "true"  => TokenKind.TrueKeyword,
                 "false" => TokenKind.FalseKeyword,
 
                 _ => TokenKind.Identifier
             };
 
-        internal static bool IsKeyword(this TokenKind kind)
+        public static bool IsKeyword(this TokenKind kind)
             => kind switch {
                 TokenKind.TrueKeyword   => true,
                 TokenKind.FalseKeyword  => true,
@@ -61,7 +70,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 _ => false
             };
 
-        internal static bool RequiresSeperator(this TokenKind kind1, TokenKind kind2)
+        public static bool RequiresSeperator(this TokenKind kind1, TokenKind kind2)
             => (kind1, kind2) switch {
                 (TokenKind.Identifier,      TokenKind.Identifier)       => true,
 

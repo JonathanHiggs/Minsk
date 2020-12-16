@@ -30,6 +30,8 @@ namespace Minsk.CodeAnalysis.Lexing
             diagnostics ??= new DiagnosticBag();
             var lexer = new Lexer(diagnostics, text);
 
+            // ToDo: track previous token and emit diagnostic warning when ambiguous tokens together
+            // eg. =+= or =!=
             while (lexer.HasNext)
                 yield return lexer.NextToken();
         }

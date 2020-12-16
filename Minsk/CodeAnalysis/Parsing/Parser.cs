@@ -82,7 +82,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
                 var operatorToken = NextToken();
                 var right = ParseBinaryExpression(binaryPrecendence);
-                
+
                 left = new BinaryExpression(left, operatorToken, right);
             }
 
@@ -125,7 +125,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
         private LexToken PeekToken(int offset)
         {
-            var index = position + offset;   
+            var index = position + offset;
 
             if (index < 0)
                 return tokens[0];
@@ -151,7 +151,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 return NextToken();
 
             diagnostics.Syntax.UnexpectedToken(Current, $"Expected '{tokenType}' but was '{Current.Kind}'");
-            
+
             return new LexToken(tokenType, Current.Span, null, null);
         }
     }

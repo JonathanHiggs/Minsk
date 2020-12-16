@@ -14,6 +14,8 @@ namespace Minsk.CodeAnalysis.Binding
             Node = node ?? throw new ArgumentNullException(nameof(node));
         }
 
+        // ToDo: Add BindErrorKind ErrorKind
+
         public override DiagnosticKind Kind => DiagnosticKind.BindError;
 
         public SyntaxNode Node { get; }

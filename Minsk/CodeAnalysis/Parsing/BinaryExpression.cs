@@ -9,13 +9,13 @@ namespace Minsk.CodeAnalysis.Parsing
     {
         public BinaryExpression(Expression left, LexToken operatorToken, Expression right)
         {
-            Left = left 
+            Left = left
                 ?? throw new ArgumentNullException(nameof(left));
 
-            OperatorToken = operatorToken 
+            OperatorToken = operatorToken
                 ?? throw new ArgumentNullException(nameof(operatorToken));
 
-            Right = right 
+            Right = right
                 ?? throw new ArgumentNullException(nameof(right));
 
             Left.Parent = this;
@@ -33,7 +33,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public override string LongText => $"{Left.LongText} {OperatorToken.Text} {Right.LongText}";
 
-        public override IEnumerable<SyntaxNode> Children 
+        public override IEnumerable<SyntaxNode> Children
         {
             get
             {

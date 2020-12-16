@@ -14,6 +14,8 @@ namespace Minsk.CodeAnalysis.Parsing
                 ?? throw new ArgumentNullException(nameof(token));
         }
 
+        // ToDo: Add SyntexErrorKind ErrorKind
+
         public override DiagnosticKind Kind => DiagnosticKind.SyntaxError;
 
         public LexToken Token { get; }

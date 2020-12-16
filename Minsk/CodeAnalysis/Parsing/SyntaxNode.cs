@@ -34,6 +34,6 @@ namespace Minsk.CodeAnalysis.Parsing
 
             foreach (var child in Children)
                 child.PrettyPrint(indent, child == lastChild);
-        }    
+        }
     }
 }

@@ -28,5 +28,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
             var lexError = messages[0] as LexError;
             Assert.That(lexError.ErrorKind, Is.EqualTo(LexErrorKind.UnexpectedNullTerminator));
         }
+
+        // ToDo: Add tests that check emission of other diagnostics
     }
 }
