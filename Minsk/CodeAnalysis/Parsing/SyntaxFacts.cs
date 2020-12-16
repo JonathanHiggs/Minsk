@@ -46,13 +46,40 @@ namespace Minsk.CodeAnalysis.Parsing
         }
 
         internal static TokenKind KeywordKind(string tokenText)
-        {
-            return tokenText switch {
-                "true" => TokenKind.TrueKeyword,
+            => tokenText switch {
+                "true"  => TokenKind.TrueKeyword,
                 "false" => TokenKind.FalseKeyword,
 
                 _ => TokenKind.Identifier
             };
-        }
+
+        internal static bool IsKeyword(this TokenKind kind)
+            => kind switch {
+                TokenKind.TrueKeyword   => true,
+                TokenKind.FalseKeyword  => true,
+
+                _ => false
+            };
+
+        internal static bool RequiresSeperator(this TokenKind kind1, TokenKind kind2)
+            => (kind1, kind2) switch {
+                (TokenKind.Identifier,      TokenKind.Identifier)       => true,
+
+                (TokenKind.Bang,            TokenKind.Equals)           => true,
+                (TokenKind.BangEquals,      TokenKind.Equals)           => true,
+                (TokenKind.Bang,            TokenKind.EqualsEquals)     => true,
+
+                (TokenKind.Equals,          TokenKind.Equals)           => true,
+                (TokenKind.Equals,          TokenKind.EqualsEquals)     => true,
+                (TokenKind.EqualsEquals,    TokenKind.Equals)           => true,
+
+                (TokenKind.Number,          TokenKind.Number)           => true,
+
+                (TokenKind k1, TokenKind k2) when k1.IsKeyword() && k2.IsKeyword()  => true,
+                (TokenKind k1, TokenKind.Identifier) when k1.IsKeyword()            => true,
+                (TokenKind.Identifier, TokenKind k2) when k2.IsKeyword()            => true,
+
+                _ => false
+            };
     }
 }

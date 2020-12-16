@@ -8,7 +8,7 @@ namespace Minsk.CodeAnalysis.Lexing
         Whitespace,
         //EoL,
         EoF,
-       
+
         // Operators
         Plus,
         Minus,
@@ -20,7 +20,7 @@ namespace Minsk.CodeAnalysis.Lexing
         Equals,
         EqualsEquals,
         PipePipe,
-        
+
         OpenParenthesis,
         CloseParenthesis,
         //OpenBrace,
@@ -31,7 +31,7 @@ namespace Minsk.CodeAnalysis.Lexing
         // Keywords
         TrueKeyword,
         FalseKeyword,
-        
+
         // Literals
         Number,
         String,

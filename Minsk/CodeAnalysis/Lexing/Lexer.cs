@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
@@ -17,10 +19,19 @@ namespace Minsk.CodeAnalysis.Lexing
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
-            if (string.IsNullOrWhiteSpace(text))
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
             this.text = text;
+        }
+
+        public static IEnumerable<LexToken> Lex(string text, DiagnosticBag diagnostics = null)
+        {
+            diagnostics ??= new DiagnosticBag();
+            var lexer = new Lexer(diagnostics, text);
+
+            while (lexer.HasNext)
+                yield return lexer.NextToken();
         }
 
         public bool HasNext => cursor.End <= text.Length;
@@ -40,7 +51,7 @@ namespace Minsk.CodeAnalysis.Lexing
                     cursor.Advance();
 
                 var tokenText = CurrentText;
-                
+
                 if (!int.TryParse(tokenText, out var value))
                     diagnostics.Lex.InvalidNumber(
                         cursor, tokenText, $"Unable to parse '{tokenText}' to Int32");
@@ -134,7 +145,7 @@ namespace Minsk.CodeAnalysis.Lexing
         private string CurrentText
             => text.Substring(cursor.Start, cursor.Length);
 
-        private char Peek(int offset) 
+        private char Peek(int offset)
             => (position + offset >= text.Length) ? '\0' : text[position + offset];
     }
 }
