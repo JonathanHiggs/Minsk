@@ -2,6 +2,9 @@ using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Lexing
 {
+    // ToDo: move to Text namespace
+    // ToDo: rename TextCursor
+    // ToDo: add ref to SourceText and ensure this.End <= source.End
     internal sealed class LexCursor
     {
         public LexCursor()
@@ -17,15 +20,15 @@ namespace Minsk.CodeAnalysis.Lexing
         public static implicit operator TextSpan(LexCursor cursor)
             => new TextSpan(cursor.Start, cursor.Length);
 
-        public void Advance(int value = 1)
+        public void Advance(int numberOfChars = 1)
         {
-            Length += value;
+            Length += numberOfChars;
         }
 
-        public TextSpan Consume(int value = 0)
+        public TextSpan Consume(int numberOfChars = 0)
         {
-            var span = new TextSpan(Start, Length + value);
-            Start = Start + Length + value;
+            var span = new TextSpan(Start, Length + numberOfChars);
+            Start = Start + Length + numberOfChars;
             Length = 0;
             return span;
         }

@@ -152,16 +152,25 @@ namespace Minsk.CodeAnalysis.Lexing
             return EmitToken(TokenKind.Unknown);
         }
 
-        private LexToken EmitToken(TokenKind kind, int consume = 0)
+        private LexToken EmitToken(TokenKind kind, int numberOfCharsConsumed = 0)
         {
             var tokenText = CurrentText;
-            return new LexToken(kind, cursor.Consume(consume), tokenText);
+            return new LexToken(kind, Consume(numberOfCharsConsumed), tokenText);
         }
 
-        private LexToken EmitValueToken(TokenKind kind, object value, int consume = 0)
+        private LexToken EmitValueToken(TokenKind kind, object value, int numberOfCharsConsumed = 0)
         {
             var tokenText = CurrentText;
-            return new LexToken(kind, cursor.Consume(consume), tokenText, value);
+            return new LexToken(kind, Consume(numberOfCharsConsumed), tokenText, value);
+        }
+
+        private TextSpan Consume(int numberOfChars = 0)
+        {
+            // ToDo: remove when LexCursor takes in the SourceText
+            var span = cursor.Consume(numberOfChars);
+            if (span.End > source.Length)
+                span = new TextSpan(span.Start, source.Length - span.Start);
+            return span;
         }
 
         private char Current => (position >= source.Length) ? '\0' : source[position];

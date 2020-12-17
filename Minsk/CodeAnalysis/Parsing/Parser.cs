@@ -107,7 +107,8 @@ namespace Minsk.CodeAnalysis.Parsing
                 TokenKind.Number
                     => ParseNumberLiteral(),
 
-                _ => throw new Exception()
+                //_ => throw new Exception()
+                _ => ParseNumberLiteral()
             };
         }
 
