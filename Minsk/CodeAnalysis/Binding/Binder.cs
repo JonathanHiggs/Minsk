@@ -66,7 +66,7 @@ namespace Minsk.CodeAnalysis.Binding
                 variable = new VariableSymbol(name, expression.Type);
                 variables[variable] = null;
             }
-            
+
             return new BoundAssignmentExpression(variable, expression);
         }
 
@@ -86,7 +86,7 @@ namespace Minsk.CodeAnalysis.Binding
             {
                 // ToDo: move into the call, and check whether left or right is a BoundNameExpression
                 diagnostics.Binding.UndefinedOperator(
-                    binaryExpression, 
+                    binaryExpression,
                     opToken.Span,
                     $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}");
 
@@ -134,7 +134,7 @@ namespace Minsk.CodeAnalysis.Binding
             if (op is null)
             {
                 diagnostics.Binding.UndefinedOperator(
-                    unaryExpression, 
+                    unaryExpression,
                     opToken.Span,
                     $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}");
 

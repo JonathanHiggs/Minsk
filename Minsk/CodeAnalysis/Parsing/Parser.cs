@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
@@ -40,48 +41,45 @@ namespace Minsk.CodeAnalysis.Parsing
 
         private Expression ParseExpression()
         {
-            return ParseAssignmentExpression();
+            return (Current, Next) switch
+            {
+                (TokenKind.Identifier, TokenKind.Equals)
+                    => ParseAssignmentExpression(),
+
+                //(TokenKind c, _) when c.IsUnaryOperator() => ParseUnaryOperator()
+
+                _ => ParsePrecedenceExpression()
+            };
         }
 
         private Expression ParseAssignmentExpression()
         {
-            if (PeekToken(0).Kind == TokenKind.Identifier
-                && PeekToken(1).Kind == TokenKind.Equals)
-            {
-                var identifierToken = NextToken();
-                var equalsToken = NextToken();
-                var expression = ParseExpression();
-
-                return new AssignmentExpression(identifierToken, equalsToken, expression);
-            }
-
-            return ParseBinaryExpression();
+            var identifierToken = MatchToken(TokenKind.Identifier);
+            var equalsToken = MatchToken(TokenKind.Equals);
+            var expression = ParseExpression();
+            return new AssignmentExpression(identifierToken, equalsToken, expression);
         }
 
-        private Expression ParseBinaryExpression(int parentPrecedence = 0)
+        private Expression ParsePrecedenceExpression(int parentPrecedence = 0)
         {
+            // ToDo: this could be cleaned up?
             Expression left;
-            var unaryPrecedence = Current.Kind.UnaryOperatorPrecedence();
+            var unaryPrecedence = Current.UnaryOperatorPrecedence();
 
             if (unaryPrecedence != 0 && unaryPrecedence >= parentPrecedence)
-            {
-                var operatorToken = NextToken();
-                var operand = ParseBinaryExpression(unaryPrecedence);
-                left = new UnaryExpression(operatorToken, operand);
-            }
+                left = ParseUnaryExpression(unaryPrecedence);
             else
-            {
                 left = ParsePrimaryExpression();
-            }
 
+            // ToDo: extract ParseBinaryExpression?
             while (true)
             {
-                var binaryPrecendence = Current.Kind.BinaryOperatorPrecedence();
+                var binaryPrecendence = Current.BinaryOperatorPrecedence();
                 if (binaryPrecendence == 0 || binaryPrecendence <= parentPrecedence)
                     break;
 
-                var operatorToken = NextToken();
-                var right = ParseBinaryExpression(binaryPrecendence);
+                var operatorToken = MatchBinaryOperatorToken();
+                var right = ParsePrecedenceExpression(binaryPrecendence);
 
                 left = new BinaryExpression(left, operatorToken, right);
             }
@@ -89,38 +87,61 @@ namespace Minsk.CodeAnalysis.Parsing
             return left;
         }
 
+        private Expression ParseUnaryExpression(int parentPrecedence = 0)
+        {
+            var operatorToken = MatchUnaryOperatorToken();
+            var operand = ParsePrecedenceExpression(parentPrecedence);
+            return new UnaryExpression(operatorToken, operand);
+        }
+
         private Expression ParsePrimaryExpression()
         {
-            switch (Current.Kind)
+            return Current switch
             {
-                case TokenKind.OpenParenthesis:
-                {
-                    var left = NextToken();
-                    var expression = ParseExpression();
-                    var right = MatchToken(TokenKind.CloseParenthesis);
+                TokenKind.OpenParenthesis
+                    => ParseParenthesisExpression(),
 
-                    return new ParenthesizedExpression(left, expression, right);
-                }
+                TokenKind.TrueKeyword or TokenKind.FalseKeyword
+                    => ParseBooleanLiteral(),
 
-                case TokenKind.FalseKeyword:
-                case TokenKind.TrueKeyword:
-                {
-                    var value = Current.Kind == TokenKind.TrueKeyword;
-                    return new LiteralExpression(NextToken(), value);
-                }
+                TokenKind.Identifier
+                    => ParseNameExpression(),
 
-                case TokenKind.Identifier:
-                {
-                    var identifierToke = NextToken();
-                    return new NameExpression(identifierToke);
-                }
+                TokenKind.Number
+                    => ParseNumberLiteral(),
 
-                default:
-                {
-                    var numberToken = MatchToken(TokenKind.Number);
-                    return new LiteralExpression(numberToken);
-                }
-            }
+                _ => throw new Exception()
+            };
+        }
+
+        private Expression ParseParenthesisExpression()
+        {
+            var left = NextToken();
+            var expression = ParseExpression();
+            var right = MatchToken(TokenKind.CloseParenthesis);
+            return new ParenthesizedExpression(left, expression, right);
+        }
+
+        private Expression ParseBooleanLiteral()
+        {
+            var isTrue = Current == TokenKind.TrueKeyword;
+            var token = isTrue
+                ? MatchToken(TokenKind.TrueKeyword)
+                : MatchToken(TokenKind.FalseKeyword);
+
+            return new LiteralExpression(token, isTrue);
+        }
+
+        private Expression ParseNameExpression()
+        {
+            var identifierToke = MatchToken(TokenKind.Identifier);
+            return new NameExpression(identifierToke);
+        }
+
+        private Expression ParseNumberLiteral()
+        {
+            var numberToken = MatchToken(TokenKind.Number);
+            return new LiteralExpression(numberToken);
         }
 
         private LexToken PeekToken(int offset)
@@ -136,23 +157,51 @@ namespace Minsk.CodeAnalysis.Parsing
             return tokens[index];
         }
 
-        private LexToken Current => PeekToken(0);
+        private TokenKind Current => PeekToken(0).Kind;
+
+        private TokenKind Next => PeekToken(1).Kind;
+
+        private LexToken MatchToken(TokenKind tokenKind)
+        {
+            if (Current == tokenKind)
+                return NextToken();
+
+            diagnostics.Syntax.UnexpectedToken(
+                PeekToken(0),
+                $"Expected '{tokenKind}' but was '{PeekToken(0).Text}'");
+
+            return new LexToken(tokenKind, PeekToken(0).Span, null, null);
+        }
+
+        private LexToken MatchBinaryOperatorToken()
+        {
+            if (Current.IsBinaryOperator())
+                return NextToken();
+
+            diagnostics.Syntax.UnexpectedToken(
+                PeekToken(0),
+                $"Expected binary operator but was '{PeekToken(0).Text}'");
+
+            return new LexToken(TokenKind.Plus, PeekToken(0).Span, null, null);
+        }
+
+        private LexToken MatchUnaryOperatorToken()
+        {
+            if (Current.IsUnaryOperator())
+                return NextToken();
+
+            diagnostics.Syntax.UnexpectedToken(
+                PeekToken(0),
+                $"Expected unary operator but was '{PeekToken(0).Text}'");
+
+            return new LexToken(TokenKind.Plus, PeekToken(0).Span, null, null);
+        }
 
         private LexToken NextToken()
         {
-            var current = Current;
+            var current = PeekToken(0);
             position++;
             return current;
-        }
-
-        private LexToken MatchToken(TokenKind tokenType)
-        {
-            if (Current.Kind == tokenType)
-                return NextToken();
-
-            diagnostics.Syntax.UnexpectedToken(Current, $"Expected '{tokenType}' but was '{Current.Kind}'");
-
-            return new LexToken(tokenType, Current.Span, null, null);
         }
     }
 }
