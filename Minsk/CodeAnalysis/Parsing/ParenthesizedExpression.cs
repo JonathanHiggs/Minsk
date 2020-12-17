@@ -31,8 +31,6 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public override string Text => string.Empty;
 
-        public override string LongText => $"{OpenParentheses.Text}{Expression.LongText}{CloseParentheses.Text}";
-
         public override IEnumerable<SyntaxNode> Children
         {
             get { yield return Expression; }

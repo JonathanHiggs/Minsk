@@ -8,8 +8,8 @@ namespace Minsk.CodeAnalysis.Parsing
     public sealed class AssignmentExpression : Expression
     {
         public AssignmentExpression(
-            LexToken identifierToken, 
-            LexToken equalsToken, 
+            LexToken identifierToken,
+            LexToken equalsToken,
             Expression expression)
         {
             IdentifierToken = identifierToken;
@@ -17,24 +17,22 @@ namespace Minsk.CodeAnalysis.Parsing
             Expression = expression;
         }
 
-        public override SyntaxKind Kind 
+        public override SyntaxKind Kind
             => SyntaxKind.AssignmentExpression;
 
         public override string Text => $"{IdentifierToken.Text} {EqualsToken.Text}";
-        
-        public override string LongText => Text;
 
         public LexToken IdentifierToken { get; }
         public LexToken EqualsToken { get; }
         public Expression Expression { get; }
 
-        public override IEnumerable<SyntaxNode> Children 
+        public override IEnumerable<SyntaxNode> Children
         { get { yield return Expression; } }
 
-        public override LexToken FirstToken 
+        public override LexToken FirstToken
             => IdentifierToken;
 
-        public override LexToken LastToken 
+        public override LexToken LastToken
             => Expression.LastToken;
 
     }

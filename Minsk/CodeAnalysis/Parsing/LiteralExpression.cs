@@ -14,7 +14,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public LiteralExpression(LexToken token, object value)
         {
-            Token = token 
+            Token = token
                 ?? throw new ArgumentNullException(nameof(token));
 
             Value = value;
@@ -28,9 +28,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public override string Text => Token.Text;
 
-        public override string LongText => Token.Text;
-
-        public override IEnumerable<SyntaxNode> Children 
+        public override IEnumerable<SyntaxNode> Children
             => Enumerable.Empty<SyntaxNode>();
 
         public override LexToken FirstToken => Token;

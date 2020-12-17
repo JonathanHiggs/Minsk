@@ -31,8 +31,6 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public override string Text => OperatorToken.Text;
 
-        public override string LongText => $"{Left.LongText} {OperatorToken.Text} {Right.LongText}";
-
         public override IEnumerable<SyntaxNode> Children
         {
             get

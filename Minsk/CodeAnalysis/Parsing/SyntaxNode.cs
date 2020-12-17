@@ -11,7 +11,6 @@ namespace Minsk.CodeAnalysis.Parsing
         public abstract SyntaxKind Kind { get; }
 
         public abstract string Text { get; }
-        public abstract string LongText { get; }
 
         public SyntaxNode Parent { set; get; }
 

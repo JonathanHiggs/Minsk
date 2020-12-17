@@ -26,9 +26,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public override string Text => OperatorToken.Text;
 
-        public override string LongText => $"{OperatorToken.Text}{Operand.LongText}";
-
-        public override IEnumerable<SyntaxNode> Children 
+        public override IEnumerable<SyntaxNode> Children
         {
             get { yield return Operand; }
         }

@@ -14,9 +14,8 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public override SyntaxKind Kind => SyntaxKind.NameExpression;
         public override string Text => IdentifierToken.Text;
-        public override string LongText => IdentifierToken.Text;
 
-        public override IEnumerable<SyntaxNode> Children 
+        public override IEnumerable<SyntaxNode> Children
             => Enumerable.Empty<SyntaxNode>();
 
         public override LexToken FirstToken => IdentifierToken;

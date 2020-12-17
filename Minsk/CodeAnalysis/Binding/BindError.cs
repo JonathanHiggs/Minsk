@@ -23,6 +23,6 @@ namespace Minsk.CodeAnalysis.Binding
         public override string ToString()
             => $"BindingError  "
              + $"{Source.Start}-{Source.Start + Source.Length}  "
-             + $"\"{Node.LongText}\"  {Message}";
+             + $"\"{Node.Text}\"  {Message}";
     }
 }
