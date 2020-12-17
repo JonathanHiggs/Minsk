@@ -1,4 +1,4 @@
-using Minsk.CodeAnalysis.Common;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Lexing
 {
@@ -20,7 +20,6 @@ namespace Minsk.CodeAnalysis.Lexing
         public TextSpan Span { get; }
         public string Text { get; }
         public object Value { get; }
-
 
         public override string ToString()
         {

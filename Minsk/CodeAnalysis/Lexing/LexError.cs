@@ -1,7 +1,7 @@
 using System;
 
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Lexing
 {
@@ -21,6 +21,6 @@ namespace Minsk.CodeAnalysis.Lexing
         public string Text { get; }
 
         public override string ToString()
-            => $"LexingError  {Source.Start}  \"{Text}\"  {Message}";
+            => $"LexingError  {Span.Start}  \"{Text}\"  {Message}";
     }
 }

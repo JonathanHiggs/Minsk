@@ -1,6 +1,6 @@
 using System;
 
-using Minsk.CodeAnalysis.Common;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Diagnostics
 {
@@ -10,15 +10,14 @@ namespace Minsk.CodeAnalysis.Diagnostics
             : this(new TextSpan(start, length), message)
         { }
 
-        protected Diagnostic(TextSpan source, string message)
+        protected Diagnostic(TextSpan span, string message)
         {
-            Source = source;
-            Message = message
-                ?? throw new ArgumentNullException(nameof(message));
+            Span = span;
+            Message = message ?? string.Empty;
         }
 
         public abstract DiagnosticKind Kind { get; }
-        public TextSpan Source { get; }
+        public TextSpan Span { get; }
         public string Message { get; }
     }
 }

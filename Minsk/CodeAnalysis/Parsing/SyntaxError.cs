@@ -21,6 +21,6 @@ namespace Minsk.CodeAnalysis.Parsing
         public LexToken Token { get; }
 
         public override string ToString()
-            => $"SyntaxError  {Source.Start}  \"{Token.Text ?? ""}\"  {Message}";
+            => $"SyntaxError  {Span.Start}  \"{Token.Text ?? ""}\"  {Message}";
     }
 }

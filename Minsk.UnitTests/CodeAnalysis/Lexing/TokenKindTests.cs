@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Minsk.CodeAnalysis.Lexing;
+using Minsk.CodeAnalysis.Text;
 
 using NUnit.Framework;
 
@@ -16,10 +17,10 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
             [ValueSource(nameof(DefaultTextTokens))] TokenKind kind)
         {
             // Arrange
-            var text = kind.GetText();
+            var source = SourceText.From(kind.GetText());
 
             // Act
-            var tokens = Lexer.Lex(text).ToList();
+            var tokens = Lexer.Lex(source).ToList();
 
             // Assert
             Assert.That(tokens.Count, Is.EqualTo(2));

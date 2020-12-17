@@ -1,26 +1,30 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class Parser
     {
+        private readonly SourceText source;
         private readonly DiagnosticBag diagnostics;
         private readonly ImmutableArray<LexToken> tokens;
 
         private int position = 0;
 
-        public Parser(string text, DiagnosticBag diagnostics)
+        public Parser(SourceText source, DiagnosticBag diagnostics)
         {
+            this.source = source
+                ?? throw new ArgumentNullException(nameof(source));
+
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
-            tokens = Lexer.Lex(text, diagnostics)
+            tokens = Lexer.Lex(source, diagnostics)
                 .Where(t => t.Kind != TokenKind.Whitespace)
                 .ToImmutableArray();
         }
@@ -29,7 +33,7 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             var expression = ParseExpression();
             var eof = MatchToken(TokenKind.EoF);
-            return new SyntaxTree(expression, eof, diagnostics);
+            return new SyntaxTree(source, expression, eof, diagnostics);
         }
 
         private Expression ParseExpression()

@@ -2,6 +2,7 @@
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
+using Minsk.CodeAnalysis.Text;
 
 using NUnit.Framework;
 
@@ -14,11 +15,11 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
         public void Lex_WithNullTerminatorChar_AddUnexpectedNullTerminatorDiagnostic()
         {
             // Arrange
-            var text = "\0";
+            var source = SourceText.From("\0");
             var diagnostics = new DiagnosticBag();
 
             // Act
-            var _ = Lexer.Lex(text, diagnostics).ToList();
+            var _ = Lexer.Lex(source, diagnostics).ToList();
             var messages = diagnostics.ToList();
 
             // Assert

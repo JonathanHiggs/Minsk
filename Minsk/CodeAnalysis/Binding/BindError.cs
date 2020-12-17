@@ -1,8 +1,8 @@
 using System;
 
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Binding
 {
@@ -22,7 +22,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         public override string ToString()
             => $"BindingError  "
-             + $"{Source.Start}-{Source.Start + Source.Length}  "
+             + $"{Span.Start}-{Span.Start + Span.Length}  "
              + $"\"{Node.Text}\"  {Message}";
     }
 }

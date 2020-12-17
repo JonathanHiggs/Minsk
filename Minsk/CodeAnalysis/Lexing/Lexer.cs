@@ -3,32 +3,33 @@ using System.Collections.Generic;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Lexing
 {
     public sealed class Lexer
     {
         private readonly DiagnosticBag diagnostics;
-        private readonly string text;
+        private readonly SourceText source;
 
         private LexCursor cursor = new LexCursor();
         private int position => cursor.End;
 
-        public Lexer(DiagnosticBag diagnostics, string text)
+        public Lexer(SourceText source, DiagnosticBag diagnostics)
         {
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
-            if (text is null)
-                throw new ArgumentNullException(nameof(text));
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
 
-            this.text = text;
+            this.source = source;
         }
 
-        public static IEnumerable<LexToken> Lex(string text, DiagnosticBag diagnostics = null)
+        public static IEnumerable<LexToken> Lex(SourceText source, DiagnosticBag diagnostics = null)
         {
             diagnostics ??= new DiagnosticBag();
-            var lexer = new Lexer(diagnostics, text);
+            var lexer = new Lexer(source, diagnostics);
 
             // ToDo: track previous token and emit diagnostic warning when ambiguous tokens together
             // eg. =+= or =!=
@@ -36,14 +37,14 @@ namespace Minsk.CodeAnalysis.Lexing
                 yield return lexer.NextToken();
         }
 
-        public bool HasNext => cursor.End <= text.Length;
+        public bool HasNext => cursor.End <= source.Length;
 
         public LexToken NextToken()
         {
-            if (position > text.Length)
+            if (position > source.Length)
                 throw new InvalidOperationException("EoF");
 
-            if (position == text.Length)
+            if (position == source.Length)
                 return EmitToken(TokenKind.EoF, 1);
 
             switch (Current)
@@ -106,7 +107,7 @@ namespace Minsk.CodeAnalysis.Lexing
 
         private LexToken ReadNullTerminator()
         {
-            cursor.Advance(text.Length - cursor.End);
+            cursor.Advance(source.Length - cursor.End);
             diagnostics.Lex.UnexpectedNullTerminator(cursor, CurrentText);
             return EmitToken(TokenKind.EoF);
         }
@@ -163,16 +164,16 @@ namespace Minsk.CodeAnalysis.Lexing
             return new LexToken(kind, cursor.Consume(consume), tokenText, value);
         }
 
-        private char Current => (position >= text.Length) ? '\0' : text[position];
+        private char Current => (position >= source.Length) ? '\0' : source[position];
 
         private char Next => Peek(1);
 
         private string CurrentText
-            => cursor.Start + cursor.Length <= text.Length
-            ? text.Substring(cursor.Start, cursor.Length)
+            => cursor.Start + cursor.Length <= source.Length
+            ? source.ToString(cursor.Start, cursor.Length)
             : string.Empty;
 
         private char Peek(int offset)
-            => (position + offset >= text.Length) ? '\0' : text[position + offset];
+            => (position + offset >= source.Length) ? '\0' : source[position + offset];
     }
 }

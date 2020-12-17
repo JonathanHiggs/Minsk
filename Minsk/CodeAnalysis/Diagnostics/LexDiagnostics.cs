@@ -1,7 +1,7 @@
 using System;
 
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Lexing;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Diagnostics
 {

@@ -4,6 +4,7 @@ using System.Linq;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Text;
 using Minsk.Utils;
 
 using NUnit.Framework;
@@ -17,10 +18,10 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
         public void Lexer_WithNullDiagnosticsBag_ThrowsArgumentNullException()
         {
             // Arrange
-            var text = "";
+            var source = SourceText.From("");
 
             // Act
-            TestDelegate ctor = () => new Lexer(null, text);
+            TestDelegate ctor = () => new Lexer(source, null);
 
             // Assert
             Assert.That(ctor, Throws.ArgumentNullException);
@@ -33,7 +34,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
             var diagnostics = new DiagnosticBag();
 
             // Act
-            TestDelegate ctor = () => new Lexer(diagnostics, null);
+            TestDelegate ctor = () => new Lexer(null, diagnostics);
 
             // Assert
             Assert.That(ctor, Throws.ArgumentNullException);
@@ -43,8 +44,11 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
         public void Lex_WithSingleToken_LexesToken(
             [ValueSource(nameof(Tokens))] Token token)
         {
+            // Arrange
+            var source = SourceText.From(token.Text);
+
             // Act
-            var tokens = Lexer.Lex(token.Text).ToList();
+            var tokens = Lexer.Lex(source).ToList();
 
             // Assert
             Assert.That(tokens.Count, Is.EqualTo(2));
@@ -56,8 +60,11 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
         public void Lex_WithSpecialToken_LexesToken(
             [ValueSource(nameof(SpecialTokens))] Token token)
         {
+            // Arrange
+            var source = SourceText.From(token.Text);
+
             // Act
-            var tokens = Lexer.Lex(token.Text).ToList();
+            var tokens = Lexer.Lex(source).ToList();
 
             // Assert
             Assert.That(tokens.Count, Is.EqualTo(2));
@@ -69,8 +76,11 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
         public void Lex_WithTokenPairs_LexesTokens(
             [ValueSource(nameof(TokenPairs))] Pair pair)
         {
+            // Arrange
+            var source = SourceText.From(pair.Text);
+
             // Act
-            var tokens = Lexer.Lex(pair.Text).ToList();
+            var tokens = Lexer.Lex(source).ToList();
 
             // Assert
             Assert.That(tokens.Count, Is.EqualTo(3));
@@ -83,8 +93,11 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
         public void Lex_WithTokenPairsSeperated_LexesTokens(
             [ValueSource(nameof(TokenPairsWithSeperator))] Trip trip)
         {
+            // Arrange
+            var source = SourceText.From(trip.Text);
+
             // Act
-            var tokens = Lexer.Lex(trip.Text).ToList();
+            var tokens = Lexer.Lex(source).ToList();
 
             // Assert
             Assert.That(tokens.Count, Is.EqualTo(4));

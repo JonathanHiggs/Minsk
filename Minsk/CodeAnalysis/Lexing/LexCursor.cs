@@ -1,5 +1,4 @@
-
-using Minsk.CodeAnalysis.Common;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Lexing
 {

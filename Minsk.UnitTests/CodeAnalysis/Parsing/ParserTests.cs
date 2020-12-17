@@ -4,6 +4,7 @@ using System.Linq;
 
 using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Text;
 
 using NUnit.Framework;
 
@@ -17,8 +18,11 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
         [Test]
         public void Constructor_WithNullDiagnosticsBag_ThrowsArgumentNull()
         {
+            // Arrange
+            var source = SourceText.From("");
+
             // Act
-            TestDelegate ctor = () => new Parser("", null);
+            TestDelegate ctor = () => new Parser(source, null);
 
             // Assert
             Assert.That(ctor, Throws.ArgumentNullException);

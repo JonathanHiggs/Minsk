@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Lexing;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Parsing
 {

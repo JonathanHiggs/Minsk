@@ -6,6 +6,7 @@ using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.Compiler
 {
@@ -90,7 +91,8 @@ namespace Minsk.Compiler
 
         public void Evaluate(string line)
         {
-            var tree = SyntaxTree.Parse(line);
+            var source = SourceText.From(line);
+            var tree = SyntaxTree.Parse(source);
             var compilation = new Compilation(tree);
             var result = compilation.Evaluate(variables);
 
@@ -101,7 +103,7 @@ namespace Minsk.Compiler
 
                 Console.WriteLine();
                 foreach (var diagnostic in result.Diagnostics)
-                    WriteDiagnostic(diagnostic, line);
+                    WriteDiagnostic(diagnostic, source);
                 Console.WriteLine();
             }
             else
@@ -126,15 +128,25 @@ namespace Minsk.Compiler
             }
         }
 
-        public void WriteDiagnostic(Diagnostic diagnostic, string line)
+        public void WriteDiagnostic(Diagnostic diagnostic, SourceText source)
         {
+            var lineIndex = source.LineIndexOf(diagnostic.Span.Start);
+            var line = source.Lines[lineIndex];
+
+            var lineNumber = lineIndex + 1;
+            var lineCharacter = diagnostic.Span.Start - line.Start + 1;
+
+            var prefix = line.Substring(0, diagnostic.Span.Start);
+            var error = line.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
+            var suffix = line.Substring(diagnostic.Span.End);
+
             Console.ForegroundColor = errorColor;
+
+            if (!string.IsNullOrWhiteSpace(source.FileName))
+                Console.Write($"{source.FileName} ");
+            Console.Write($"({lineNumber}, {lineCharacter}): ");
             Console.WriteLine(diagnostic);
             Console.ResetColor();
-
-            var prefix = line.Substring(0, diagnostic.Source.Start);
-            var error = line.Substring(diagnostic.Source.Start, diagnostic.Source.Length);
-            var suffix = line.Substring(diagnostic.Source.End);
 
             Console.Write("    ");
             Console.Write(prefix);
