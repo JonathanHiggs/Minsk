@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
+using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
 using Minsk.CodeAnalysis.Text;
 
@@ -30,19 +32,54 @@ namespace Minsk.Compiler
         {
             while (!shouldExit)
             {
-                Console.Write(prompt);
-                Console.Write(" ");
+                var textBuilder = new StringBuilder();
 
-                var line = Console.ReadLine();
-                if (line.Length > 1 && line[0] == '#')
-                    HandleCommand(line.Substring(1));
-                else if (line.Length > 0)
-                    Evaluate(line);
+                var moreLines = false;
+                do
+                {
+                    Console.Write(moreLines ? "|" : prompt);
+                    Console.Write(" ");
+
+                    var line = Console.ReadLine();
+                    textBuilder.AppendLine(line);
+
+                    if (!moreLines)
+                        moreLines = IsMultiline(line);
+                    else
+                        moreLines = !IsMultilineFinished(line);
+                }
+                while (moreLines);
+
+                var text = textBuilder.ToString();
+
+                if (text.Length > 1 && text[0] == '#')
+                    HandleCommand(text.Substring(1));
+                else if (text.Length > 0)
+                    Evaluate(text);
             }
         }
 
+        private bool IsMultiline(string line)
+        {
+            if (line.StartsWith("#"))
+                return false;
+
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            var source = SourceText.From(line);
+            var tree = SyntaxTree.Parse(source);
+
+            return tree.Diagnostics.Any();
+        }
+
+        private bool IsMultilineFinished(string line)
+            => string.IsNullOrWhiteSpace(line);
+
         public void HandleCommand(string line)
         {
+            line = line.Replace("\r\n", "");
+
             var sections = line.Split(' ');
             var command = sections[0];
             var args = sections.Skip(1);
@@ -136,9 +173,9 @@ namespace Minsk.Compiler
             var lineNumber = lineIndex + 1;
             var lineCharacter = diagnostic.Span.Start - line.Start + 1;
 
-            var prefix = line.Substring(0, diagnostic.Span.Start);
-            var error = line.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
-            var suffix = line.Substring(diagnostic.Span.End);
+            var prefix = source.ToString(line.Start, diagnostic.Span.Start - line.Start);
+            var error = source.ToString(diagnostic.Span.Start, diagnostic.Span.Length);
+            var suffix = source.ToString(diagnostic.Span.End, line.End - diagnostic.Span.End);
 
             Console.ForegroundColor = errorColor;
 
