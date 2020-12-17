@@ -35,6 +35,7 @@ namespace Minsk.CodeAnalysis.Diagnostics.Visualization
         public void Print()
         {
             // ToDo: adapt to work with TextWriter
+            // ToDo: check bug when rolling over line end
             var foreground = Console.ForegroundColor;
             var background = Console.BackgroundColor;
 
@@ -69,7 +70,7 @@ namespace Minsk.CodeAnalysis.Diagnostics.Visualization
             Console.ForegroundColor = Settings.LinkForeground;
             Console.BackgroundColor = Settings.LinkBackground;
             Console.SetCursorPosition(left, top);
-            Console.Write("|");
+            Console.Write("│");
         }
 
         protected void PrintLeftLink(int left, int right, int top)

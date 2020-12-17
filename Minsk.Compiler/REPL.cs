@@ -21,7 +21,8 @@ namespace Minsk.Compiler
         private bool showHeaders = false;
         private bool showErrorCarrot = false;
 
-        private string prompt = ">";
+        private string prompt = "»";
+        private string continuation = "·";
 
         private ConsoleColor errorColor = ConsoleColor.DarkRed;
 
@@ -37,8 +38,10 @@ namespace Minsk.Compiler
                 var moreLines = false;
                 do
                 {
-                    Console.Write(moreLines ? "|" : prompt);
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(!moreLines ? prompt : continuation);
                     Console.Write(" ");
+                    Console.ResetColor();
 
                     var line = Console.ReadLine();
                     textBuilder.AppendLine(line);
@@ -145,8 +148,10 @@ namespace Minsk.Compiler
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(result.Value);
                 Console.WriteLine();
+                Console.ResetColor();
             }
 
             if (showTree)

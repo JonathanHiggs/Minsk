@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,11 +27,53 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public void PrettyPrint(TextWriter textWriter, string indent = "", bool isLast = true)
         {
+            var toConsole = textWriter == Console.Out;
+
             var marker = isLast ? "└──" : "├──";
 
-            textWriter.Write(indent);
-            textWriter.Write(marker);
-            textWriter.WriteLine($"{Kind}  {Text}");
+            if (toConsole)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                textWriter.Write(indent);
+                textWriter.Write(marker);
+                Console.ResetColor();
+            }
+            else
+            {
+                textWriter.Write(indent);
+                textWriter.Write(marker);
+            }
+
+
+            if (toConsole)
+            {
+                switch (Kind)
+                {
+                    case SyntaxKind.AssignmentExpression:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        break;
+
+                    case SyntaxKind.BinaryExpression:
+                    case SyntaxKind.UnaryExpression:
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        break;
+
+                    case SyntaxKind.NameExpression:
+                    case SyntaxKind.LiteralExpression:
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                textWriter.WriteLine($"{Kind}  {Text}");
+                Console.ResetColor();
+            }
+            else
+            {
+                textWriter.WriteLine($"{Kind}  {Text}");
+            }
 
             indent += isLast ? "   " : "│  ";
 
