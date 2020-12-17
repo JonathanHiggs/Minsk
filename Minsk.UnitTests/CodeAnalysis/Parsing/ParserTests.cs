@@ -143,7 +143,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
         private Expression ParseExpression(string text)
         {
             var syntaxTree = SyntaxTree.Parse(text);
-            var root = syntaxTree.Root;
+            var root = syntaxTree.Root.Expression;
 
             //Assert.That(root, Is.TypeOf<Expression>());
 

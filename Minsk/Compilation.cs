@@ -22,7 +22,7 @@ namespace Minsk.CodeAnalysis
         {
             var diagnostics = Syntax.Diagnostics;
             var binder = new Binder(diagnostics, variables);
-            var boundExpression = binder.BindExpression(Syntax.Root);
+            var boundExpression = binder.BindExpression(Syntax.Root.Expression);
 
             if (diagnostics.Any())
                 return new EvaluationResult(null, diagnostics.ToImmutableArray());

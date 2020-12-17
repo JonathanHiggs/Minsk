@@ -29,11 +29,12 @@ namespace Minsk.CodeAnalysis.Parsing
                 .ToImmutableArray();
         }
 
-        public SyntaxTree Parse()
+        public CompilationUnit ParseCompilationUnit()
         {
             var expression = ParseExpression();
-            var eof = MatchToken(TokenKind.EoF);
-            return new SyntaxTree(source, expression, eof, diagnostics);
+            var eofToken = MatchToken(TokenKind.EoF);
+
+            return new CompilationUnit(expression, eofToken);
         }
 
         private Expression ParseExpression()
