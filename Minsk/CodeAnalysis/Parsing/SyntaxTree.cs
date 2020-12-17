@@ -22,7 +22,7 @@ namespace Minsk.CodeAnalysis.Parsing
         public static SyntaxTree Parse(string line)
         {
             var diagnostics = new DiagnosticBag();
-            var parser = new Parser(diagnostics, line);
+            var parser = new Parser(line, diagnostics);
             return parser.Parse();
         }
 

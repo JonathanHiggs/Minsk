@@ -18,7 +18,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
         public void Constructor_WithNullDiagnosticsBag_ThrowsArgumentNull()
         {
             // Act
-            TestDelegate ctor = () => new Parser(null, "");
+            TestDelegate ctor = () => new Parser("", null);
 
             // Assert
             Assert.That(ctor, Throws.ArgumentNullException);

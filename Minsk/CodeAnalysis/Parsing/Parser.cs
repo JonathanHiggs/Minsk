@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.Immutable;
+using System.Linq;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
@@ -9,27 +10,19 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class Parser
     {
-        public readonly DiagnosticBag diagnostics;
-        private List<LexToken> tokens;
+        private readonly DiagnosticBag diagnostics;
+        private readonly ImmutableArray<LexToken> tokens;
+
         private int position = 0;
 
-        public Parser(DiagnosticBag diagnostics, string text)
+        public Parser(string text, DiagnosticBag diagnostics)
         {
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
-            tokens = new List<LexToken>(text.Length / 4);
-            var lexer = new Lexer(diagnostics, text);
-
-            while(lexer.HasNext)
-            {
-                var token = lexer.NextToken();
-
-                if (token.Kind == TokenKind.Whitespace)
-                    continue;
-
-                tokens.Add(token);
-            }
+            tokens = Lexer.Lex(text, diagnostics)
+                .Where(t => t.Kind != TokenKind.Whitespace)
+                .ToImmutableArray();
         }
 
         public SyntaxTree Parse()
@@ -151,8 +144,8 @@ namespace Minsk.CodeAnalysis.Parsing
             if (index < 0)
                 return tokens[0];
 
-            if (index >= tokens.Count)
-                return tokens[tokens.Count - 1];
+            if (index >= tokens.Length)
+                return tokens[tokens.Length - 1];
 
             return tokens[index];
         }

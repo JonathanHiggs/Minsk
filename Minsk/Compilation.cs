@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 using Minsk.CodeAnalysis.Binding;
 using Minsk.CodeAnalysis.Common;
+using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis
@@ -23,12 +25,12 @@ namespace Minsk.CodeAnalysis
             var boundExpression = binder.BindExpression(Syntax.Root);
 
             if (diagnostics.Any())
-                return new EvaluationResult(diagnostics, null);
+                return new EvaluationResult(null, diagnostics.ToImmutableArray());
 
             var evaluator = new Evaluator(boundExpression, variables);
             var value = evaluator.Evaluate();
 
-            return new EvaluationResult(diagnostics, value);
+            return new EvaluationResult(value, ImmutableArray<Diagnostic>.Empty);
         }
     }
 }

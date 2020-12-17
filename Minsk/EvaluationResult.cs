@@ -1,20 +1,20 @@
 using System;
+using System.Collections.Immutable;
 
 using Minsk.CodeAnalysis.Diagnostics;
 
 namespace Minsk.CodeAnalysis
 {
-    public sealed class EvaluationResult 
+    public sealed class EvaluationResult
     {
-        public EvaluationResult(DiagnosticBag diagnostics, object value)
+        public EvaluationResult(object value, ImmutableArray<Diagnostic> diagnostics)
         {
-            Diagnostics = diagnostics
-                ?? throw new ArgumentNullException(nameof(diagnostics));
-                
             Value = value;
+            Diagnostics = diagnostics;
         }
 
-        public DiagnosticBag Diagnostics { get; }
+        public ImmutableArray<Diagnostic> Diagnostics { get; }
+
         public object Value { get; }
     }
 }
