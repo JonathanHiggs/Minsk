@@ -34,6 +34,7 @@ namespace Minsk.CodeAnalysis.Diagnostics.Visualization
 
         public void Print()
         {
+            // ToDo: adapt to work with TextWriter
             var foreground = Console.ForegroundColor;
             var background = Console.BackgroundColor;
 

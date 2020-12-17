@@ -114,7 +114,7 @@ namespace Minsk.Compiler
             {
                 if (showHeaders)
                     Console.WriteLine("--- Expression Tree");
-                tree.Root.PrettyPrint();
+                tree.Root.PrettyPrint(Console.Out);
             }
 
             if (showVisualTree)

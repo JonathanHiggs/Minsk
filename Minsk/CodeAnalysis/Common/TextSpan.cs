@@ -8,16 +8,11 @@ namespace Minsk.CodeAnalysis.Common
             Length = length;
         }
 
+        public static TextSpan FromBounds(int start, int end)
+            => new TextSpan(start, end - start);
+
         public int Start { get; }
         public int Length { get; }
         public int End => Start + Length;
-
-        public TextSpan Advance()
-            => new TextSpan(Start + Length, 0);
-
-        public TextSpan Inc() => Inc(1);
-
-        public TextSpan Inc(int value)
-            => new TextSpan(Start, Length + value);
     }
 }
