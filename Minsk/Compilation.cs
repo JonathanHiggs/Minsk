@@ -29,8 +29,8 @@ namespace Minsk.CodeAnalysis
         public SyntaxTree SyntaxTree { get; }
 
         internal BoundGlobalScope GlobalScope
-        { 
-            get 
+        {
+            get
             {
                 if (globalScope is null)
                 {
@@ -50,7 +50,7 @@ namespace Minsk.CodeAnalysis
             if (diagnostics.Any())
                 return new EvaluationResult(null, diagnostics.ToImmutableArray());
 
-            var evaluator = new Evaluator(GlobalScope.Expression, variables);
+            var evaluator = new Evaluator(GlobalScope.Statement, variables);
             var value = evaluator.Evaluate();
 
             return new EvaluationResult(value, ImmutableArray<Diagnostic>.Empty);

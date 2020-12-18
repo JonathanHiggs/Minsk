@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -31,10 +32,40 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public CompilationUnit ParseCompilationUnit()
         {
-            var expression = ParseExpression();
+            var statement = ParseStatement();
             var eofToken = MatchToken(TokenKind.EoF);
 
-            return new CompilationUnit(expression, eofToken);
+            return new CompilationUnit(statement, eofToken);
+        }
+
+        private Statement ParseStatement()
+        {
+            if (Current == TokenKind.OpenBrace)
+                return ParseBlockStatement();
+
+            return ParseExpressionStatement();
+        }
+
+        private Statement ParseBlockStatement()
+        {
+            var openBrace = MatchToken(TokenKind.OpenBrace);
+            var expression = ImmutableArray.CreateBuilder<Statement>();
+
+            while (Current != TokenKind.CloseBrace && Current != TokenKind.EoF)
+            {
+                expression.Add(ParseStatement());
+            }
+
+            var closeBrace = MatchToken(TokenKind.CloseBrace);
+
+            return new BlockStatement(openBrace, expression.ToImmutable(), closeBrace);
+        }
+
+        private Statement ParseExpressionStatement()
+        {
+            var expression = ParseExpression();
+            // Note: Can prevent particular expressions from being valid statements
+            return new ExpressionStatement(expression);
         }
 
         private Expression ParseExpression()

@@ -8,10 +8,11 @@ namespace Minsk.CodeAnalysis
 {
     internal sealed class Evaluator
     {
-        private readonly BoundExpression root;
+        private readonly BoundStatement root;
         private readonly Dictionary<VariableSymbol, object> variables;
+        private object lastValue = null;
 
-        public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
+        public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object> variables)
         {
             this.root = root ?? throw new ArgumentNullException(nameof(root));
 
@@ -20,7 +21,38 @@ namespace Minsk.CodeAnalysis
         }
 
         public object Evaluate()
-            => EvaluateExpression(root);
+        {
+            EvaluateStatement(root);
+            return lastValue;
+        }
+
+        private void EvaluateStatement(BoundStatement node)
+        {
+            switch (node.Kind)
+            {
+                case BoundNodeKind.BlockStatement:
+                    EvaluateBlockStatement(node as BoundBlockStatement);
+                    break;
+
+                case BoundNodeKind.ExpressionStatement:
+                    EvaluateExpressionStatement(node as BoundExpressionStatement);
+                    break;
+
+                default:
+                    throw new Exception();
+            }
+        }
+
+        private void EvaluateBlockStatement(BoundBlockStatement boundBlockStatement)
+        {
+            foreach (var statement in boundBlockStatement.BoundStatements)
+                EvaluateStatement(statement);
+        }
+
+        private void EvaluateExpressionStatement(BoundExpressionStatement boundExpressionStatement)
+        {
+            lastValue = EvaluateExpression(boundExpressionStatement.Expression);
+        }
 
         private object EvaluateExpression(BoundExpression node)
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 using Minsk.CodeAnalysis.Common;
@@ -17,21 +18,21 @@ namespace Minsk.CodeAnalysis.Binding
         {
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
-                
+
             scope = new BoundScope(parent);
         }
 
         public static BoundGlobalScope BindGlobalScope(
-            BoundGlobalScope previous, 
-            CompilationUnit compilationUnit, 
+            BoundGlobalScope previous,
+            CompilationUnit compilationUnit,
             DiagnosticBag diagnostics)
         {
             var parentScope = CreateParentScope(previous);
             var binder = new Binder(diagnostics, parentScope);
-            var expression = binder.BindExpression(compilationUnit.Expression);
+            var statement = binder.BindStatement(compilationUnit.Statement);
             var variables = binder.scope.DeclaredVariables;
 
-            return new BoundGlobalScope(previous, diagnostics, variables, expression);
+            return new BoundGlobalScope(previous, diagnostics, variables, statement);
         }
 
         private static BoundScope CreateParentScope(BoundGlobalScope globalScope)
@@ -57,31 +58,58 @@ namespace Minsk.CodeAnalysis.Binding
             return scope;
         }
 
+        private BoundStatement BindStatement(Statement statement)
+        {
+            return statement.Kind switch {
+                SyntaxKind.BlockStatement
+                    => BindBlockStatement(statement as BlockStatement),
+
+                SyntaxKind.ExpressionStatement
+                    => BindExpressionStatement(statement as ExpressionStatement),
+
+                _   => throw new NotImplementedException($"statement.Kind")
+            };
+        }
+
+        private BoundStatement BindBlockStatement(BlockStatement blockStatement)
+        {
+            var boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
+
+            foreach (var statement in blockStatement.Statements)
+                boundStatements.Add(BindStatement(statement));
+
+            return new BoundBlockStatement(boundStatements.ToImmutable());
+        }
+
+        private BoundStatement BindExpressionStatement(ExpressionStatement expressionStatement)
+        {
+            var expression = BindExpression(expressionStatement.Expression);
+            return new BoundExpressionStatement(expression);
+        }
+
         public BoundExpression BindExpression(Expression expression)
         {
-            switch (expression.Kind)
-            {
-                case SyntaxKind.AssignmentExpression:
-                    return BindAssignmentExpression(expression as AssignmentExpression);
+            return expression.Kind switch {
+                SyntaxKind.AssignmentExpression
+                    => BindAssignmentExpression(expression as AssignmentExpression),
 
-                case SyntaxKind.BinaryExpression:
-                    return BindBinaryExpression(expression as BinaryExpression);
+                SyntaxKind.BinaryExpression
+                    => BindBinaryExpression(expression as BinaryExpression),
 
-                case SyntaxKind.LiteralExpression:
-                    return BindLiteralExpression(expression as LiteralExpression);
+                SyntaxKind.LiteralExpression
+                    => BindLiteralExpression(expression as LiteralExpression),
 
-                case SyntaxKind.NameExpression:
-                    return BindNameExpression(expression as NameExpression);
+                SyntaxKind.NameExpression
+                    => BindNameExpression(expression as NameExpression),
 
-                case SyntaxKind.ParenthesesExpression:
-                    return BindParenthesizedExpression(expression as ParenthesizedExpression);
+                SyntaxKind.ParenthesesExpression
+                    => BindParenthesizedExpression(expression as ParenthesizedExpression),
 
-                case SyntaxKind.UnaryExpression:
-                    return BindUnaryExpression(expression as UnaryExpression);
+                SyntaxKind.UnaryExpression
+                    => BindUnaryExpression(expression as UnaryExpression),
 
-                default:
-                    throw new Exception($"Unexpected syntax node '{expression.Kind}'");
-            }
+                _   => throw new NotImplementedException($"Unexpected syntax node '{expression.Kind}'")
+            };
         }
 
         private BoundExpression BindAssignmentExpression(AssignmentExpression assignment)

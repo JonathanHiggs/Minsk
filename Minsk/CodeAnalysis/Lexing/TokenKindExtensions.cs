@@ -27,6 +27,8 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.PipePipe:
                 case TokenKind.OpenParenthesis:
                 case TokenKind.CloseParenthesis:
+                case TokenKind.OpenBrace:
+                case TokenKind.CloseBrace:
                     return true;
 
                 case TokenKind.TrueKeyword:

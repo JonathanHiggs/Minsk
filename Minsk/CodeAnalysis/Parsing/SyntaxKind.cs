@@ -11,6 +11,10 @@ namespace Minsk.CodeAnalysis.Parsing
         UnaryExpression,
 
         // Nodes
-        CompilationUnit
+        CompilationUnit,
+
+        // Statements
+        BlockStatement,
+        ExpressionStatement
     }
 }

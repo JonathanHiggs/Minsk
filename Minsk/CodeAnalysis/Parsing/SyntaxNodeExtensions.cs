@@ -88,7 +88,7 @@ namespace Minsk.CodeAnalysis.Parsing
                     return new UnaryVisualNode(
                         string.Empty,
                         "CompilationUnit",
-                        unit.Expression.ToVisualTree(settings),
+                        unit.Statement.ToVisualTree(settings),
                         settings);
                 }
 

@@ -25,8 +25,8 @@ namespace Minsk.CodeAnalysis.Lexing
 
         [Description("(")]      OpenParenthesis,
         [Description(")")]      CloseParenthesis,
-        //OpenBrace,
-        //CloseBrace,
+        [Description("{")]      OpenBrace,
+        [Description("}")]      CloseBrace,
         //OpenBracket,
         //CloseBracket,
 

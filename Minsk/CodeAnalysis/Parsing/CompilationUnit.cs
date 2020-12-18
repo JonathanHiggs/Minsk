@@ -7,23 +7,23 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class CompilationUnit : SyntaxNode
     {
-        public CompilationUnit(Expression expression, LexToken endOfFileToken)
+        public CompilationUnit(Statement statement, LexToken endOfFileToken)
         {
-            Expression = expression;
+            Statement = statement;
             EndOfFileToken = endOfFileToken;
         }
 
-        public Expression Expression { get; }
+        public Statement Statement { get; }
         public LexToken EndOfFileToken { get; }
 
         public override SyntaxKind Kind => SyntaxKind.CompilationUnit;
 
-        public override string Text => "CompilationUnit";
+        public override string Text => string.Empty;
 
         public override IEnumerable<SyntaxNode> Children
-        { get { yield return Expression; } }
+        { get { yield return Statement; } }
 
-        public override LexToken FirstToken => Expression.FirstToken;
+        public override LexToken FirstToken => Statement.FirstToken;
 
         public override LexToken LastToken => EndOfFileToken;
     }

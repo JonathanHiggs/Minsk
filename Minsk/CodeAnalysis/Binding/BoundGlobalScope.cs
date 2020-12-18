@@ -11,17 +11,17 @@ namespace Minsk.CodeAnalysis.Binding
             BoundGlobalScope previous,
             DiagnosticBag diagnostics,
             ImmutableArray<VariableSymbol> variables,
-            BoundExpression expression)
+            BoundStatement statement)
         {
             Previous = previous;
             Diagnostics = diagnostics;
             Variables = variables;
-            Expression = expression;
+            Statement = statement;
         }
 
         public BoundGlobalScope Previous { get; }
         public DiagnosticBag Diagnostics { get; }
         public ImmutableArray<VariableSymbol> Variables { get; }
-        public BoundExpression Expression { get; }
+        public BoundStatement Statement { get; }
     }
 }
