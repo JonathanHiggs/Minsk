@@ -21,11 +21,12 @@ namespace Minsk.Compiler
         private bool showHeaders = false;
         private bool showErrorCarrot = false;
 
-        private string prompt = "»";
-        private string continuation = "·";
+        private string prompt = ">";
+        private string continuation = "|";
 
         private ConsoleColor errorColor = ConsoleColor.DarkRed;
 
+        private Compilation previous;
         private Dictionary<VariableSymbol, object> variables
             = new Dictionary<VariableSymbol, object>();
 
@@ -93,6 +94,10 @@ namespace Minsk.Compiler
                     Console.Clear();
                     return;
 
+                case "reset":
+                    previous = null;
+                    return;
+
                 case "exit":
                     shouldExit = true;
                     return;
@@ -133,7 +138,9 @@ namespace Minsk.Compiler
         {
             var source = SourceText.From(line);
             var tree = SyntaxTree.Parse(source);
-            var compilation = new Compilation(tree);
+
+            var compilation = previous?.ContinueWith(tree) ?? new Compilation(tree);
+
             var result = compilation.Evaluate(variables);
 
             if (result.Diagnostics.Any())
@@ -148,6 +155,7 @@ namespace Minsk.Compiler
             }
             else
             {
+                previous = compilation;
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(result.Value);
                 Console.WriteLine();

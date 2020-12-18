@@ -82,6 +82,16 @@ namespace Minsk.CodeAnalysis.Parsing
                         settings);
                 }
 
+                case SyntaxKind.CompilationUnit:
+                {
+                    var unit = node as CompilationUnit;
+                    return new UnaryVisualNode(
+                        string.Empty,
+                        "CompilationUnit",
+                        unit.Expression.ToVisualTree(settings),
+                        settings);
+                }
+
                 default:
                     throw new InvalidOperationException();
             }

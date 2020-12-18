@@ -18,7 +18,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public override SyntaxKind Kind => SyntaxKind.CompilationUnit;
 
-        public override string Text => throw new NotImplementedException();
+        public override string Text => "CompilationUnit";
 
         public override IEnumerable<SyntaxNode> Children
         { get { yield return Expression; } }

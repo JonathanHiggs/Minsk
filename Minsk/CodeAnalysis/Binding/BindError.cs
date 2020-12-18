@@ -8,6 +8,7 @@ namespace Minsk.CodeAnalysis.Binding
 {
     public sealed class BindError : Diagnostic
     {
+        // ToDo: Use LexToken rather than TextSpan
         public BindError(SyntaxNode node, TextSpan span, string message)
             : base(span, message)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
@@ -10,15 +11,50 @@ namespace Minsk.CodeAnalysis.Binding
     internal sealed class Binder
     {
         private readonly DiagnosticBag diagnostics;
-        private readonly Dictionary<VariableSymbol, object> variables;
+        private BoundScope scope;
 
-        public Binder(DiagnosticBag diagnostics, Dictionary<VariableSymbol, object> variables)
+        public Binder(DiagnosticBag diagnostics, BoundScope parent)
         {
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
+                
+            scope = new BoundScope(parent);
+        }
 
-            this.variables = variables
-                ?? throw new ArgumentNullException(nameof(variables));
+        public static BoundGlobalScope BindGlobalScope(
+            BoundGlobalScope previous, 
+            CompilationUnit compilationUnit, 
+            DiagnosticBag diagnostics)
+        {
+            var parentScope = CreateParentScope(previous);
+            var binder = new Binder(diagnostics, parentScope);
+            var expression = binder.BindExpression(compilationUnit.Expression);
+            var variables = binder.scope.DeclaredVariables;
+
+            return new BoundGlobalScope(previous, diagnostics, variables, expression);
+        }
+
+        private static BoundScope CreateParentScope(BoundGlobalScope globalScope)
+        {
+            var stack = new Stack<BoundGlobalScope>();
+            while (globalScope is not null)
+            {
+                stack.Push(globalScope);
+                globalScope = globalScope.Previous;
+            }
+
+            BoundScope scope = null;
+            while (stack.Any())
+            {
+                globalScope = stack.Pop();
+
+                scope = new BoundScope(scope);
+
+                foreach (var variable in globalScope.Variables)
+                    scope.TryDeclare(variable);
+            }
+
+            return scope;
         }
 
         public BoundExpression BindExpression(Expression expression)
@@ -53,19 +89,20 @@ namespace Minsk.CodeAnalysis.Binding
             var name = assignment.IdentifierToken.Text;
             var expression = BindExpression(assignment.Expression);
 
-            var variable = variables.Keys.FirstOrDefault(v => v.Name == name);
+            var (success, variable) = scope.TryLookup(name);
 
-            if (!(variable is null) && variable.Type != expression.Type)
-            {
-                variables.Remove(variable);
-                variable = new VariableSymbol(name, expression.Type);
-                variables[variable] = null;
-            }
-            else if (variable is null)
+            if (!success)
             {
                 variable = new VariableSymbol(name, expression.Type);
-                variables[variable] = null;
+                success = scope.TryDeclare(variable);
             }
+            else if (expression.Type != variable.Type)
+            {
+                diagnostics.Binding.CannotConvert(assignment, expression.Type, variable);
+            }
+
+            //if (!success)
+            //    diagnostics.Binding.VariableRedeclaration(assignment);
 
             return new BoundAssignmentExpression(variable, expression);
         }
@@ -106,12 +143,12 @@ namespace Minsk.CodeAnalysis.Binding
         {
             var name = nameExpression.IdentifierToken.Text;
 
-            var variable = variables.Keys.FirstOrDefault(key => key.Name == name);
+            var (found, variable) = scope.TryLookup(name);
 
-            if (variable is null)
+            if (!found)
             {
                 diagnostics.Binding.UndefinedIdentifier(nameExpression);
-                return new BoundLiteralExpression(0);
+                return new BoundVariableExpression(variable);
             }
 
             return new BoundVariableExpression(variable);
