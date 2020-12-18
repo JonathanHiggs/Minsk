@@ -49,6 +49,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
             Assert.That(op1Text, Is.Not.Null);
             Assert.That(op2Text, Is.Not.Null);
 
+            // Assert
             if (op1Precedence >= op2Precedence)
             {
                 // Expected:
@@ -58,14 +59,13 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
                 //  /  \
                 // a    b
 
-                using (var e = expression.Enumerate())
-                {
-                    e.AssertBinaryExpression(op2);
-                    e.AssertBinaryExpression(op1);
-                    e.AssertNameExpression("a");
-                    e.AssertNameExpression("b");
-                    e.AssertNameExpression("c");
-                }
+                using var e = expression.Enumerate();
+
+                e.AssertBinaryExpression(op2);
+                e.AssertBinaryExpression(op1);
+                e.AssertNameExpression("a");
+                e.AssertNameExpression("b");
+                e.AssertNameExpression("c");
             }
             else
             {
@@ -76,14 +76,13 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
                 //    /  \
                 //   b    c
 
-                using (var e = expression.Enumerate())
-                {
-                    e.AssertBinaryExpression(op1);
-                    e.AssertNameExpression("a");
-                    e.AssertBinaryExpression(op2);
-                    e.AssertNameExpression("b");
-                    e.AssertNameExpression("c");
-                }
+                using var e = expression.Enumerate();
+
+                e.AssertBinaryExpression(op1);
+                e.AssertNameExpression("a");
+                e.AssertBinaryExpression(op2);
+                e.AssertNameExpression("b");
+                e.AssertNameExpression("c");
             }
         }
 
@@ -104,6 +103,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
             // Act
             var expression = ParseExpression(text);
 
+            // Assert
             if (unaryPrecedence >= binaryPrecedence)
             {
                 // Expected:
@@ -113,13 +113,12 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
                 //   |
                 //   a
 
-                using (var e = expression.Enumerate())
-                {
-                    e.AssertBinaryExpression(binaryOp);
-                    e.AssertUnaryExpression(unaryOp);
-                    e.AssertNameExpression("a");
-                    e.AssertNameExpression("b");
-                }
+                using var e = expression.Enumerate();
+
+                e.AssertBinaryExpression(binaryOp);
+                e.AssertUnaryExpression(unaryOp);
+                e.AssertNameExpression("a");
+                e.AssertNameExpression("b");
             }
             else
             {
@@ -130,14 +129,40 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
                 //   /  \
                 //  a    b
 
-                using (var e = expression.Enumerate())
-                {
-                    e.AssertUnaryExpression(unaryOp);
-                    e.AssertBinaryExpression(binaryOp);
-                    e.AssertNameExpression("a");
-                    e.AssertNameExpression("b");
-                }
+                using var e = expression.Enumerate();
+
+                e.AssertUnaryExpression(unaryOp);
+                e.AssertBinaryExpression(binaryOp);
+                e.AssertNameExpression("a");
+                e.AssertNameExpression("b");
             }
+        }
+
+        [Test, Combinatorial]
+        public void Parse_WithUnaryPair_BuildsTree(
+            [ValueSource(nameof(UnaryOperators))] TokenKind op1,
+            [ValueSource(nameof(UnaryOperators))] TokenKind op2)
+        {
+            // Arrange
+            var op1Text = op1.GetText();
+            var op2Text = op2.GetText();
+
+            var text = $"{op1Text} {op2Text} a";
+
+            // Act
+            var expression = ParseExpression(text);
+
+            // Assert expected:
+            //   op1
+            //    |
+            //   op2
+            //   / \
+            //  a   b
+            using var e = expression.Enumerate();
+
+            e.AssertUnaryExpression(op1);
+            e.AssertUnaryExpression(op2);
+            e.AssertNameExpression("a");
         }
 
         private Expression ParseExpression(string text)
