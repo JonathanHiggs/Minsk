@@ -22,8 +22,6 @@ namespace Minsk.CodeAnalysis.Binding
         public SyntaxNode Node { get; }
 
         public override string ToString()
-            => $"BindingError  "
-             + $"{Span.Start}-{Span.Start + Span.Length}  "
-             + $"\"{Node.Text}\"  {Message}";
+            => $"BindingError  {Message}";
     }
 }

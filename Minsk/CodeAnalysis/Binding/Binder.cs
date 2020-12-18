@@ -5,6 +5,7 @@ using System.Linq;
 
 using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
+using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis.Binding
@@ -67,6 +68,9 @@ namespace Minsk.CodeAnalysis.Binding
                 SyntaxKind.ExpressionStatement
                     => BindExpressionStatement(statement as ExpressionStatement),
 
+                SyntaxKind.VariableDeclaration
+                    => BindVariableDeclaration(statement as VariableDeclarationStatement),
+
                 _   => throw new NotImplementedException($"statement.Kind")
             };
         }
@@ -74,10 +78,12 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundStatement BindBlockStatement(BlockStatement blockStatement)
         {
             var boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
+            scope = new BoundScope(scope);
 
             foreach (var statement in blockStatement.Statements)
                 boundStatements.Add(BindStatement(statement));
 
+            scope = scope.Parent;
             return new BoundBlockStatement(boundStatements.ToImmutable());
         }
 
@@ -85,6 +91,22 @@ namespace Minsk.CodeAnalysis.Binding
         {
             var expression = BindExpression(expressionStatement.Expression);
             return new BoundExpressionStatement(expression);
+        }
+
+        private BoundVariableDeclarationStatement BindVariableDeclaration(
+            VariableDeclarationStatement node)
+        {
+            var name = node.IdentifierToken.Text;
+            var isReadOnly = node.KeywordToken.Kind == TokenKind.LetKeyword;
+            var expression = BindExpression(node.Expression);
+            var variable = new VariableSymbol(name, isReadOnly, expression.Type);
+
+            if (!scope.TryDeclare(variable))
+            {
+                diagnostics.Binding.VariableRedeclaration(node);
+            }
+
+            return new BoundVariableDeclarationStatement(variable, expression);
         }
 
         public BoundExpression BindExpression(Expression expression)
@@ -112,35 +134,29 @@ namespace Minsk.CodeAnalysis.Binding
             };
         }
 
-        private BoundExpression BindAssignmentExpression(AssignmentExpression assignment)
+        private BoundExpression BindAssignmentExpression(AssignmentExpression node)
         {
-            var name = assignment.IdentifierToken.Text;
-            var expression = BindExpression(assignment.Expression);
+            var name = node.IdentifierToken.Text;
+            var expression = BindExpression(node.Expression);
 
             var (success, variable) = scope.TryLookup(name);
 
             if (!success)
-            {
-                variable = new VariableSymbol(name, expression.Type);
-                success = scope.TryDeclare(variable);
-            }
+                diagnostics.Binding.UndeclaredIdentifier(node);
+            else if (variable.IsReadOnly)
+                diagnostics.Binding.CannotAssignToReadOnlyVariable(node);
             else if (expression.Type != variable.Type)
-            {
-                diagnostics.Binding.CannotConvert(assignment, expression.Type, variable);
-            }
-
-            //if (!success)
-            //    diagnostics.Binding.VariableRedeclaration(assignment);
+                diagnostics.Binding.CannotConvert(node, expression.Type, variable);
 
             return new BoundAssignmentExpression(variable, expression);
         }
 
-        private BoundExpression BindBinaryExpression(BinaryExpression binaryExpression)
+        private BoundExpression BindBinaryExpression(BinaryExpression node)
         {
-            var left = BindExpression(binaryExpression.Left);
-            var right = BindExpression(binaryExpression.Right);
+            var left = BindExpression(node.Left);
+            var right = BindExpression(node.Right);
 
-            var opToken = binaryExpression.OperatorToken;
+            var opToken = node.OperatorToken;
 
             var op = BoundBinaryOperator.Bind(
                 opToken.Kind,
@@ -151,7 +167,7 @@ namespace Minsk.CodeAnalysis.Binding
             {
                 // ToDo: move into the call, and check whether left or right is a BoundNameExpression
                 diagnostics.Binding.UndefinedOperator(
-                    binaryExpression,
+                    node,
                     opToken.Span,
                     $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}");
 
@@ -161,21 +177,21 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundBinaryExpression(left, op, right);
         }
 
-        private BoundLiteralExpression BindLiteralExpression(LiteralExpression literalExpression)
+        private BoundLiteralExpression BindLiteralExpression(LiteralExpression node)
         {
-            var value = literalExpression.Value ?? 0;
+            var value = node.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 
-        private BoundExpression BindNameExpression(NameExpression nameExpression)
+        private BoundExpression BindNameExpression(NameExpression node)
         {
-            var name = nameExpression.IdentifierToken.Text;
+            var name = node.IdentifierToken.Text;
 
             var (found, variable) = scope.TryLookup(name);
 
             if (!found)
             {
-                diagnostics.Binding.UndefinedIdentifier(nameExpression);
+                diagnostics.Binding.UndeclaredIdentifier(node);
                 return new BoundVariableExpression(variable);
             }
 
@@ -183,14 +199,14 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
 
-        private BoundExpression BindParenthesizedExpression(ParenthesizedExpression parenthesizedExpression)
-            => BindExpression(parenthesizedExpression.Expression);
+        private BoundExpression BindParenthesizedExpression(ParenthesizedExpression node)
+            => BindExpression(node.Expression);
 
-        private BoundExpression BindUnaryExpression(UnaryExpression unaryExpression)
+        private BoundExpression BindUnaryExpression(UnaryExpression node)
         {
-            var operand = BindExpression(unaryExpression.Operand);
+            var operand = BindExpression(node.Operand);
 
-            var opToken = unaryExpression.OperatorToken;
+            var opToken = node.OperatorToken;
 
             var op = BoundUnaryOperator.Bind(
                 opToken.Kind,
@@ -199,7 +215,7 @@ namespace Minsk.CodeAnalysis.Binding
             if (op is null)
             {
                 diagnostics.Binding.UndefinedOperator(
-                    unaryExpression,
+                    node,
                     opToken.Span,
                     $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}");
 

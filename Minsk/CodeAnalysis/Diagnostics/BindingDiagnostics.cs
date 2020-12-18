@@ -21,22 +21,34 @@ namespace Minsk.CodeAnalysis.Diagnostics
         public void UndefinedOperator(SyntaxNode node, TextSpan span, string message)
             => Error(node, span, message);
 
-        public void UndefinedIdentifier(NameExpression nameExpression)
+        public void UndeclaredIdentifier(NameExpression node)
             => Error(
-                nameExpression,
-                nameExpression.IdentifierToken.Span,
-                $"Undefined identifier {nameExpression.IdentifierToken.Text}");
+                node,
+                node.IdentifierToken.Span,
+                $"Undefined identifier {node.IdentifierToken.Text}");
 
-        public void VariableRedeclaration(AssignmentExpression assignment)
+        public void UndeclaredIdentifier(AssignmentExpression node)
             => Error(
-                assignment,
-                assignment.IdentifierToken.Span,
-                $"Variable {assignment.IdentifierToken.Text} already declared");
+                node,
+                node.IdentifierToken.Span,
+                $"Undeclared identifier {node.IdentifierToken.Text}");
 
-        public void CannotConvert(AssignmentExpression assignment, Type expressionType, VariableSymbol variable)
+        public void VariableRedeclaration(VariableDeclarationStatement node)
             => Error(
-                assignment,
-                assignment.EqualsToken.Span,
-                $"Can't assign {expressionType} to {variable.Type}");
+                node,
+                node.IdentifierToken.Span,
+                $"Variable {node.IdentifierToken.Text} already declared");
+
+        public void CannotConvert(AssignmentExpression node, Type expressionType, VariableSymbol variable)
+            => Error(
+                node,
+                node.EqualsToken.Span,
+                $"Cannot assign {expressionType} to {node.IdentifierToken.Text}:{variable.Type}");
+
+        public void CannotAssignToReadOnlyVariable(AssignmentExpression node)
+            => Error(
+                node,
+                node.IdentifierToken.Span,
+                $"Cannot assign to a read-only variable");
     }
 }

@@ -33,6 +33,8 @@ namespace Minsk.CodeAnalysis.Lexing
 
                 case TokenKind.TrueKeyword:
                 case TokenKind.FalseKeyword:
+                case TokenKind.VarKeyword:
+                case TokenKind.LetKeyword:
                     return true;
 
                 default:

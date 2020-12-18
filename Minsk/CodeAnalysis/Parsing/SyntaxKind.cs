@@ -15,6 +15,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
         // Statements
         BlockStatement,
-        ExpressionStatement
+        ExpressionStatement,
+        VariableDeclaration
     }
 }

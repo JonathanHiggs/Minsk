@@ -33,6 +33,8 @@ namespace Minsk.CodeAnalysis.Lexing
         // Keywords
         [Description("true")]   TrueKeyword,
         [Description("false")]  FalseKeyword,
+        [Description("var")]    VarKeyword,
+        [Description("let")]    LetKeyword,
 
         // Literals
         Number,

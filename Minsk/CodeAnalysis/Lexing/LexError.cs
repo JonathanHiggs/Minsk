@@ -21,6 +21,6 @@ namespace Minsk.CodeAnalysis.Lexing
         public string Text { get; }
 
         public override string ToString()
-            => $"LexingError  {Span.Start}  \"{Text}\"  {Message}";
+            => $"LexingError  {Message}";
     }
 }

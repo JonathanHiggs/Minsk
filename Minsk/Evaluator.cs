@@ -38,6 +38,10 @@ namespace Minsk.CodeAnalysis
                     EvaluateExpressionStatement(node as BoundExpressionStatement);
                     break;
 
+                case BoundNodeKind.VariableDeclaration:
+                    EvaluateVariableDeclarationStatement(node as BoundVariableDeclarationStatement);
+                    break;
+
                 default:
                     throw new Exception();
             }
@@ -49,9 +53,16 @@ namespace Minsk.CodeAnalysis
                 EvaluateStatement(statement);
         }
 
-        private void EvaluateExpressionStatement(BoundExpressionStatement boundExpressionStatement)
+        private void EvaluateExpressionStatement(BoundExpressionStatement statement)
         {
-            lastValue = EvaluateExpression(boundExpressionStatement.Expression);
+            lastValue = EvaluateExpression(statement.Expression);
+        }
+
+        private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement statement)
+        {
+            var value = EvaluateExpression(statement.Expression);
+            variables[statement.Variable] = value;
+            lastValue = value;
         }
 
         private object EvaluateExpression(BoundExpression node)

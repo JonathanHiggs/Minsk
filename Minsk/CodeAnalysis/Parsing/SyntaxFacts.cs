@@ -58,14 +58,18 @@ namespace Minsk.CodeAnalysis.Parsing
                 // ToDo: Add Keyword attributes to TokenKind and Debug.Assert false cases
                 "true"  => TokenKind.TrueKeyword,
                 "false" => TokenKind.FalseKeyword,
+                "var"   => TokenKind.VarKeyword,
+                "let"   => TokenKind.LetKeyword,
 
-                _ => TokenKind.Identifier
+                _       => TokenKind.Identifier
             };
 
         public static bool IsKeyword(this TokenKind kind)
             => kind switch {
                 TokenKind.TrueKeyword   => true,
                 TokenKind.FalseKeyword  => true,
+                TokenKind.VarKeyword    => true,
+                TokenKind.LetKeyword    => true,
 
                 _ => false
             };

@@ -40,10 +40,15 @@ namespace Minsk.CodeAnalysis.Parsing
 
         private Statement ParseStatement()
         {
-            if (Current == TokenKind.OpenBrace)
-                return ParseBlockStatement();
+            return Current switch {
+                TokenKind.OpenBrace
+                    => ParseBlockStatement(),
 
-            return ParseExpressionStatement();
+                TokenKind.VarKeyword or TokenKind.LetKeyword
+                    => ParseVariableDeclarationStatement(),
+
+                _   => ParseExpressionStatement()
+            };
         }
 
         private Statement ParseBlockStatement()
@@ -66,6 +71,15 @@ namespace Minsk.CodeAnalysis.Parsing
             var expression = ParseExpression();
             // Note: Can prevent particular expressions from being valid statements
             return new ExpressionStatement(expression);
+        }
+
+        private Statement ParseVariableDeclarationStatement()
+        {
+            var keyword = MatchTokenFrom(TokenKind.VarKeyword, TokenKind.LetKeyword);
+            var identifier = MatchToken(TokenKind.Identifier);
+            var equals = MatchToken(TokenKind.Equals);
+            var expression = ParseExpression();
+            return new VariableDeclarationStatement(keyword, identifier, equals, expression);
         }
 
         private Expression ParseExpression()
@@ -201,6 +215,18 @@ namespace Minsk.CodeAnalysis.Parsing
                 $"Expected '{tokenKind}' but was '{PeekToken(0).Text}'");
 
             return new LexToken(tokenKind, PeekToken(0).Span, null, null);
+        }
+
+        private LexToken MatchTokenFrom(params TokenKind[] tokenKinds)
+        {
+            if (tokenKinds.Contains(Current))
+                return NextToken();
+
+            diagnostics.Syntax.UnexpectedToken(
+                PeekToken(0),
+                $"Expected one of {string.Join(',', tokenKinds.Select(k => $"'{k}'"))}, but was '{PeekToken(0).Text}'");
+
+            return new LexToken(tokenKinds[0], PeekToken(0).Span, null, null);
         }
 
         private LexToken MatchBinaryOperatorToken()
