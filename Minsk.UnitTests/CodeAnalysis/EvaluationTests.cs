@@ -54,6 +54,10 @@ namespace Minsk.UnitTests.CodeAnalysis
                 ("{ var x = 10 if x == 11 x = 12 }", 10),
                 ("{ var x = 9 if x == 9 x = x + 11 else x = x - 1 }", 20),
                 ("{ var x = 10 if x == 9 x = x + 11 else x = x - 1 }", 9),
+                ("{ var i = 0 while i < 10 i = i + 1 i }", 10),
+                ("{ var i = 0 while (i < 10) i = i + 1 i }", 10),
+                ("{ var i = 0 while i < 10 { i = i + 1 } i }", 10),
+                ("{ var i = 0 while (i < 10) { i = i + 1 } i }", 10),
                 //("", ),
             };
 

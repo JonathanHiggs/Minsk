@@ -138,6 +138,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
                 (TokenKind.LetKeyword,          "let"),
                 (TokenKind.IfKeyword,           "if"),
                 (TokenKind.ElseKeyword,         "else"),
+                (TokenKind.WhileKeyword,        "while"),
 
                 (TokenKind.Number,              "1"),
                 (TokenKind.Number,              "123"),

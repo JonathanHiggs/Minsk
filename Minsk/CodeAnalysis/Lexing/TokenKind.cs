@@ -42,6 +42,7 @@ namespace Minsk.CodeAnalysis.Lexing
         [Description("let")]    LetKeyword,
         [Description("if")]     IfKeyword,
         [Description("else")]   ElseKeyword,
+        [Description("while")]  WhileKeyword,
 
         // Literals
         Number,

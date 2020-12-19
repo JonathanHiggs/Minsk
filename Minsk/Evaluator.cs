@@ -46,6 +46,10 @@ namespace Minsk.CodeAnalysis
                     EvaluateVariableDeclarationStatement(node as BoundVariableDeclarationStatement);
                     break;
 
+                case BoundNodeKind.WhileStatement:
+                    EvaluateWhileStatement(node as BoundWhileStatement);
+                    break;
+
                 default:
                     throw new Exception();
             }
@@ -76,6 +80,12 @@ namespace Minsk.CodeAnalysis
             var value = EvaluateExpression(node.Expression);
             variables[node.Variable] = value;
             lastValue = value;
+        }
+
+        private void EvaluateWhileStatement(BoundWhileStatement node)
+        {
+            while((bool)EvaluateExpression(node.Condition))
+                EvaluateStatement(node.Body);
         }
 
         private object EvaluateExpression(BoundExpression node)

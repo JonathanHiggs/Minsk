@@ -74,6 +74,9 @@ namespace Minsk.CodeAnalysis.Binding
                 SyntaxKind.VariableDeclaration
                     => BindVariableDeclaration(node as VariableDeclarationStatement),
 
+                SyntaxKind.WhileStatement
+                    => BindWhileStatement(node as WhileStatement),
+
                 _   => throw new NotImplementedException($"statement.Kind")
             };
         }
@@ -113,7 +116,7 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundVariableDeclarationStatement BindVariableDeclaration(
+        private BoundStatement BindVariableDeclaration(
             VariableDeclarationStatement node)
         {
             var name = node.IdentifierToken.Text;
@@ -125,6 +128,13 @@ namespace Minsk.CodeAnalysis.Binding
                 diagnostics.Binding.VariableRedeclaration(node);
 
             return new BoundVariableDeclarationStatement(variable, expression);
+        }
+
+        private BoundStatement BindWhileStatement(WhileStatement node)
+        {
+            var condition = BindExpression(node.Condition, typeof(bool));
+            var body = BindStatement(node.Body);
+            return new BoundWhileStatement(condition, body);
         }
 
         public BoundExpression BindExpression(Expression node)

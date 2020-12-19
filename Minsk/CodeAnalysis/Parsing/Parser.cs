@@ -44,11 +44,14 @@ namespace Minsk.CodeAnalysis.Parsing
                 TokenKind.OpenBrace
                     => ParseBlockStatement(),
 
+                TokenKind.IfKeyword
+                    => ParseConditionalStatement(),
+
                 TokenKind.VarKeyword or TokenKind.LetKeyword
                     => ParseVariableDeclarationStatement(),
 
-                TokenKind.IfKeyword
-                    => ParseConditionalStatement(),
+                TokenKind.WhileKeyword
+                    => ParseWhileStatement(),
 
                 _   => ParseExpressionStatement()
             };
@@ -102,6 +105,14 @@ namespace Minsk.CodeAnalysis.Parsing
             var equals = MatchToken(TokenKind.Equals);
             var expression = ParseExpression();
             return new VariableDeclarationStatement(keyword, identifier, equals, expression);
+        }
+
+        private Statement ParseWhileStatement()
+        {
+            var keyword = MatchToken(TokenKind.WhileKeyword);
+            var condition = ParseExpression();
+            var body = ParseStatement();
+            return new WhileStatement(keyword, condition, body);
         }
 
         private Expression ParseExpression()
