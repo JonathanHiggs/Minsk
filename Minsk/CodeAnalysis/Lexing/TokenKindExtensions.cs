@@ -42,6 +42,8 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.IfKeyword:
                 case TokenKind.ElseKeyword:
                 case TokenKind.WhileKeyword:
+                case TokenKind.ForKeyword:
+                case TokenKind.ToKeyword:
                     return true;
 
                 default:

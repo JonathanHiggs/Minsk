@@ -15,13 +15,13 @@ namespace Minsk.CodeAnalysis.Parsing
             Expression expression)
         {
             KeywordToken = keywordToken;
-            IdentifierToken = identifierToken;
+            Identifier = identifierToken;
             EqualsToken = equalsToken;
             Expression = expression;
         }
 
         public LexToken KeywordToken { get; }
-        public LexToken IdentifierToken { get; }
+        public LexToken Identifier { get; }
         public LexToken EqualsToken { get; }
         public Expression Expression { get; }
 

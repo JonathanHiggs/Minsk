@@ -54,7 +54,13 @@ namespace Minsk.CodeAnalysis.Diagnostics
         public void VariableRedeclaration(VariableDeclarationStatement node)
             => Error(
                 node,
-                node.IdentifierToken.Span,
-                $"Variable {node.IdentifierToken.Text} already declared");
+                node.Identifier.Span,
+                $"Variable {node.Identifier.Text} already declared");
+
+        public void VariableRedeclaration(ForToStatement node)
+            => Error(
+                node,
+                node.Identifier.Span,
+                $"Variable {node.Identifier.Text} already declared");
     }
 }

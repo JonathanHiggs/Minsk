@@ -18,6 +18,7 @@ namespace Minsk.CodeAnalysis.Parsing
         BlockStatement,
         ConditionalStatement,
         ExpressionStatement,
+        ForToStatement,
         VariableDeclaration,
         WhileStatement,
     }

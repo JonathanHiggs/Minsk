@@ -47,6 +47,9 @@ namespace Minsk.CodeAnalysis.Parsing
                 TokenKind.IfKeyword
                     => ParseConditionalStatement(),
 
+                TokenKind.ForKeyword
+                    => ParseForToStatement(),
+
                 TokenKind.VarKeyword or TokenKind.LetKeyword
                     => ParseVariableDeclarationStatement(),
 
@@ -80,6 +83,20 @@ namespace Minsk.CodeAnalysis.Parsing
             var elseClause = ParseOptionalElseClause();
             return new ConditionalStatement(ifKeyword, condition, statement, elseClause);
         }
+
+        private Statement ParseForToStatement()
+        {
+            var forKeyword = MatchToken(TokenKind.ForKeyword);
+            var identifier = MatchToken(TokenKind.Identifier);
+            var equals = MatchToken(TokenKind.Equals);
+            var lowerBound = ParseExpression();
+            var toKeyword = MatchToken(TokenKind.ToKeyword);
+            var upperBound = ParseExpression();
+            var body = ParseStatement();
+
+            return new ForToStatement(
+                forKeyword, identifier, equals, lowerBound, toKeyword, upperBound, body);
+        } 
 
         private ElseClauseSyntax ParseOptionalElseClause()
         {

@@ -67,6 +67,8 @@ namespace Minsk.CodeAnalysis.Parsing
                 "if"    => TokenKind.IfKeyword,
                 "else"  => TokenKind.ElseKeyword,
                 "while" => TokenKind.WhileKeyword,
+                "for"   => TokenKind.ForKeyword,
+                "to"    => TokenKind.ToKeyword,
 
                 _       => TokenKind.Identifier
             };
@@ -80,6 +82,8 @@ namespace Minsk.CodeAnalysis.Parsing
                 TokenKind.IfKeyword     => true,
                 TokenKind.ElseKeyword   => true,
                 TokenKind.WhileKeyword  => true,
+                TokenKind.ForKeyword    => true,
+                TokenKind.ToKeyword     => true,
 
                 _ => false
             };

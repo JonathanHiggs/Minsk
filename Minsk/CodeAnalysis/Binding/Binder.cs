@@ -65,11 +65,14 @@ namespace Minsk.CodeAnalysis.Binding
                 SyntaxKind.BlockStatement
                     => BindBlockStatement(node as BlockStatement),
 
+                SyntaxKind.ConditionalStatement
+                    => BindConditionalStatement(node as ConditionalStatement),
+
                 SyntaxKind.ExpressionStatement
                     => BindExpressionStatement(node as ExpressionStatement),
 
-                SyntaxKind.ConditionalStatement
-                    => BindConditionalStatement(node as ConditionalStatement),
+                SyntaxKind.ForToStatement
+                    => BindForToStatement(node as ForToStatement),
 
                 SyntaxKind.VariableDeclaration
                     => BindVariableDeclaration(node as VariableDeclarationStatement),
@@ -116,10 +119,29 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
+        private BoundStatement BindForToStatement(ForToStatement node)
+        {
+            var lowerBound = BindExpression(node.LowerBound, typeof(int));
+            var upperBound = BindExpression(node.UpperBound, typeof(int));
+
+            scope = new BoundScope(scope);
+
+            var name = node.Identifier.Text;
+            var variable = new VariableSymbol(name, true, typeof(int));
+
+            if (!scope.TryDeclare(variable))
+                diagnostics.Binding.VariableRedeclaration(node);
+
+            var body = BindStatement(node.Body);
+            scope = scope.Parent;
+
+            return new BoundForToStatement(variable, lowerBound, upperBound, body);
+        }
+
         private BoundStatement BindVariableDeclaration(
             VariableDeclarationStatement node)
         {
-            var name = node.IdentifierToken.Text;
+            var name = node.Identifier.Text;
             var isReadOnly = node.KeywordToken.Kind == TokenKind.LetKeyword;
             var expression = BindExpression(node.Expression);
             var variable = new VariableSymbol(name, isReadOnly, expression.Type);

@@ -58,6 +58,12 @@ namespace Minsk.UnitTests.CodeAnalysis
                 ("{ var i = 0 while (i < 10) i = i + 1 i }", 10),
                 ("{ var i = 0 while i < 10 { i = i + 1 } i }", 10),
                 ("{ var i = 0 while (i < 10) { i = i + 1 } i }", 10),
+                ("{ var sum = 0 for i = 1 to 4 sum = sum + i sum }", 10),
+                ("{ var sum = 0 for i = 1 to 4 { sum = sum + i } sum }", 10),
+                ("{ var sum = 0 for i = (2 - 1) to 4 { sum = sum + i } sum }", 10),
+                ("{ var sum = 0 for i = (2 - 1) to (5 - 1) { sum = sum + i } sum }", 10),
+                ("{ var sum = 0 for i = (2 - 1) to (5 - 1) sum = sum + i sum }", 10),
+                ("{ var sum = 0 for i = 1 to (5 - 1) sum = sum + i sum }", 10),
                 //("", ),
             };
 
@@ -112,6 +118,22 @@ namespace Minsk.UnitTests.CodeAnalysis
                 {
                     var x = 10
                     x [=] true
+                }",
+                // Non boolean condition
+                @"
+                {
+                    if [10]
+                        10
+                }",
+                @"
+                {
+                    while [1]
+                        1
+                }",
+                @"
+                {
+                    for i = [false] to 10
+                        10
                 }",
             }).Select(AnnotatedText.Parse);
 
