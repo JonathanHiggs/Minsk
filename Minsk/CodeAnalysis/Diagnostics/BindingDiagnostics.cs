@@ -18,6 +18,24 @@ namespace Minsk.CodeAnalysis.Diagnostics
         private void Error(SyntaxNode node, TextSpan span, string message)
             => bag.Report(new BindError(node, span, message));
 
+        public void CannotAssignToReadOnlyVariable(AssignmentExpression node)
+            => Error(
+                node,
+                node.IdentifierToken.Span,
+                $"Cannot assign to a read-only variable");
+
+        public void CannotConvert(Expression node, Type expressionType, Type targetType)
+            => Error(
+                node,
+                TextSpan.FromBounds(node.FirstToken.Span.Start, node.LastToken.Span.End),
+                $"{expressionType} to {targetType}");
+
+        public void CannotConvert(AssignmentExpression node, Type expressionType, VariableSymbol variable)
+            => Error(
+                node,
+                node.EqualsToken.Span,
+                $"Cannot assign {expressionType} to {node.IdentifierToken.Text}:{variable.Type}");
+
         public void UndefinedOperator(SyntaxNode node, TextSpan span, string message)
             => Error(node, span, message);
 
@@ -38,17 +56,5 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node,
                 node.IdentifierToken.Span,
                 $"Variable {node.IdentifierToken.Text} already declared");
-
-        public void CannotConvert(AssignmentExpression node, Type expressionType, VariableSymbol variable)
-            => Error(
-                node,
-                node.EqualsToken.Span,
-                $"Cannot assign {expressionType} to {node.IdentifierToken.Text}:{variable.Type}");
-
-        public void CannotAssignToReadOnlyVariable(AssignmentExpression node)
-            => Error(
-                node,
-                node.IdentifierToken.Span,
-                $"Cannot assign to a read-only variable");
     }
 }

@@ -12,10 +12,12 @@ namespace Minsk.CodeAnalysis.Parsing
 
         // Nodes
         CompilationUnit,
+        ElseNode,
 
         // Statements
         BlockStatement,
+        ConditionalStatement,
         ExpressionStatement,
-        VariableDeclaration
+        VariableDeclaration,
     }
 }

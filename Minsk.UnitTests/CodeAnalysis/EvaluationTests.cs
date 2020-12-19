@@ -50,6 +50,10 @@ namespace Minsk.UnitTests.CodeAnalysis
                 ("{ var x = 3 * 3 }", 9),
                 ("{ var x = (4 * 4) }", 16),
                 ("{{ var x = 10 } var x = 11 }", 11),
+                ("{ var x = 10 if x == 10 x = 11 }", 11),
+                ("{ var x = 10 if x == 11 x = 12 }", 10),
+                ("{ var x = 9 if x == 9 x = x + 11 else x = x - 1 }", 20),
+                ("{ var x = 10 if x == 9 x = x + 11 else x = x - 1 }", 9),
                 //("", ),
             };
 

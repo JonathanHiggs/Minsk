@@ -64,6 +64,8 @@ namespace Minsk.CodeAnalysis.Parsing
                 "false" => TokenKind.FalseKeyword,
                 "var"   => TokenKind.VarKeyword,
                 "let"   => TokenKind.LetKeyword,
+                "if"    => TokenKind.IfKeyword,
+                "else"  => TokenKind.ElseKeyword,
 
                 _       => TokenKind.Identifier
             };
@@ -74,6 +76,8 @@ namespace Minsk.CodeAnalysis.Parsing
                 TokenKind.FalseKeyword  => true,
                 TokenKind.VarKeyword    => true,
                 TokenKind.LetKeyword    => true,
+                TokenKind.IfKeyword     => true,
+                TokenKind.ElseKeyword   => true,
 
                 _ => false
             };

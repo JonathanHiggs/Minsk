@@ -59,37 +59,57 @@ namespace Minsk.CodeAnalysis.Binding
             return scope;
         }
 
-        private BoundStatement BindStatement(Statement statement)
+        private BoundStatement BindStatement(Statement node)
         {
-            return statement.Kind switch {
+            return node.Kind switch {
                 SyntaxKind.BlockStatement
-                    => BindBlockStatement(statement as BlockStatement),
+                    => BindBlockStatement(node as BlockStatement),
 
                 SyntaxKind.ExpressionStatement
-                    => BindExpressionStatement(statement as ExpressionStatement),
+                    => BindExpressionStatement(node as ExpressionStatement),
+
+                SyntaxKind.ConditionalStatement
+                    => BindConditionalStatement(node as ConditionalStatement),
 
                 SyntaxKind.VariableDeclaration
-                    => BindVariableDeclaration(statement as VariableDeclarationStatement),
+                    => BindVariableDeclaration(node as VariableDeclarationStatement),
 
                 _   => throw new NotImplementedException($"statement.Kind")
             };
         }
 
-        private BoundStatement BindBlockStatement(BlockStatement blockStatement)
+        private BoundStatement BindBlockStatement(BlockStatement node)
         {
             var boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
             scope = new BoundScope(scope);
 
-            foreach (var statement in blockStatement.Statements)
+            foreach (var statement in node.Statements)
                 boundStatements.Add(BindStatement(statement));
 
             scope = scope.Parent;
             return new BoundBlockStatement(boundStatements.ToImmutable());
         }
 
-        private BoundStatement BindExpressionStatement(ExpressionStatement expressionStatement)
+        private BoundStatement BindConditionalStatement(ConditionalStatement node)
         {
-            var expression = BindExpression(expressionStatement.Expression);
+            var condition = BindExpression(node.Condition, typeof(bool));
+            var statement = BindStatement(node.ThenStatement);
+            var elseStatement = BindOptionalElseClause(node.ElseClause);
+
+            return new BoundConditionalStatement(condition, statement, elseStatement);
+        }
+
+        private BoundStatement BindOptionalElseClause(ElseClauseSyntax node)
+        {
+            if (node is null)
+                return null;
+
+            return BindStatement(node.Statement);
+        }
+
+        private BoundStatement BindExpressionStatement(ExpressionStatement node)
+        {
+            var expression = BindExpression(node.Expression);
             return new BoundExpressionStatement(expression);
         }
 
@@ -102,36 +122,44 @@ namespace Minsk.CodeAnalysis.Binding
             var variable = new VariableSymbol(name, isReadOnly, expression.Type);
 
             if (!scope.TryDeclare(variable))
-            {
                 diagnostics.Binding.VariableRedeclaration(node);
-            }
 
             return new BoundVariableDeclarationStatement(variable, expression);
         }
 
-        public BoundExpression BindExpression(Expression expression)
+        public BoundExpression BindExpression(Expression node)
         {
-            return expression.Kind switch {
+            return node.Kind switch {
                 SyntaxKind.AssignmentExpression
-                    => BindAssignmentExpression(expression as AssignmentExpression),
+                    => BindAssignmentExpression(node as AssignmentExpression),
 
                 SyntaxKind.BinaryExpression
-                    => BindBinaryExpression(expression as BinaryExpression),
+                    => BindBinaryExpression(node as BinaryExpression),
 
                 SyntaxKind.LiteralExpression
-                    => BindLiteralExpression(expression as LiteralExpression),
+                    => BindLiteralExpression(node as LiteralExpression),
 
                 SyntaxKind.NameExpression
-                    => BindNameExpression(expression as NameExpression),
+                    => BindNameExpression(node as NameExpression),
 
                 SyntaxKind.ParenthesesExpression
-                    => BindParenthesizedExpression(expression as ParenthesizedExpression),
+                    => BindParenthesizedExpression(node as ParenthesizedExpression),
 
                 SyntaxKind.UnaryExpression
-                    => BindUnaryExpression(expression as UnaryExpression),
+                    => BindUnaryExpression(node as UnaryExpression),
 
-                _   => throw new NotImplementedException($"Unexpected syntax node '{expression.Kind}'")
+                _   => throw new NotImplementedException($"Unexpected syntax node '{node.Kind}'")
             };
+        }
+
+        public BoundExpression BindExpression(Expression node, Type targetType)
+        {
+            var expression = BindExpression(node);
+
+            if (expression.Type != targetType)
+                diagnostics.Binding.CannotConvert(node, expression.Type, targetType);
+
+            return expression;
         }
 
         private BoundExpression BindAssignmentExpression(AssignmentExpression node)

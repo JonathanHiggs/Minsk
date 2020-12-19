@@ -11,7 +11,8 @@ namespace Minsk.CodeAnalysis.Binding
 
         // Statements
         BlockStatement,
+        ConditionalStatement,
         ExpressionStatement,
-        VariableDeclaration
+        VariableDeclaration,
     }
 }

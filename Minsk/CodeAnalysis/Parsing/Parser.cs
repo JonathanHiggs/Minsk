@@ -47,6 +47,9 @@ namespace Minsk.CodeAnalysis.Parsing
                 TokenKind.VarKeyword or TokenKind.LetKeyword
                     => ParseVariableDeclarationStatement(),
 
+                TokenKind.IfKeyword
+                    => ParseConditionalStatement(),
+
                 _   => ParseExpressionStatement()
             };
         }
@@ -64,6 +67,25 @@ namespace Minsk.CodeAnalysis.Parsing
             var closeBrace = MatchToken(TokenKind.CloseBrace);
 
             return new BlockStatement(openBrace, expression.ToImmutable(), closeBrace);
+        }
+
+        private Statement ParseConditionalStatement()
+        {
+            var ifKeyword = MatchToken(TokenKind.IfKeyword);
+            var condition = ParseExpression();
+            var statement = ParseStatement();
+            var elseClause = ParseOptionalElseClause();
+            return new ConditionalStatement(ifKeyword, condition, statement, elseClause);
+        }
+
+        private ElseClauseSyntax ParseOptionalElseClause()
+        {
+            if (Current != TokenKind.ElseKeyword)
+                return null;
+
+            var elseKeyword = MatchToken(TokenKind.ElseKeyword);
+            var elseStatement = ParseStatement();
+            return new ElseClauseSyntax(elseKeyword, elseStatement);
         }
 
         private Statement ParseExpressionStatement()

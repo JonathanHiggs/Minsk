@@ -34,6 +34,10 @@ namespace Minsk.CodeAnalysis
                     EvaluateBlockStatement(node as BoundBlockStatement);
                     break;
 
+                case BoundNodeKind.ConditionalStatement:
+                    EvaluateConditionalStatement(node as BoundConditionalStatement);
+                    break;
+
                 case BoundNodeKind.ExpressionStatement:
                     EvaluateExpressionStatement(node as BoundExpressionStatement);
                     break;
@@ -47,21 +51,30 @@ namespace Minsk.CodeAnalysis
             }
         }
 
-        private void EvaluateBlockStatement(BoundBlockStatement boundBlockStatement)
+        private void EvaluateBlockStatement(BoundBlockStatement node)
         {
-            foreach (var statement in boundBlockStatement.BoundStatements)
+            foreach (var statement in node.BoundStatements)
                 EvaluateStatement(statement);
         }
 
-        private void EvaluateExpressionStatement(BoundExpressionStatement statement)
+        private void EvaluateConditionalStatement(BoundConditionalStatement node)
         {
-            lastValue = EvaluateExpression(statement.Expression);
+            var condition = (bool)EvaluateExpression(node.Condition);
+            if (condition)
+                EvaluateStatement(node.ThenStatement);
+            else if (node.ElseStatement is not null)
+                EvaluateStatement(node.ElseStatement);
         }
 
-        private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement statement)
+        private void EvaluateExpressionStatement(BoundExpressionStatement node)
         {
-            var value = EvaluateExpression(statement.Expression);
-            variables[statement.Variable] = value;
+            lastValue = EvaluateExpression(node.Expression);
+        }
+
+        private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement node)
+        {
+            var value = EvaluateExpression(node.Expression);
+            variables[node.Variable] = value;
             lastValue = value;
         }
 
