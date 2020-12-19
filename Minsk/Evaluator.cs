@@ -103,13 +103,17 @@ namespace Minsk.CodeAnalysis
             var op = node.Op.Kind;
 
             return op switch {
-                BoundBinaryOperatorKind.Addition        => (int)left + (int)right,
-                BoundBinaryOperatorKind.Subtraction     => (int)left - (int)right,
-                BoundBinaryOperatorKind.Multiplication  => (int)left * (int)right,
-                BoundBinaryOperatorKind.Division        => (int)left / (int)right,
+                BoundBinaryOperatorKind.Addition        => (int)left  +  (int)right,
+                BoundBinaryOperatorKind.Subtraction     => (int)left  -  (int)right,
+                BoundBinaryOperatorKind.Multiplication  => (int)left  *  (int)right,
+                BoundBinaryOperatorKind.Division        => (int)left  /  (int)right,
 
                 BoundBinaryOperatorKind.LogicalAnd      => (bool)left && (bool)right,
                 BoundBinaryOperatorKind.LogicalOr       => (bool)left || (bool)right,
+                BoundBinaryOperatorKind.Less            => (int)left  <  (int)right,
+                BoundBinaryOperatorKind.LessOrEquals    => (int)left  <= (int)right,
+                BoundBinaryOperatorKind.Greater         => (int)left  >  (int)right,
+                BoundBinaryOperatorKind.GreaterOrEquals => (int)left  >= (int)right,
 
                 BoundBinaryOperatorKind.Equals          => Equals(left, right),
                 BoundBinaryOperatorKind.NotEquals       => !Equals(left, right),

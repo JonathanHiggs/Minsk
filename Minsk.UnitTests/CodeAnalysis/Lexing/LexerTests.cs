@@ -124,12 +124,18 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
                 (TokenKind.AmpersandAmperand,   "&&"),
                 (TokenKind.Equals,              "="),
                 (TokenKind.EqualsEquals,        "=="),
+                (TokenKind.Less,                "<"),
+                (TokenKind.LessOrEquals,        "<="),
+                (TokenKind.Greater,             ">"),
+                (TokenKind.GreaterOrEquals,     ">="),
                 (TokenKind.PipePipe,            "||"),
                 (TokenKind.OpenParenthesis,     "("),
                 (TokenKind.CloseParenthesis,    ")"),
 
                 (TokenKind.TrueKeyword,         "true"),
                 (TokenKind.FalseKeyword,        "false"),
+                (TokenKind.VarKeyword,          "var"),
+                (TokenKind.LetKeyword,          "let"),
 
                 (TokenKind.Number,              "1"),
                 (TokenKind.Number,              "123"),
@@ -174,6 +180,9 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
 
             public static implicit operator Token((TokenKind, string) tuple)
                 => new Token(tuple.Item1, tuple.Item2);
+
+            public override string ToString()
+                => $"{Kind}: '{Text}'";
         }
 
         public readonly struct Pair
@@ -191,6 +200,9 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
 
             public static implicit operator Pair((TokenKind, TokenKind, string) tuple)
                 => new Pair(tuple.Item1, tuple.Item2, tuple.Item3);
+
+            public override string ToString()
+                => $"{Kind1}, {Kind2}: '{Text}'";
         }
 
         public readonly struct Trip
@@ -210,6 +222,9 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
 
             public static implicit operator Trip((TokenKind, TokenKind, TokenKind, string) tuple)
                 => new Trip(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
+
+            public override string ToString()
+                => $"{Kind1}, {Kind2}, {Kind3}: '{Text}'";
         }
 
         //private void Test(string text, params TokenKind[] expected)

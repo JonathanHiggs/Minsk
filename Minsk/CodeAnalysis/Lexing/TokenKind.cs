@@ -22,6 +22,11 @@ namespace Minsk.CodeAnalysis.Lexing
         [Description("=")]      Equals,
         [Description("==")]     EqualsEquals,
         [Description("||")]     PipePipe,
+        [Description("<")]      Less,
+        [Description("<=")]     LessOrEquals,
+        [Description(">")]      Greater,
+        [Description(">=")]     GreaterOrEquals,
+
 
         [Description("(")]      OpenParenthesis,
         [Description(")")]      CloseParenthesis,

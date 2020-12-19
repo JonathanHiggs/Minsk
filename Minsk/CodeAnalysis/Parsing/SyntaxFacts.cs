@@ -40,6 +40,10 @@ namespace Minsk.CodeAnalysis.Parsing
 
                 case TokenKind.EqualsEquals:
                 case TokenKind.BangEquals:
+                case TokenKind.Less:
+                case TokenKind.LessOrEquals:
+                case TokenKind.Greater:
+                case TokenKind.GreaterOrEquals:
                     return 3;
 
                 case TokenKind.AmpersandAmperand:
@@ -84,7 +88,16 @@ namespace Minsk.CodeAnalysis.Parsing
 
                 (TokenKind.Equals,          TokenKind.Equals)           => true,
                 (TokenKind.Equals,          TokenKind.EqualsEquals)     => true,
+                (TokenKind.Equals,          TokenKind.Less)             => true,
+                (TokenKind.Equals,          TokenKind.Greater)          => true,
                 (TokenKind.EqualsEquals,    TokenKind.Equals)           => true,
+
+                (TokenKind.Less,            TokenKind.Equals)           => true,
+                (TokenKind.Less,            TokenKind.EqualsEquals)     => true,
+                (TokenKind.LessOrEquals,    TokenKind.Equals)           => true,
+                (TokenKind.Greater,         TokenKind.Equals)           => true,
+                (TokenKind.Greater,         TokenKind.EqualsEquals)     => true,
+                (TokenKind.GreaterOrEquals, TokenKind.Equals)           => true,
 
                 (TokenKind.Number,          TokenKind.Number)           => true,
 

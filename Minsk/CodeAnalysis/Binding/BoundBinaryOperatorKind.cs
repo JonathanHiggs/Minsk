@@ -7,12 +7,16 @@ namespace Minsk.CodeAnalysis.Binding
         Subtraction,
         Multiplication,
         Division,
+        Less,
+        LessOrEquals,
+        Greater,
+        GreaterOrEquals,
 
         // Logical
         LogicalAnd,
         LogicalOr,
 
         Equals,
-        NotEquals
+        NotEquals,
     }
 }

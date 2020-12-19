@@ -74,6 +74,13 @@ namespace Minsk.CodeAnalysis.Lexing
                     //return EmitToken(TokenType.Ampersand, 1);
                 } break;
 
+                case '|':
+                {
+                    if (Next == '|')
+                        return EmitToken(TokenKind.PipePipe, 2);
+                    //return EmitToken(TokenType.Pipe, 1);
+                } break;
+
                 case '!':
                 {
                     if (Next == '=')
@@ -88,12 +95,18 @@ namespace Minsk.CodeAnalysis.Lexing
                     return EmitToken(TokenKind.Equals, 1);
                 }
 
-                case '|':
+                case '<':
                 {
-                    if (Next == '|')
-                        return EmitToken(TokenKind.PipePipe, 2);
-                    //return EmitToken(TokenType.Pipe, 1);
-                } break;
+                    if (Next == '=')
+                        return EmitToken(TokenKind.LessOrEquals, 2);
+                    return EmitToken(TokenKind.Less, 1);
+                }
+                case '>':
+                {
+                    if (Next == '=')
+                        return EmitToken(TokenKind.GreaterOrEquals, 2);
+                    return EmitToken(TokenKind.Greater, 1);
+                }
 
                 default:
                 {
