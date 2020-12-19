@@ -67,7 +67,13 @@ namespace Minsk.CodeAnalysis.Parsing
 
             while (Current != TokenKind.CloseBrace && Current != TokenKind.EoF)
             {
+                var startToken = PeekToken(0);
+
                 expression.Add(ParseStatement());
+
+                // if ParseStatement didn't consume any errors, skip the current token
+                if (PeekToken(0) == startToken)
+                    NextToken();
             }
 
             var closeBrace = MatchToken(TokenKind.CloseBrace);

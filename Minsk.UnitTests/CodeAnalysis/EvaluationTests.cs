@@ -35,14 +35,15 @@ namespace Minsk.UnitTests.CodeAnalysis
                 ("4 > 3", true),
                 ("3 >= 3", true),
                 ("3 >= 7", false),
-                ("false == false", true),
-                ("true == false", false),
-                ("false != true", true),
-                ("true != false", true),
                 ("true", true),
                 ("false", false),
                 ("!true", false),
                 ("!false", true),
+                ("false == false", true),
+                ("true == false", false),
+                ("false != true", true),
+                ("true != false", true),
+                ("var a = 10", 10),
                 ("{ var a = 10 }", 10),
                 ("{ var a = 10 a = a + 14 }", 24),
                 ("{ var a = 10 \n a = a + 14 }", 24),
@@ -89,8 +90,10 @@ namespace Minsk.UnitTests.CodeAnalysis
         private static IEnumerable<AnnotatedText> BadCode
             => (new List<string> {
                 // Unexpected character
-                //"[@]",
-                //"{ [@] }",
+                "[]",
+                "[@][][]",
+                "{ [@][] }",
+                "{[)][]",
                 // Undefined operator
                 "[+]true",
                 "true [+] true",
@@ -135,6 +138,8 @@ namespace Minsk.UnitTests.CodeAnalysis
                     for i = [false] to 10
                         10
                 }",
+                //
+                @"var [=] 10"
             }).Select(AnnotatedText.Parse);
 
 

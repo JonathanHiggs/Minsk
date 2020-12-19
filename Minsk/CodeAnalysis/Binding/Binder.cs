@@ -142,6 +142,13 @@ namespace Minsk.CodeAnalysis.Binding
             VariableDeclarationStatement node)
         {
             var name = node.Identifier.Text;
+
+            // Happens when Identifier token is inserted by parser. Error should already
+            // be reported
+            if (string.IsNullOrEmpty(name))
+                // ToDo: return error expression
+                return new BoundExpressionStatement(new BoundLiteralExpression(0));
+
             var isReadOnly = node.KeywordToken.Kind == TokenKind.LetKeyword;
             var expression = BindExpression(node.Expression);
             var variable = new VariableSymbol(name, isReadOnly, expression.Type);
@@ -246,6 +253,12 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundExpression BindNameExpression(NameExpression node)
         {
             var name = node.IdentifierToken.Text;
+
+            // Happens when Identifier token is inserted by parser. Error should already
+            // be reported
+            if (string.IsNullOrEmpty(name))
+                // ToDo: return error expression
+                return new BoundLiteralExpression(0);
 
             var (found, variable) = scope.TryLookup(name);
 
