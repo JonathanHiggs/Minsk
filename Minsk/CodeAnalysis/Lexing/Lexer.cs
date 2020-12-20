@@ -71,15 +71,21 @@ namespace Minsk.CodeAnalysis.Lexing
                 {
                     if (Next == '&')
                         return EmitToken(TokenKind.AmpersandAmperand, 2);
-                    //return EmitToken(TokenType.Ampersand, 1);
-                } break;
+                    return EmitToken(TokenKind.Ampersand, 1);
+                }
 
                 case '|':
                 {
                     if (Next == '|')
                         return EmitToken(TokenKind.PipePipe, 2);
-                    //return EmitToken(TokenType.Pipe, 1);
-                } break;
+                    return EmitToken(TokenKind.Pipe, 1);
+                }
+
+                case '^':
+                    return EmitToken(TokenKind.Hat, 1);
+
+                case '~':
+                    return EmitToken(TokenKind.Tilde, 1);
 
                 case '!':
                 {

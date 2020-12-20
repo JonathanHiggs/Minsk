@@ -157,6 +157,14 @@ namespace Minsk.CodeAnalysis
                 BoundBinaryOperatorKind.Equals          => Equals(left, right),
                 BoundBinaryOperatorKind.NotEquals       => !Equals(left, right),
 
+                BoundBinaryOperatorKind.BitwiseAnd when node.Left.Type == typeof(int)   => (int) left & (int) right,
+                BoundBinaryOperatorKind.BitwiseOr  when node.Left.Type == typeof(int)   => (int) left | (int) right,
+                BoundBinaryOperatorKind.BitwiseXor when node.Left.Type == typeof(int)   => (int) left ^ (int) right,
+
+                BoundBinaryOperatorKind.BitwiseAnd when node.Left.Type == typeof(bool)  => (bool)left & (bool)right,
+                BoundBinaryOperatorKind.BitwiseOr  when node.Left.Type == typeof(bool)  => (bool)left | (bool)right,
+                BoundBinaryOperatorKind.BitwiseXor when node.Left.Type == typeof(bool)  => (bool)left ^ (bool)right,
+
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateBinaryExpression")
             };
@@ -178,6 +186,8 @@ namespace Minsk.CodeAnalysis
                 BoundUnaryOperatorKind.Negation => -(int)value,
 
                 BoundUnaryOperatorKind.LogicalNegation => !(bool)value,
+
+                BoundUnaryOperatorKind.OnesCompliment => ~(int)value,
 
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateUnaryExpression")

@@ -8,17 +8,17 @@ namespace Minsk.CodeAnalysis.Binding
     internal sealed class BoundUnaryOperator
     {
         private BoundUnaryOperator(
-            TokenKind tokenKind, 
-            BoundUnaryOperatorKind kind, 
+            TokenKind tokenKind,
+            BoundUnaryOperatorKind kind,
             Type operandType
         )
             : this(tokenKind, kind, operandType, operandType)
         { }
-        
+
         private BoundUnaryOperator(
-            TokenKind tokenKind, 
-            BoundUnaryOperatorKind kind, 
-            Type operandType, 
+            TokenKind tokenKind,
+            BoundUnaryOperatorKind kind,
+            Type operandType,
             Type resultType)
         {
             TokenKind = tokenKind;
@@ -43,6 +43,9 @@ namespace Minsk.CodeAnalysis.Binding
             // Numerical
             new BoundUnaryOperator(TokenKind.Plus,  BoundUnaryOperatorKind.Identity,        typeof(int)),
             new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negation,        typeof(int)),
+
+            // Bitwise
+            new BoundUnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesCompliment,  typeof(int)),
         };
     }
 }

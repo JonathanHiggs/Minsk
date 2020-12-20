@@ -18,5 +18,10 @@ namespace Minsk.CodeAnalysis.Binding
 
         Equals,
         NotEquals,
+
+        // Bitwise
+        BitwiseAnd,
+        BitwiseOr,
+        BitwiseXor,
     }
 }

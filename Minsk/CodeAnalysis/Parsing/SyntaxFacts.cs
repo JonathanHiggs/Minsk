@@ -15,6 +15,8 @@ namespace Minsk.CodeAnalysis.Parsing
                 case TokenKind.Plus:
                 case TokenKind.Minus:
                 case TokenKind.Bang:
+                case TokenKind.Tilde:
+                case TokenKind.Hat:
                     return 6;
 
                 default:
@@ -46,10 +48,13 @@ namespace Minsk.CodeAnalysis.Parsing
                 case TokenKind.GreaterOrEquals:
                     return 3;
 
+                case TokenKind.Ampersand:
                 case TokenKind.AmpersandAmperand:
                     return 2;
 
+                case TokenKind.Pipe:
                 case TokenKind.PipePipe:
+                case TokenKind.Hat:
                     return 1;
 
                 default:

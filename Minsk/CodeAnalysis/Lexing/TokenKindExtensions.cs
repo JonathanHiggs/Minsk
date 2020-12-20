@@ -21,9 +21,11 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.ForwardSlash:
                 case TokenKind.Bang:
                 case TokenKind.BangEquals:
+                case TokenKind.Ampersand:
                 case TokenKind.AmpersandAmperand:
                 case TokenKind.Equals:
                 case TokenKind.EqualsEquals:
+                case TokenKind.Pipe:
                 case TokenKind.PipePipe:
                 case TokenKind.OpenParenthesis:
                 case TokenKind.CloseParenthesis:
@@ -33,6 +35,8 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.LessOrEquals:
                 case TokenKind.Greater:
                 case TokenKind.GreaterOrEquals:
+                case TokenKind.Tilde:
+                case TokenKind.Hat:
                     return true;
 
                 case TokenKind.TrueKeyword:

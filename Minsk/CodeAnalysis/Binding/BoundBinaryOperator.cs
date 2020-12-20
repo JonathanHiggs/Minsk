@@ -69,6 +69,14 @@ namespace Minsk.CodeAnalysis.Binding
             new BoundBinaryOperator(TokenKind.Minus,             BoundBinaryOperatorKind.Subtraction,       typeof(int)),
             new BoundBinaryOperator(TokenKind.Star,              BoundBinaryOperatorKind.Multiplication,    typeof(int)),
             new BoundBinaryOperator(TokenKind.ForwardSlash,      BoundBinaryOperatorKind.Division,          typeof(int)),
+
+            // Bitwise
+            new BoundBinaryOperator(TokenKind.Ampersand,        BoundBinaryOperatorKind.BitwiseAnd,         typeof(int)),
+            new BoundBinaryOperator(TokenKind.Pipe,             BoundBinaryOperatorKind.BitwiseOr,          typeof(int)),
+            new BoundBinaryOperator(TokenKind.Hat,           BoundBinaryOperatorKind.BitwiseXor,         typeof(int)),
+            new BoundBinaryOperator(TokenKind.Ampersand,        BoundBinaryOperatorKind.BitwiseAnd,         typeof(bool)),
+            new BoundBinaryOperator(TokenKind.Pipe,             BoundBinaryOperatorKind.BitwiseOr,          typeof(bool)),
+            new BoundBinaryOperator(TokenKind.Hat,           BoundBinaryOperatorKind.BitwiseXor,         typeof(bool)),
         };
     }
 }

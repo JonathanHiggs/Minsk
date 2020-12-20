@@ -7,6 +7,9 @@ namespace Minsk.CodeAnalysis.Binding
         Negation,
 
         // Logical
-        LogicalNegation
+        LogicalNegation,
+
+        // Bitwise
+        OnesCompliment,
     }
 }
