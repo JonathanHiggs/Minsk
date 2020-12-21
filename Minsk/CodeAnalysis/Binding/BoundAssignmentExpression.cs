@@ -29,6 +29,6 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
         protected override string PrettyPrintText()
-            => $"{Variable.Name}, {Variable.Type.Name}";
+            => $"{Variable.Type.Name}:{Variable.Name} =";
     }
 }

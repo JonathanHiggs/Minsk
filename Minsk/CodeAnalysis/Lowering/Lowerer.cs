@@ -1,22 +1,110 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+
 using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis.Common;
 
 namespace Minsk.CodeAnalysis.Lowering
 {
     internal sealed class Lowerer : BoundTreeRewriter
     {
+        private int labelCount;
+
         private Lowerer()
         { }
 
-        public static BoundStatement Lower(BoundStatement statement)
+        public static BoundBlockStatement Lower(BoundStatement statement)
         {
             var lowerer = new Lowerer();
-            return lowerer.RewriteStatement(statement);
+            var result = lowerer.RewriteStatement(statement);
+            return lowerer.Flattern(result);
+        }
+
+        private BoundBlockStatement Flattern(BoundStatement node)
+        {
+            var builder = ImmutableArray.CreateBuilder<BoundStatement>();
+            var stack = new Stack<BoundStatement>();
+            stack.Push(node);
+
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+
+                if (current is BoundBlockStatement block)
+                {
+                    foreach (var s in block.Statements.Reverse())
+                        stack.Push(s);
+                }
+                else
+                {
+                    builder.Add(current);
+                }
+            }
+
+            return new BoundBlockStatement(builder.ToImmutable());
+        }
+
+        protected override BoundStatement RewriteConditionalStatement(BoundConditionalStatement node)
+        {
+            if (node.ElseStatement is null)
+            {
+                // if <condition> <then>
+                // --- to --->
+                // {
+                // gotoFalse <condition> end
+                // <then>
+                // end:
+                // }
+
+                var endLabel = GenerateLabel("end");
+                var gotoFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, true);
+                var endLabelStatement = new BoundLabelStatement(endLabel);
+
+                var result = new BoundBlockStatement(
+                    gotoFalse,
+                    node.ThenStatement,
+                    endLabelStatement);
+
+                return RewriteStatement(result);
+            }
+            else
+            {
+                // if <condition> <then> else <else>
+                // --- to --->
+                // {
+                // gotoFalse <condition> else
+                // <then>
+                // goto end
+                // else:
+                // <else>
+                // end:
+                // }
+
+                var endLabel = GenerateLabel("end");
+                var elseLabel = GenerateLabel("else");
+
+                var gotoFalse = new BoundConditionalGotoStatement(elseLabel, node.Condition, true);
+                var gotoEnd = new BoundGotoStatement(endLabel);
+                var elseLabelStatement = new BoundLabelStatement(elseLabel);
+                var endLabelStatement = new BoundLabelStatement(endLabel);
+
+                var result = new BoundBlockStatement(
+                    gotoFalse,
+                    node.ThenStatement,
+                    gotoEnd,
+                    elseLabelStatement,
+                    node.ElseStatement,
+                    endLabelStatement);
+
+                return RewriteStatement(result);
+            }
         }
 
         protected override BoundStatement RewriteForToStatement(BoundForToStatement node)
         {
             // for <var> = <lower> to <upper> <body>
-            // to
+            // --- to --->
             // {
             // var <var> = <lower>
             // while <var> <= <upper>
@@ -45,9 +133,51 @@ namespace Minsk.CodeAnalysis.Lowering
 
             var whileStatement = new BoundWhileStatement(condition, whileBlock);
 
-            return new BoundBlockStatement(
+            var result = new BoundBlockStatement(
                 variableDeclaration,
                 whileStatement);
+
+            return RewriteStatement(result);
+        }
+
+        protected override BoundStatement RewriteWhileStatement(BoundWhileStatement node)
+        {
+            // while <condition> <body>
+            // --- to --->
+            // {
+            // goto check
+            // continue:
+            // <body>
+            // check:
+            // gotoTrue <condition> continue
+            // end:
+            // }
+
+            var continueLabel = GenerateLabel("continue");
+            var checkLabel = GenerateLabel("check");
+            var endLabel = GenerateLabel("end");
+
+            var gotoCheck = new BoundGotoStatement(checkLabel);
+            var continueStatement = new BoundLabelStatement(continueLabel);
+            var checkStatement = new BoundLabelStatement(checkLabel);
+            var gotoTrueStatement = new BoundConditionalGotoStatement(continueLabel, node.Condition, false);
+            var endStatement = new BoundLabelStatement(endLabel);
+
+            var result = new BoundBlockStatement(
+                gotoCheck,
+                continueStatement,
+                node.Body,
+                checkStatement,
+                gotoTrueStatement,
+                endStatement);
+
+            return RewriteStatement(result);
+        }
+
+        private LabelSymbol GenerateLabel(string name)
+        {
+            var id = $"Label-{name}-{labelCount++}";
+            return new LabelSymbol(id);
         }
     }
 }

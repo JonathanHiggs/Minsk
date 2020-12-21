@@ -21,6 +21,9 @@ namespace Minsk.CodeAnalysis.Binding
             => Enumerable.Empty<BoundNode>();
 
         protected override string PrettyPrintText()
-            => $"{Variable?.Name ?? "''"}, {Type?.Name ?? "Unknown"}";
+            => $"{Type?.Name ?? "Unknown"}:{Variable?.Name ?? "''"}";
+
+        public override string ToString()
+            => $"{Type?.Name ?? "Unknown"}:{Variable?.Name ?? "''"}";
     }
 }

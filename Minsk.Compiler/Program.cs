@@ -1,4 +1,6 @@
-﻿namespace Minsk.Compiler
+﻿using System;
+
+namespace Minsk.Compiler
 {
     class Program
     {

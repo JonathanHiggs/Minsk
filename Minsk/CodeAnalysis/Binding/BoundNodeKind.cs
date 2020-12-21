@@ -12,8 +12,11 @@ namespace Minsk.CodeAnalysis.Binding
         // Statements
         BlockStatement,
         ConditionalStatement,
+        ConditionalGotoStatement,
         ExpressionStatement,
         ForToStatement,
+        GotoStatement,
+        LabelStatement,
         VariableDeclarationStatement,
         WhileStatement,
     }

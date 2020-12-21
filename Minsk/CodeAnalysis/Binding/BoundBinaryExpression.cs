@@ -34,6 +34,6 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
         protected override string PrettyPrintText()
-            => $"{Op.Kind}, {Type.Name}";
+            => $"{Type.Name}.{Op.Kind}";
     }
 }
