@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Minsk.CodeAnalysis.Common;
 
@@ -14,5 +16,11 @@ namespace Minsk.CodeAnalysis.Binding
         public VariableSymbol Variable { get; }
         public override BoundNodeKind Kind => BoundNodeKind.VariableExpression;
         public override Type Type => Variable?.Type;
+
+        public override IEnumerable<BoundNode> Children
+            => Enumerable.Empty<BoundNode>();
+
+        protected override string PrettyPrintText()
+            => $"{Variable?.Name ?? "''"}, {Type?.Name ?? "Unknown"}";
     }
 }

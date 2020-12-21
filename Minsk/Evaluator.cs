@@ -61,7 +61,7 @@ namespace Minsk.CodeAnalysis
 
         private void EvaluateBlockStatement(BoundBlockStatement node)
         {
-            foreach (var statement in node.BoundStatements)
+            foreach (var statement in node.Statements)
                 EvaluateStatement(statement);
         }
 

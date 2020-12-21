@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Minsk.CodeAnalysis.Binding
 {
@@ -12,5 +14,11 @@ namespace Minsk.CodeAnalysis.Binding
         public override Type Type => Value.GetType();
         public override BoundNodeKind Kind => BoundNodeKind.LiteralExpression;
         public object Value { get; }
+
+        public override IEnumerable<BoundNode> Children
+            => Enumerable.Empty<BoundNode>();
+
+        protected override string PrettyPrintText()
+            => $"{Value}, {Type.Name}";
     }
 }

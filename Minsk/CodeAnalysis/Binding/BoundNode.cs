@@ -1,7 +1,12 @@
+using System;
+
+using Minsk.CodeAnalysis.Common;
+
 namespace Minsk.CodeAnalysis.Binding
 {
-    internal abstract class BoundNode
+    internal abstract class BoundNode : Node<BoundNode, BoundNodeKind>
     {
-        public abstract BoundNodeKind Kind { get; }
+        protected override ConsoleColor PrettyPrintColorForKind(BoundNodeKind kind)
+            => Console.ForegroundColor;
     }
 }

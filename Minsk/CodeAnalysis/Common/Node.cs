@@ -7,7 +7,7 @@ namespace Minsk.CodeAnalysis.Common
 {
     public abstract class Node<T, TKind> where T : Node<T, TKind>
     {
-        public T Parent { get; }
+        public T Parent { get; internal set; }
 
         public abstract IEnumerable<T> Children { get; }
 

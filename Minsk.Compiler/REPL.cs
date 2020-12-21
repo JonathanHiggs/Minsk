@@ -18,6 +18,7 @@ namespace Minsk.Compiler
 
         private bool showTree = false;
         private bool showVisualTree = false;
+        private bool showBoundTree = true;
         private bool showHeaders = false;
         private bool showErrorCarrot = false;
 
@@ -121,11 +122,13 @@ namespace Minsk.Compiler
                 case "showtrees":
                     showTree = true;
                     showVisualTree = true;
+                    showBoundTree = true;
                     return;
 
                 case "hidetrees":
                     showTree = false;
                     showVisualTree = false;
+                    showBoundTree = false;
                     return;
 
                 default:
@@ -165,16 +168,23 @@ namespace Minsk.Compiler
             if (showTree)
             {
                 if (showHeaders)
-                    Console.WriteLine("--- Expression Tree");
+                    Console.WriteLine("--- Syntax Tree");
                 tree.Root.PrettyPrint(Console.Out);
             }
 
-            if (showVisualTree)
+            //if (showVisualTree)
+            //{
+            //    if (showHeaders)
+            //        Console.WriteLine("\n--- Visual Tree");
+            //    var visualTree = tree.ToVisualTree();
+            //    visualTree.Print();
+            //}
+
+            if (showBoundTree)
             {
                 if (showHeaders)
-                    Console.WriteLine("\n--- Visual Tree");
-                var visualTree = tree.ToVisualTree();
-                visualTree.Print();
+                    Console.WriteLine("\n--- Bound Syntax Tree");
+                compilation.GlobalScope.Statement.PrettyPrint(Console.Out);
             }
         }
 
