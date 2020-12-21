@@ -92,8 +92,14 @@ namespace Minsk.CodeAnalysis.Parsing
                         settings);
                 }
 
+                case SyntaxKind.ExpressionStatement:
+                {
+                    var statement = node as ExpressionStatement;
+                    return statement.Expression.ToVisualTree(settings);
+                }
+
                 default:
-                    throw new InvalidOperationException();
+                    throw new NotImplementedException(node.Kind.ToString());
             }
         }
     }
