@@ -61,6 +61,7 @@ namespace Minsk.CodeAnalysis
 
         public void EmitTree(TextWriter writer)
         {
+            //GlobalScope.Statement.PrettyPrint(writer);
             var statement = GetStatement();
             statement.PrettyPrint(writer);
         }

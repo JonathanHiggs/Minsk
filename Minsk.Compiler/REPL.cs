@@ -184,7 +184,7 @@ namespace Minsk.Compiler
             {
                 if (showHeaders)
                     Console.WriteLine("\n--- Bound Syntax Tree");
-                compilation.GlobalScope.Statement.PrettyPrint(Console.Out);
+                compilation.EmitTree(Console.Out);
             }
         }
 

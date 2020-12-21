@@ -13,6 +13,14 @@ namespace Minsk.CodeAnalysis.Binding
                 statement.Parent = this;
         }
 
+        public BoundBlockStatement(params BoundStatement[] statements)
+        {
+            Statements = statements.ToImmutableArray();
+
+            foreach (var statement in Statements)
+                statement.Parent = this;
+        }
+
         public ImmutableArray<BoundStatement> Statements { get; }
 
         public override BoundNodeKind Kind => BoundNodeKind.BlockStatement;

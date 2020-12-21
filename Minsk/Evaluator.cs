@@ -43,8 +43,9 @@ namespace Minsk.CodeAnalysis
                     break;
 
                 case BoundNodeKind.ForToStatement:
-                    EvaluateForToStatement(node as BoundForToStatement);
-                    break;
+                    throw new InvalidOperationException("ForTo Statements should have been lowered");
+                    //EvaluateForToStatement(node as BoundForToStatement);
+                    //break;
 
                 case BoundNodeKind.VariableDeclarationStatement:
                     EvaluateVariableDeclarationStatement(node as BoundVariableDeclarationStatement);
