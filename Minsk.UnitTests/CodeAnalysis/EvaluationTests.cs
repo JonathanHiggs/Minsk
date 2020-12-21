@@ -84,8 +84,27 @@ namespace Minsk.UnitTests.CodeAnalysis
             };
 
         [Test]
-        public void Evaluate_WithGoodCode(
+        public void Evaluate_WithGoodCode_EvaluatesToCorrectValue(
             [ValueSource(nameof(Cases))] (string Code, object ExpectedResult) testCase)
+        {
+            // Arrange
+            var tree = SyntaxTree.Parse(testCase.Code);
+            var compilation = new Compilation(tree);
+            var variables = new Dictionary<VariableSymbol, object>();
+
+            // Apriori
+            Assert.That(tree.Diagnostics, Is.Empty);
+
+            // Act
+            var result = compilation.Evaluate(variables);
+
+            // Assert
+            Assert.That(result.Value, Is.EqualTo(testCase.ExpectedResult));
+        }
+
+        [Test]
+        public void Evaluate_WithGoodCode_AllNodesHaveParentSet(
+            [ValueSource(nameof(Cases))] (string Code, object _) testCase)
         {
             // Arrange
             var tree = SyntaxTree.Parse(testCase.Code);
@@ -99,7 +118,6 @@ namespace Minsk.UnitTests.CodeAnalysis
             var result = compilation.Evaluate(variables);
 
             // Assert
-            Assert.That(result.Value, Is.EqualTo(testCase.ExpectedResult));
         }
 
         private static IEnumerable<AnnotatedText> BadCode

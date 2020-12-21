@@ -72,6 +72,19 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
             }
         }
 
+        public void AssertParentNotNull()
+        {
+            try
+            {
+                Assert.That(enumerator.MoveNext());
+                Assert.That(enumerator.Current.Parent, Is.Not.Null);
+            }
+            catch when (MarkFailed())
+            {
+                throw;
+            }
+        }
+
         private static IEnumerable<SyntaxNode> Flattern(SyntaxNode node)
         {
             var stack = new Stack<SyntaxNode>();
