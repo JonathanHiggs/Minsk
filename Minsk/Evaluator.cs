@@ -46,7 +46,7 @@ namespace Minsk.CodeAnalysis
                     EvaluateForToStatement(node as BoundForToStatement);
                     break;
 
-                case BoundNodeKind.VariableDeclaration:
+                case BoundNodeKind.VariableDeclarationStatement:
                     EvaluateVariableDeclarationStatement(node as BoundVariableDeclarationStatement);
                     break;
 
@@ -93,7 +93,7 @@ namespace Minsk.CodeAnalysis
 
         private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement node)
         {
-            var value = EvaluateExpression(node.Expression);
+            var value = EvaluateExpression(node.Initializer);
             variables[node.Variable] = value;
             lastValue = value;
         }

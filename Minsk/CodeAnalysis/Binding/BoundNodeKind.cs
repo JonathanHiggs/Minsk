@@ -14,7 +14,7 @@ namespace Minsk.CodeAnalysis.Binding
         ConditionalStatement,
         ExpressionStatement,
         ForToStatement,
-        VariableDeclaration,
+        VariableDeclarationStatement,
         WhileStatement,
     }
 }

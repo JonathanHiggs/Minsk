@@ -9,21 +9,21 @@ namespace Minsk.CodeAnalysis.Binding
         public BoundVariableDeclarationStatement(VariableSymbol variable, BoundExpression expression)
         {
             Variable = variable;
-            Expression = expression;
+            Initializer = expression;
 
-            Expression.Parent = this;
+            Initializer.Parent = this;
         }
 
         public VariableSymbol Variable { get; }
-        public BoundExpression Expression { get; }
+        public BoundExpression Initializer { get; }
 
-        public override BoundNodeKind Kind => BoundNodeKind.VariableDeclaration;
+        public override BoundNodeKind Kind => BoundNodeKind.VariableDeclarationStatement;
 
         public override IEnumerable<BoundNode> Children
         {
             get
             {
-                yield return Expression;
+                yield return Initializer;
             }
         }
 

@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
 using Minsk.CodeAnalysis.Binding;
 using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
+using Minsk.CodeAnalysis.Lowering;
 using Minsk.CodeAnalysis.Parsing;
 
 namespace Minsk.CodeAnalysis
@@ -50,10 +52,23 @@ namespace Minsk.CodeAnalysis
             if (diagnostics.Any())
                 return new EvaluationResult(null, diagnostics.ToImmutableArray());
 
-            var evaluator = new Evaluator(GlobalScope.Statement, variables);
+            var statement = GetStatement();
+            var evaluator = new Evaluator(statement, variables);
             var value = evaluator.Evaluate();
 
             return new EvaluationResult(value, ImmutableArray<Diagnostic>.Empty);
+        }
+
+        public void EmitTree(TextWriter writer)
+        {
+            var statement = GetStatement();
+            statement.PrettyPrint(writer);
+        }
+
+        private BoundStatement GetStatement()
+        {
+            var result = GlobalScope.Statement;
+            return Lowerer.Lower(result);
         }
     }
 }
