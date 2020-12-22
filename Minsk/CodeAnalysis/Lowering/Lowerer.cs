@@ -107,16 +107,21 @@ namespace Minsk.CodeAnalysis.Lowering
             // --- to --->
             // {
             // var <var> = <lower>
-            // while <var> <= <upper>
+            // let upperBound = <upper>
+            // while <var> <= upperBound
             //     <body>
             //     <var> = <var> + 1
             // }
 
             var variableDeclaration = new BoundVariableDeclarationStatement(node.Variable, node.LowerBound);
+            var upperBoundSymbol = new VariableSymbol("upperBound", true, typeof(int));
+            var upperBoundDeclaration = new BoundVariableDeclarationStatement(upperBoundSymbol, node.UpperBound);
+            var upperBoundExpression = new BoundVariableExpression(upperBoundSymbol);
+
             var condition = new BoundBinaryExpression(
                 new BoundVariableExpression(node.Variable),
                 BoundBinaryOperator.Bind(Lexing.TokenKind.LessOrEquals, typeof(int), typeof(int)),
-                node.UpperBound);
+                upperBoundExpression);
 
             var increment = new BoundExpressionStatement(
                 new BoundAssignmentExpression(
@@ -135,6 +140,7 @@ namespace Minsk.CodeAnalysis.Lowering
 
             var result = new BoundBlockStatement(
                 variableDeclaration,
+                upperBoundDeclaration,
                 whileStatement);
 
             return RewriteStatement(result);

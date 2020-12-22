@@ -14,5 +14,8 @@ namespace Minsk.CodeAnalysis.Common
         public string Name { get; }
         public bool IsReadOnly { get; }
         public Type Type { get; }
+
+        public override string ToString()
+            => $"{Type?.Name ?? "Unknown"}:{Name ?? "Unknown"}";
     }
 }

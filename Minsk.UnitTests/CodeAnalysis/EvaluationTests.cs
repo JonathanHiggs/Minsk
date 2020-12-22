@@ -80,6 +80,8 @@ namespace Minsk.UnitTests.CodeAnalysis
                 ("{ var sum = 0 for i = (2 - 1) to (5 - 1) { sum = sum + i } sum }", 10),
                 ("{ var sum = 0 for i = (2 - 1) to (5 - 1) sum = sum + i sum }", 10),
                 ("{ var sum = 0 for i = 1 to (5 - 1) sum = sum + i sum }", 10),
+                ("{ var a = 10 for i = 0 to (a = a - 1) { } a }", 9),
+                ("{ var result = 0 for i = 0 to (result + 2) result = i result }", 2),
                 //("", ),
             };
 
