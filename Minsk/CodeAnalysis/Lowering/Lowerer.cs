@@ -58,7 +58,7 @@ namespace Minsk.CodeAnalysis.Lowering
                 // }
 
                 var endLabel = GenerateLabel("end");
-                var gotoFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, true);
+                var gotoFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, false);
                 var endLabelStatement = new BoundLabelStatement(endLabel);
 
                 var result = new BoundBlockStatement(
@@ -84,7 +84,7 @@ namespace Minsk.CodeAnalysis.Lowering
                 var endLabel = GenerateLabel("end");
                 var elseLabel = GenerateLabel("else");
 
-                var gotoFalse = new BoundConditionalGotoStatement(elseLabel, node.Condition, true);
+                var gotoFalse = new BoundConditionalGotoStatement(elseLabel, node.Condition, false);
                 var gotoEnd = new BoundGotoStatement(endLabel);
                 var elseLabelStatement = new BoundLabelStatement(elseLabel);
                 var endLabelStatement = new BoundLabelStatement(endLabel);
@@ -166,7 +166,7 @@ namespace Minsk.CodeAnalysis.Lowering
             var gotoCheck = new BoundGotoStatement(checkLabel);
             var continueStatement = new BoundLabelStatement(continueLabel);
             var checkStatement = new BoundLabelStatement(checkLabel);
-            var gotoTrueStatement = new BoundConditionalGotoStatement(continueLabel, node.Condition, false);
+            var gotoTrueStatement = new BoundConditionalGotoStatement(continueLabel, node.Condition, true);
             var endStatement = new BoundLabelStatement(endLabel);
 
             var result = new BoundBlockStatement(

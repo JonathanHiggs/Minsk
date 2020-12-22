@@ -9,16 +9,16 @@ namespace Minsk.CodeAnalysis.Binding
         public BoundConditionalGotoStatement(
             LabelSymbol label,
             BoundExpression condition,
-            bool jumpIfFalse = false)
+            bool jumpIfTrue = false)
         {
             Label = label;
             Condition = condition;
-            JumpIfFalse = jumpIfFalse;
+            JumpIfTrue = jumpIfTrue;
         }
 
         public LabelSymbol Label { get; }
         public BoundExpression Condition { get; }
-        public bool JumpIfFalse { get; }
+        public bool JumpIfTrue { get; }
 
         public override IEnumerable<BoundNode> Children
         { get { yield return Condition; } }
@@ -26,6 +26,6 @@ namespace Minsk.CodeAnalysis.Binding
         public override BoundNodeKind Kind => BoundNodeKind.ConditionalGotoStatement;
 
         protected override string PrettyPrintText()
-            => $"{Label.Name} when {!JumpIfFalse}";
+            => $"{Label.Name} when {JumpIfTrue}";
     }
 }
