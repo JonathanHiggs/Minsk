@@ -175,8 +175,9 @@ namespace Minsk.CodeAnalysis.Lexing
 
         private LexToken EmitToken(TokenKind kind, int numberOfCharsConsumed = 0)
         {
+            cursor.Advance(numberOfCharsConsumed);
             var tokenText = CurrentText;
-            return new LexToken(kind, Consume(numberOfCharsConsumed), tokenText);
+            return new LexToken(kind, Consume(), tokenText);
         }
 
         private LexToken EmitValueToken(TokenKind kind, object value, int numberOfCharsConsumed = 0)

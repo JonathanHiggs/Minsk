@@ -5,7 +5,9 @@ using System.Linq;
 
 using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Common;
+using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Text;
 using Minsk.IO;
 
 namespace Minsk.Compiler
@@ -28,37 +30,35 @@ namespace Minsk.Compiler
             LoadSubmissions();
         }
 
-        //protected override object RenderLine(IReadOnlyList<string> lines, int lineIndex, object state)
-        //{
-        //    foreach (var line in lines)
-        //        RenderLine(line);
+        protected override object RenderLine(IReadOnlyList<string> lines, int lineIndex, object state)
+        {
+            RenderLine(lines[lineIndex]);
 
-        //    return state;
-        //}
+            return state;
+        }
 
-        //private void RenderLine(string line)
-        //{
-        //    var tokens = Lexer.Lex(SourceText.From(line), null).TakeWhile(t => t.Kind != TokenKind.EoF);
-        //    foreach (var token in tokens)
-        //    {
-        //        var isKeyword = token.Kind.IsKeyword();
-        //        var isNumber = token.Kind == TokenKind.Number;
-        //        var isIdentifier = token.Kind == TokenKind.Identifier;
+        private void RenderLine(string line)
+        {
+            var tokens = Lexer.Lex(SourceText.From(line), null).TakeWhile(t => t.Kind != TokenKind.EoF);
+            foreach (var token in tokens)
+            {
+                var isKeyword = token.Kind.IsKeyword();
+                var isNumber = token.Kind == TokenKind.Number;
+                var isIdentifier = token.Kind == TokenKind.Identifier;
 
-        //        if (isKeyword)
-        //            Console.ForegroundColor = ConsoleColor.Blue;
-        //        else if (isNumber)
-        //            Console.ForegroundColor = ConsoleColor.Cyan;
-        //        else if (isIdentifier)
-        //            Console.ForegroundColor = ConsoleColor.DarkYellow;
-        //        else
-        //            Console.ForegroundColor = ConsoleColor.White;
+                if (isKeyword)
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                else if (isNumber)
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                else if (isIdentifier)
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                else
+                    Console.ForegroundColor = ConsoleColor.White;
 
-        //        Console.Write(token.Text);
-        //        Console.ResetColor();
-        //    }
-        //    Console.WriteLine();
-        //}
+                Console.Write(token.Text);
+                Console.ResetColor();
+            }
+        }
 
         //protected override object RenderLine(IReadOnlyList<string> lines, int lineIndex, object state)
         //{
@@ -133,6 +133,12 @@ namespace Minsk.Compiler
         {
             previous = null;
             variables.Clear();
+            ClearSubmissions();
+        }
+
+        [MetaCommand("delete", "Deletes saves submissions")]
+        private void EvaluateDelete()
+        {
             ClearSubmissions();
         }
 
