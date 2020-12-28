@@ -4,22 +4,25 @@ namespace Minsk.CodeAnalysis.Lexing
 {
     public class LexToken
     {
-        public LexToken(TokenKind tokenKind, int position, int length, string text, object value = null)
-            : this(tokenKind, new TextSpan(position, length), text, value)
-        { }
-
-        public LexToken(TokenKind tokenKind, TextSpan span, string text, object value = null)
+        public LexToken(
+            TokenKind tokenKind,
+            TextSpan span,
+            string text,
+            object value = null,
+            bool isMissing = false)
         {
             Kind = tokenKind;
             Span = span;
             Text = text;
             Value = value;
+            IsMissing = isMissing;
         }
 
         public TokenKind Kind { get; }
         public TextSpan Span { get; }
         public string Text { get; }
         public object Value { get; }
+        public bool IsMissing { get; }
 
         public override string ToString()
         {

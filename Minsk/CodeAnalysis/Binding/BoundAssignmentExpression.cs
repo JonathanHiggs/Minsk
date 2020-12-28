@@ -29,6 +29,8 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
         protected override string PrettyPrintText()
-            => $"{Variable.Type.Name}:{Variable.Name} =";
+            => Variable is not null
+                ? $"{Variable.Type.Name}:{Variable.Name} ="
+                : "null";
     }
 }

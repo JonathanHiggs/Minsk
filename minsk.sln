@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minsk.Compiler", "Minsk.Compiler\Minsk.Compiler.csproj", "{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minsk.Compiler", "Minsk.Compiler\Minsk.Compiler.csproj", "{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minsk", "Minsk\Minsk.csproj", "{915C3DDE-836D-4334-91CF-BE1633E4E23C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minsk", "Minsk\Minsk.csproj", "{915C3DDE-836D-4334-91CF-BE1633E4E23C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minsk.UnitTests", "Minsk.UnitTests\Minsk.UnitTests.csproj", "{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minsk.UnitTests", "Minsk.UnitTests\Minsk.UnitTests.csproj", "{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,9 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -58,5 +55,11 @@ Global
 		{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}.Release|x64.Build.0 = Release|Any CPU
 		{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}.Release|x86.ActiveCfg = Release|Any CPU
 		{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F7978EEF-EA68-4445-96AB-692235096FD8}
 	EndGlobalSection
 EndGlobal

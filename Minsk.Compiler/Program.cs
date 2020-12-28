@@ -1,17 +1,10 @@
-﻿using System;
-
-namespace Minsk.Compiler
+﻿namespace Minsk.Compiler
 {
     class Program
     {
         static void Main(string[] args)
         {
-            REPL();
-        }
-
-        static void REPL()
-        {
-            var repl = new REPL();
+            var repl = new MinskRepl();
             repl.Run();
         }
     }

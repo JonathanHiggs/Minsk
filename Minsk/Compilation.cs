@@ -26,6 +26,12 @@ namespace Minsk.CodeAnalysis
             SyntaxTree = syntaxTree;
         }
 
+        public static Compilation CreateScript(SyntaxTree syntaxTree)
+            => new Compilation(null, syntaxTree);
+
+        public static Compilation CreateScript(Compilation previous, SyntaxTree syntaxTree)
+            => new Compilation(previous, syntaxTree);
+
         public Compilation Previous { get; }
 
         public SyntaxTree SyntaxTree { get; }
@@ -61,7 +67,6 @@ namespace Minsk.CodeAnalysis
 
         public void EmitTree(TextWriter writer)
         {
-            //GlobalScope.Statement.PrettyPrint(writer);
             var statement = GetStatement();
             statement.PrettyPrint(writer);
         }

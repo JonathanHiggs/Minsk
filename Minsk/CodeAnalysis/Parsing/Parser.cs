@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -102,7 +101,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
             return new ForToStatement(
                 forKeyword, identifier, equals, lowerBound, toKeyword, upperBound, body);
-        } 
+        }
 
         private ElseClauseSyntax ParseOptionalElseClause()
         {
@@ -270,7 +269,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 PeekToken(0),
                 $"Expected '{tokenKind}' but was '{PeekToken(0).Text}'");
 
-            return new LexToken(tokenKind, PeekToken(0).Span, null, null);
+            return new LexToken(tokenKind, PeekToken(0).Span, null, null, isMissing: true);
         }
 
         private LexToken MatchTokenFrom(params TokenKind[] tokenKinds)
