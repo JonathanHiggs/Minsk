@@ -22,5 +22,9 @@ namespace Minsk.CodeAnalysis.Diagnostics
         public void UnexpectedNullTerminator(TextSpan span, string text)
             => bag.Report(new LexError(
                 LexErrorKind.UnexpectedNullTerminator, span, text, "Unexpected null terminator"));
+
+        public void UnterminatedString(TextSpan span, string text)
+            => bag.Report(new LexError(
+                LexErrorKind.UnterminatedString, span, text, "Unterminated string"));
     }
 }

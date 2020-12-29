@@ -44,6 +44,7 @@ namespace Minsk.Compiler
             {
                 var isKeyword = token.Kind.IsKeyword();
                 var isNumber = token.Kind == TokenKind.Number;
+                var isString = token.Kind == TokenKind.String;
                 var isIdentifier = token.Kind == TokenKind.Identifier;
 
                 if (isKeyword)
@@ -52,8 +53,10 @@ namespace Minsk.Compiler
                     Console.ForegroundColor = ConsoleColor.Cyan;
                 else if (isIdentifier)
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
+                else if (isString)
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 else
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Gray;
 
                 Console.Write(token.Text);
                 Console.ResetColor();

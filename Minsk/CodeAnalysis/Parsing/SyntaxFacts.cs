@@ -93,8 +93,8 @@ namespace Minsk.CodeAnalysis.Parsing
                 _ => false
             };
 
-        public static bool RequiresSeperator(this TokenKind kind1, TokenKind kind2)
-            => (kind1, kind2) switch {
+        public static bool RequiresSeperator(this (TokenKind First, TokenKind Second) pair)
+            => pair switch {
                 (TokenKind.Identifier,      TokenKind.Identifier)       => true,
 
                 (TokenKind.Bang,            TokenKind.Equals)           => true,
@@ -115,6 +115,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 (TokenKind.GreaterOrEquals, TokenKind.Equals)           => true,
 
                 (TokenKind.Number,          TokenKind.Number)           => true,
+                (TokenKind.String,          TokenKind.String)           => true,
 
                 (TokenKind k1, TokenKind k2) when k1.IsKeyword() && k2.IsKeyword()  => true,
                 (TokenKind k1, TokenKind.Identifier) when k1.IsKeyword()            => true,

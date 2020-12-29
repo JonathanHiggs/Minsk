@@ -4,6 +4,7 @@
     {
         InvalidNumber,
         InvalidCharacter,
-        UnexpectedNullTerminator
+        UnexpectedNullTerminator,
+        UnterminatedString
     }
 }

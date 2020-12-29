@@ -208,6 +208,9 @@ namespace Minsk.CodeAnalysis.Parsing
                 TokenKind.Number
                     => ParseNumberLiteral(),
 
+                TokenKind.String
+                    => ParseStringLiteral(),
+
                 //_ => throw new Exception()
                 _ => ParseNumberLiteral()
             };
@@ -241,6 +244,12 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             var numberToken = MatchToken(TokenKind.Number);
             return new LiteralExpression(numberToken);
+        }
+
+        private Expression ParseStringLiteral()
+        {
+            var stringToken = MatchToken(TokenKind.String);
+            return new LiteralExpression(stringToken);
         }
 
         private LexToken PeekToken(int offset)

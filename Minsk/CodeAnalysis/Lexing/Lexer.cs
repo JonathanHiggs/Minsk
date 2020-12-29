@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Parsing;
@@ -59,6 +60,9 @@ namespace Minsk.CodeAnalysis.Lexing
                 case ')':   return EmitToken(TokenKind.CloseParenthesis, 1);
                 case '{':   return EmitToken(TokenKind.OpenBrace, 1);
                 case '}':   return EmitToken(TokenKind.CloseBrace, 1);
+
+                case '"':
+                    return ReadStringToken();
 
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9':
@@ -131,6 +135,48 @@ namespace Minsk.CodeAnalysis.Lexing
             cursor.Advance(source.Length - cursor.End);
             diagnostics.Lex.UnexpectedNullTerminator(cursor, CurrentText);
             return EmitToken(TokenKind.EoF);
+        }
+
+        private LexToken ReadStringToken()
+        {
+            cursor.Advance();
+            var sb = new StringBuilder();
+
+            var done = false;
+
+            while (!done)
+            {
+                switch (Current)
+                {
+                    case '\0':
+                    case '\r':
+                    case '\n':
+                        diagnostics.Lex.UnterminatedString(TextSpan.From(cursor.Start, 1), CurrentText);
+                        done = true;
+                        break;
+
+                    case '"':
+                    {
+                        if (Next == '"')
+                        {
+                            sb.Append('"');
+                            cursor.Advance(2);
+                        }
+                        else
+                        {
+                            cursor.Advance();
+                            done = true;
+                        }
+                    } break;
+
+                    default:
+                        sb.Append(Current);
+                        cursor.Advance();
+                        break;
+                }
+            }
+
+            return EmitValueToken(TokenKind.String, sb.ToString());
         }
 
         private LexToken ReadNumberToken()

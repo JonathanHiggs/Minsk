@@ -8,6 +8,9 @@ namespace Minsk.CodeAnalysis.Text
             Length = length;
         }
 
+        public static TextSpan From(int start, int length)
+            => new TextSpan(start, length);
+
         public static TextSpan FromBounds(int start, int end)
             => new TextSpan(start, end - start);
 

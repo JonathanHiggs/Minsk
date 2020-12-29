@@ -146,6 +146,9 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
                 (TokenKind.Number,              "123"),
                 (TokenKind.Number,              "98765"),
 
+                (TokenKind.String,              "\"test\""),
+                (TokenKind.String,              "\"te\"\"st\""),
+
                 (TokenKind.Identifier,          "well"),
                 (TokenKind.Identifier,          "HELLO"),
                 (TokenKind.Identifier,          "tHeRe"),
@@ -161,13 +164,13 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
             => Tokens
                 .Where(t => t.Kind != TokenKind.Whitespace)
                 .CartesianJoin((p1, p2) => new Pair(p1.Kind, p2.Kind, p1.Text + p2.Text))
-                .Where(p => !p.Kind1.RequiresSeperator(p.Kind2));
+                .Where(p => !(p.Kind1, p.Kind2).RequiresSeperator());
 
         private static IEnumerable<Trip> TokenPairsWithSeperator
             => Tokens
                 .Where(t => t.Kind != TokenKind.Whitespace)
                 .CartesianJoin((p1, p2) => (Kind1: p1.Kind, Text1: p1.Text, Kind2: p2.Kind, Text2: p2.Text))
-                .Where(p => p.Kind1.RequiresSeperator(p.Kind2))
+                .Where(p => (p.Kind1, p.Kind2).RequiresSeperator())
                 .CrossJoin(
                     Tokens.Where(t => t.Kind == TokenKind.Whitespace),
                     (p, w) => new Trip(p.Kind1, w.Kind, p.Kind2, p.Text1 + w.Text + p.Text2));
