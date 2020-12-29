@@ -1,3 +1,4 @@
+
 using Minsk.CodeAnalysis.Symbols;
 
 namespace Minsk.CodeAnalysis.Binding

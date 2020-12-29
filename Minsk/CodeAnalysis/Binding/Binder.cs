@@ -223,6 +223,9 @@ namespace Minsk.CodeAnalysis.Binding
             var left = BindExpression(node.Left);
             var right = BindExpression(node.Right);
 
+            if (left.Type == TypeSymbol.Error || right.Type == TypeSymbol.Error)
+                return new BoundErrorExpression();
+
             var opToken = node.OperatorToken;
 
             var op = BoundBinaryOperator.Bind(
@@ -238,7 +241,7 @@ namespace Minsk.CodeAnalysis.Binding
                     opToken.Span,
                     $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}");
 
-                return left;
+                return new BoundErrorExpression();
             }
 
             return new BoundBinaryExpression(left, op, right);
@@ -254,18 +257,16 @@ namespace Minsk.CodeAnalysis.Binding
         {
             var name = node.IdentifierToken.Text;
 
-            // Happens when Identifier token is inserted by parser. Error should already
-            // be reported
+            // Happens when Identifier token is inserted by parser. Error should already be reported
             if (string.IsNullOrEmpty(name))
-                // ToDo: return error expression
-                return new BoundLiteralExpression(0);
+                return new BoundErrorExpression();
 
             var (found, variable) = scope.TryLookup(name);
 
             if (!found)
             {
                 diagnostics.Binding.UndeclaredIdentifier(node);
-                return new BoundVariableExpression(variable);
+                return new BoundErrorExpression();
             }
 
             return new BoundVariableExpression(variable);
@@ -278,6 +279,9 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundExpression BindUnaryExpression(UnaryExpression node)
         {
             var operand = BindExpression(node.Operand);
+
+            if (operand.Type == TypeSymbol.Error)
+                return new BoundErrorExpression();
 
             var opToken = node.OperatorToken;
 
@@ -292,7 +296,7 @@ namespace Minsk.CodeAnalysis.Binding
                     opToken.Span,
                     $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}");
 
-                return operand;
+                return new BoundErrorExpression();
             }
 
             return new BoundUnaryExpression(op, operand);

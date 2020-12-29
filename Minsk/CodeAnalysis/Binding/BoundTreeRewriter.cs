@@ -58,6 +58,9 @@ namespace Minsk.CodeAnalysis.Binding
                 BoundNodeKind.BinaryExpression
                     => RewriteBinaryExpression(node as BoundBinaryExpression),
 
+                BoundNodeKind.ErrorExpression
+                    => RewriteErrorExpression(node as BoundErrorExpression),
+
                 BoundNodeKind.LiteralExpression
                     => RewriteLiteralExpression(node as BoundLiteralExpression),
 
@@ -71,8 +74,7 @@ namespace Minsk.CodeAnalysis.Binding
             };
         }
 
-        protected virtual BoundExpression RewriteAssignmentExpression(
-            BoundAssignmentExpression node)
+        protected virtual BoundExpression RewriteAssignmentExpression(BoundAssignmentExpression node)
         {
             var expression = RewriteExpression(node.Expression);
             if (expression == node.Expression)
@@ -81,8 +83,7 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundAssignmentExpression(node.Variable, expression);
         }
 
-        protected virtual BoundExpression RewriteBinaryExpression(
-            BoundBinaryExpression node)
+        protected virtual BoundExpression RewriteBinaryExpression(BoundBinaryExpression node)
         {
             var left = RewriteExpression(node.Left);
             var right = RewriteExpression(node.Right);
@@ -93,14 +94,13 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundBinaryExpression(left, node.Op, right);
         }
 
-        protected virtual BoundExpression RewriteLiteralExpression(
-            BoundLiteralExpression node)
-        {
-            return node;
-        }
+        protected virtual BoundExpression RewriteErrorExpression(BoundErrorExpression node)
+            => node;
 
-        protected virtual BoundExpression RewriteUnaryExpression(
-            BoundUnaryExpression node)
+        protected virtual BoundExpression RewriteLiteralExpression(BoundLiteralExpression node)
+            => node;
+
+        protected virtual BoundExpression RewriteUnaryExpression(BoundUnaryExpression node)
         {
             var operand = RewriteExpression(node.Operand);
             if (operand == node.Operand)
@@ -109,11 +109,8 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundUnaryExpression(node.Op, operand);
         }
 
-        protected virtual BoundExpression RewriteVariableExpression(
-            BoundVariableExpression node)
-        {
-            return node;
-        }
+        protected virtual BoundExpression RewriteVariableExpression(BoundVariableExpression node)
+            => node;
 
         public virtual BoundStatement RewriteStatement(BoundStatement node)
         {
@@ -225,14 +222,10 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
         protected virtual BoundStatement RewriteGotoStatement(BoundGotoStatement node)
-        {
-            return node;
-        }
+            => node;
 
         protected virtual BoundStatement RewriteLabelStatement(BoundLabelStatement node)
-        {
-            return node;
-        }
+            => node;
 
         protected virtual BoundStatement RewriteVariableDeclarationStatement(
             BoundVariableDeclarationStatement node)

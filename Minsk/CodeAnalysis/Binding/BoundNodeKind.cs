@@ -5,6 +5,7 @@ namespace Minsk.CodeAnalysis.Binding
         // Expressions
         AssignmentExpression,
         BinaryExpression,
+        ErrorExpression,
         LiteralExpression,
         UnaryExpression,
         VariableExpression,
