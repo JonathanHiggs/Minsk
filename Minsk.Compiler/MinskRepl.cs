@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 
 using Minsk.CodeAnalysis;
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Symbols;
 using Minsk.CodeAnalysis.Text;
 using Minsk.IO;
 

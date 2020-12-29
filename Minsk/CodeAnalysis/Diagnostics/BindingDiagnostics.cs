@@ -1,8 +1,8 @@
 using System;
 
 using Minsk.CodeAnalysis.Binding;
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Symbols;
 using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Diagnostics

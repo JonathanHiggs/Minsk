@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 
 using Minsk.CodeAnalysis.Binding;
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lowering;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Symbols;
 
 namespace Minsk.CodeAnalysis
 {

@@ -3,8 +3,8 @@ using System.Linq;
 
 using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Binding;
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Symbols;
 
 using NUnit.Framework;
 

@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-using Minsk.CodeAnalysis.Common;
+using Minsk.CodeAnalysis.Symbols;
 
 namespace Minsk.CodeAnalysis.Binding
 {
     internal sealed class BoundScope
     {
-        private Dictionary<string, VariableSymbol> variables 
+        private Dictionary<string, VariableSymbol> variables
             = new Dictionary<string, VariableSymbol>();
 
         public BoundScope(BoundScope parent)
@@ -17,7 +17,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         public BoundScope Parent { get; }
 
-        public ImmutableArray<VariableSymbol> DeclaredVariables 
+        public ImmutableArray<VariableSymbol> DeclaredVariables
             => variables.Values.ToImmutableArray();
 
         public (bool Success, VariableSymbol Variable) TryLookup(string name)

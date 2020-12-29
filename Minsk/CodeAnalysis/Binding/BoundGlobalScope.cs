@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 
-using Minsk.CodeAnalysis.Common;
 using Minsk.CodeAnalysis.Diagnostics;
+using Minsk.CodeAnalysis.Symbols;
 
 namespace Minsk.CodeAnalysis.Binding
 {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-using Minsk.CodeAnalysis.Common;
+using Minsk.CodeAnalysis.Symbols;
 
 namespace Minsk.CodeAnalysis.Binding
 {
