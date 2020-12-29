@@ -7,7 +7,7 @@ namespace Minsk.CodeAnalysis.Binding
 {
     internal sealed class BoundLabelStatement : BoundStatement
     {
-        public BoundLabelStatement(LabelSymbol label)
+        public BoundLabelStatement(BoundLabel label)
         {
             Label = label;
         }
@@ -16,7 +16,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         public override BoundNodeKind Kind => BoundNodeKind.LabelStatement;
 
-        public LabelSymbol Label { get; }
+        public BoundLabel Label { get; }
 
         protected override string PrettyPrintText()
             => $"{Label.Name}:";

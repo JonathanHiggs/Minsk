@@ -7,12 +7,12 @@ namespace Minsk.CodeAnalysis.Binding
 {
     internal sealed class BoundGotoStatement : BoundStatement
     {
-        public BoundGotoStatement(LabelSymbol label)
+        public BoundGotoStatement(BoundLabel label)
         {
             Label = label;
         }
 
-        public LabelSymbol Label { get; }
+        public BoundLabel Label { get; }
 
         public override IEnumerable<BoundNode> Children => Enumerable.Empty<BoundNode>();
 

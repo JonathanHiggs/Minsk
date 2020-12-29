@@ -180,10 +180,10 @@ namespace Minsk.CodeAnalysis.Lowering
             return RewriteStatement(result);
         }
 
-        private LabelSymbol GenerateLabel(string name)
+        private BoundLabel GenerateLabel(string name)
         {
             var id = $"Label-{name}-{labelCount++}";
-            return new LabelSymbol(id);
+            return new BoundLabel(id);
         }
     }
 }

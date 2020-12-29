@@ -7,7 +7,7 @@ namespace Minsk.CodeAnalysis.Binding
     internal sealed class BoundConditionalGotoStatement : BoundStatement
     {
         public BoundConditionalGotoStatement(
-            LabelSymbol label,
+            BoundLabel label,
             BoundExpression condition,
             bool jumpIfTrue = false)
         {
@@ -16,7 +16,7 @@ namespace Minsk.CodeAnalysis.Binding
             JumpIfTrue = jumpIfTrue;
         }
 
-        public LabelSymbol Label { get; }
+        public BoundLabel Label { get; }
         public BoundExpression Condition { get; }
         public bool JumpIfTrue { get; }
 
