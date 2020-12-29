@@ -126,35 +126,31 @@ namespace Minsk.CodeAnalysis.Binding
 
             scope = new BoundScope(scope);
 
-            var name = node.Identifier.Text;
-            var variable = new VariableSymbol(name, true, TypeSymbol.Int);
-
-            if (!scope.TryDeclare(variable))
-                diagnostics.Binding.VariableRedeclaration(node);
-
+            var variable = BindVariable(node, node.Identifier, TypeSymbol.Int, true);
             var body = BindStatement(node.Body);
             scope = scope.Parent;
 
             return new BoundForToStatement(variable, lowerBound, upperBound, body);
         }
 
+        private VariableSymbol BindVariable(SyntaxNode node, LexToken identifier, TypeSymbol type, bool isReadOnly = false)
+        {
+            var isMissing = identifier.IsMissing;
+            var name = identifier.Text ?? "?";
+
+            var variable = new VariableSymbol(name, isReadOnly, type);
+            if (!isMissing && !scope.TryDeclare(variable))
+                diagnostics.Binding.VariableRedeclaration(node, identifier);
+
+            return variable;
+        }
+
         private BoundStatement BindVariableDeclaration(
             VariableDeclarationStatement node)
         {
-            var name = node.Identifier.Text;
-
-            // Happens when Identifier token is inserted by parser. Error should already
-            // be reported
-            if (string.IsNullOrEmpty(name))
-                // ToDo: return error expression
-                return new BoundExpressionStatement(new BoundLiteralExpression(0));
-
             var isReadOnly = node.KeywordToken.Kind == TokenKind.LetKeyword;
             var expression = BindExpression(node.Expression);
-            var variable = new VariableSymbol(name, isReadOnly, expression.Type);
-
-            if (!scope.TryDeclare(variable))
-                diagnostics.Binding.VariableRedeclaration(node);
+            var variable = BindVariable(node, node.Identifier, expression.Type, isReadOnly);
 
             return new BoundVariableDeclarationStatement(variable, expression);
         }
@@ -195,7 +191,7 @@ namespace Minsk.CodeAnalysis.Binding
         {
             var expression = BindExpression(node);
 
-            if (expression.Type != targetType)
+            if (!targetType.IsErrorType && !expression.Type.IsErrorType && expression.Type != targetType)
                 diagnostics.Binding.CannotConvert(node, expression.Type, targetType);
 
             return expression;
@@ -247,9 +243,12 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundBinaryExpression(left, op, right);
         }
 
-        private BoundLiteralExpression BindLiteralExpression(LiteralExpression node)
+        private BoundExpression BindLiteralExpression(LiteralExpression node)
         {
-            var value = node.Value ?? 0;
+            if (node.FirstToken.IsMissing)
+                return new BoundErrorExpression();
+
+            var value = node.Value;
             return new BoundLiteralExpression(value);
         }
 
@@ -271,7 +270,6 @@ namespace Minsk.CodeAnalysis.Binding
 
             return new BoundVariableExpression(variable);
         }
-
 
         private BoundExpression BindParenthesizedExpression(ParenthesizedExpression node)
             => BindExpression(node.Expression);

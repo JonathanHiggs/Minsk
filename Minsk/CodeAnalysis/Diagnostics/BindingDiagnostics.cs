@@ -1,6 +1,7 @@
 using System;
 
 using Minsk.CodeAnalysis.Binding;
+using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
 using Minsk.CodeAnalysis.Symbols;
 using Minsk.CodeAnalysis.Text;
@@ -51,11 +52,11 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node.IdentifierToken.Span,
                 $"Undeclared identifier {node.IdentifierToken.Text}");
 
-        public void VariableRedeclaration(VariableDeclarationStatement node)
+        public void VariableRedeclaration(SyntaxNode node, LexToken identifierToken)
             => Error(
                 node,
-                node.Identifier.Span,
-                $"Variable {node.Identifier.Text} already declared");
+                identifierToken.Span,
+                $"Variable {identifierToken.Text} already declared");
 
         public void VariableRedeclaration(ForToStatement node)
             => Error(

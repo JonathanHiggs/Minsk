@@ -1,9 +1,14 @@
-﻿namespace Minsk.CodeAnalysis.Symbols
+﻿using System;
+
+namespace Minsk.CodeAnalysis.Symbols
 {
     public abstract class Symbol
     {
         private protected Symbol(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException($"{nameof(name)} is null or white space");
+
             Name = name;
         }
 

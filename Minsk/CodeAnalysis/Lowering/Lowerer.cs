@@ -9,7 +9,7 @@ namespace Minsk.CodeAnalysis.Lowering
 {
     internal sealed class Lowerer : BoundTreeRewriter
     {
-        private int labelCount;
+        private int labelCount = 1;
 
         private Lowerer()
         { }
