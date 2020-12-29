@@ -20,13 +20,13 @@ namespace Minsk.CodeAnalysis.Symbols
         {
             IsInternalType = isInternalType;
             IsErrorType = isErrorType;
-            IsNullType = isVoidType;
+            IsVoidType = isVoidType;
         }
 
         public override SymbolKind Kind => SymbolKind.Type;
 
         public bool IsErrorType { get; }
-        public bool IsNullType { get; }
+        public bool IsVoidType { get; }
         public bool IsInternalType { get; }
 
         public static TypeSymbol FromValue(object value)

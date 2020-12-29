@@ -115,7 +115,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         private BoundStatement BindExpressionStatement(ExpressionStatement node)
         {
-            var expression = BindExpression(node.Expression);
+            var expression = BindExpression(node.Expression, canBeVoid: true);
             return new BoundExpressionStatement(expression);
         }
 
@@ -139,14 +139,14 @@ namespace Minsk.CodeAnalysis.Binding
             var name = identifier.Text ?? "?";
 
             var variable = new VariableSymbol(name, isReadOnly, type);
+
             if (!isMissing && !scope.TryDeclare(variable))
                 diagnostics.Binding.VariableRedeclaration(node, identifier);
 
             return variable;
         }
 
-        private BoundStatement BindVariableDeclaration(
-            VariableDeclarationStatement node)
+        private BoundStatement BindVariableDeclaration(VariableDeclarationStatement node)
         {
             var isReadOnly = node.KeywordToken.Kind == TokenKind.LetKeyword;
             var expression = BindExpression(node.Expression);
@@ -162,7 +162,30 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundWhileStatement(condition, body);
         }
 
-        public BoundExpression BindExpression(Expression node)
+        private BoundExpression BindExpression(Expression node, TypeSymbol targetType)
+        {
+            var expression = BindExpression(node);
+
+            if (!targetType.IsErrorType && !expression.Type.IsErrorType && expression.Type != targetType)
+                diagnostics.Binding.CannotConvert(node, expression.Type, targetType);
+
+            return expression;
+        }
+
+        private BoundExpression BindExpression(Expression node, bool canBeVoid = false)
+        {
+            var expression = BindExpressionInternal(node);
+
+            if (!canBeVoid && expression.Type.IsVoidType)
+            {
+                diagnostics.Binding.VoidExpression(node);
+                return new BoundErrorExpression();
+            }
+
+            return expression;
+        }
+
+        private BoundExpression BindExpressionInternal(Expression node)
         {
             return node.Kind switch {
                 SyntaxKind.AssignmentExpression
@@ -190,20 +213,13 @@ namespace Minsk.CodeAnalysis.Binding
             };
         }
 
-        public BoundExpression BindExpression(Expression node, TypeSymbol targetType)
-        {
-            var expression = BindExpression(node);
-
-            if (!targetType.IsErrorType && !expression.Type.IsErrorType && expression.Type != targetType)
-                diagnostics.Binding.CannotConvert(node, expression.Type, targetType);
-
-            return expression;
-        }
-
         private BoundExpression BindAssignmentExpression(AssignmentExpression node)
         {
             var name = node.IdentifierToken.Text;
             var expression = BindExpression(node.Expression);
+
+            if (expression is BoundErrorExpression)
+                return new BoundErrorExpression();
 
             var (success, variable) = scope.TryLookup(name);
 

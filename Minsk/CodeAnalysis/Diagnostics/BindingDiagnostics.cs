@@ -78,5 +78,8 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node,
                 node.Identifier.Span,
                 $"Variable {node.Identifier.Text} already declared");
+
+        public void VoidExpression(Expression node)
+            => Error(node, node.Span, "Expression must return a value");
     }
 }

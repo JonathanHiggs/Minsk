@@ -21,6 +21,6 @@ namespace Minsk.CodeAnalysis.Binding
             => Enumerable.Empty<BoundNode>();
 
         protected override string PrettyPrintText()
-            => $"{Type.Name}:{Value}";
+            => Value is string ? $"{Type.Name}:\"{Value}\"" : $"{Type.Name}:{Value}";
     }
 }
