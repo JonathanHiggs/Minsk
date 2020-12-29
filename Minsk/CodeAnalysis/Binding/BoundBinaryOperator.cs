@@ -86,6 +86,9 @@ namespace Minsk.CodeAnalysis.Binding
             From(Token.Ampersand,           Op.BitwiseAnd,      TypeSymbol.Bool),
             From(Token.Pipe,                Op.BitwiseOr,       TypeSymbol.Bool),
             From(Token.Hat,                 Op.BitwiseXor,      TypeSymbol.Bool),
+
+            // String
+            From(Token.Plus,                Op.Addition,        TypeSymbol.String),
         };
     }
 }

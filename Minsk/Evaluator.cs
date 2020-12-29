@@ -199,7 +199,9 @@ namespace Minsk.CodeAnalysis
             var op = node.Op.Kind;
 
             return op switch {
-                BinOp.Addition        => (int)left  +  (int)right,
+                BinOp.Addition when node.Left.Type == TypeSymbol.Int && node.Right.Type == TypeSymbol.Int
+                    => (int)left  +  (int)right,
+
                 BinOp.Subtraction     => (int)left  -  (int)right,
                 BinOp.Multiplication  => (int)left  *  (int)right,
                 BinOp.Division        => (int)left  /  (int)right,
@@ -220,6 +222,9 @@ namespace Minsk.CodeAnalysis
                 BinOp.BitwiseAnd when node.Left.Type == TypeSymbol.Bool  => (bool)left & (bool)right,
                 BinOp.BitwiseOr  when node.Left.Type == TypeSymbol.Bool  => (bool)left | (bool)right,
                 BinOp.BitwiseXor when node.Left.Type == TypeSymbol.Bool  => (bool)left ^ (bool)right,
+
+                BinOp.Addition when node.Left.Type == TypeSymbol.String && node.Right.Type == TypeSymbol.String
+                    => (string)left + (string)right,
 
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateBinaryExpression")
