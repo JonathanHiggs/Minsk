@@ -2,16 +2,17 @@ using System;
 
 namespace Minsk.CodeAnalysis.Symbols
 {
-    public sealed class VariableSymbol
+    public sealed class VariableSymbol : Symbol
     {
-        public VariableSymbol(string name, bool isReadOnly, Type type)
+        internal VariableSymbol(string name, bool isReadOnly, Type type)
+            : base(name)
         {
-            Name = name;
             IsReadOnly = isReadOnly;
             Type = type;
         }
 
-        public string Name { get; }
+        public override SymbolKind Kind => SymbolKind.Variable;
+
         public bool IsReadOnly { get; }
         public Type Type { get; }
 
