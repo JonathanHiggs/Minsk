@@ -239,7 +239,15 @@ namespace Minsk.Compiler
                 syntaxTree.Root.PrettyPrint(Console.Out);
 
             if (showProgram)
+            {
+                if (showTree)
+                    Console.WriteLine();
+
                 compilation.EmitTree(Console.Out);
+            }
+
+            if (showTree || showProgram)
+                Console.WriteLine();
 
             var result = compilation.Evaluate(variables);
             Console.Out.WriteDiagnostics(result.Diagnostics, syntaxTree.Source);

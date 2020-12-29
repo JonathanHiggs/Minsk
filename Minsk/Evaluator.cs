@@ -80,73 +80,10 @@ namespace Minsk.CodeAnalysis
             return lastValue;
         }
 
-        //private void EvaluateStatement(BoundStatement node)
-        //{
-        //    switch (node.Kind)
-        //    {
-        //        case BoundNodeKind.BlockStatement:
-        //            EvaluateBlockStatement(node as BoundBlockStatement);
-        //            break;
-        //
-        //        case BoundNodeKind.ConditionalStatement:
-        //            throw new InvalidOperationException("If statements should have been lowered");
-        //            //EvaluateConditionalStatement(node as BoundConditionalStatement);
-        //            //break;
-        //
-        //        case BoundNodeKind.ExpressionStatement:
-        //            EvaluateExpressionStatement(node as BoundExpressionStatement);
-        //            break;
-        //
-        //        case BoundNodeKind.ForToStatement:
-        //            throw new InvalidOperationException("ForTo statements should have been lowered");
-        //            //EvaluateForToStatement(node as BoundForToStatement);
-        //            //break;
-        //
-        //        case BoundNodeKind.VariableDeclarationStatement:
-        //            EvaluateVariableDeclarationStatement(node as BoundVariableDeclarationStatement);
-        //            break;
-        //
-        //        case BoundNodeKind.WhileStatement:
-        //            throw new InvalidOperationException("While statements should have been lowered");
-        //            //EvaluateWhileStatement(node as BoundWhileStatement);
-        //            //break;
-        //
-        //        default:
-        //            throw new Exception();
-        //    }
-        //}
-
-        //private void EvaluateBlockStatement(BoundBlockStatement node)
-        //{
-        //    foreach (var statement in node.Statements)
-        //        EvaluateStatement(statement);
-        //}
-
-        //private void EvaluateConditionalStatement(BoundConditionalStatement node)
-        //{
-        //    var condition = (bool)EvaluateExpression(node.Condition);
-        //    if (condition)
-        //        EvaluateStatement(node.ThenStatement);
-        //    else if (node.ElseStatement is not null)
-        //        EvaluateStatement(node.ElseStatement);
-        //}
-
         private void EvaluateExpressionStatement(BoundExpressionStatement node)
         {
             lastValue = EvaluateExpression(node.Expression);
         }
-
-        //private void EvaluateForToStatement(BoundForToStatement node)
-        //{
-        //    var lowerBound = (int)EvaluateExpression(node.LowerBound);
-        //    var upperBound = (int)EvaluateExpression(node.UpperBound);
-        //
-        //    for (var value = lowerBound; value <= upperBound; value++)
-        //    {
-        //        variables[node.Variable] = value;
-        //        EvaluateStatement(node.Body);
-        //    }
-        //}
 
         private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement node)
         {
@@ -154,12 +91,6 @@ namespace Minsk.CodeAnalysis
             variables[node.Variable] = value;
             lastValue = value;
         }
-
-        //private void EvaluateWhileStatement(BoundWhileStatement node)
-        //{
-        //    while((bool)EvaluateExpression(node.Condition))
-        //        EvaluateStatement(node.Body);
-        //}
 
         private object EvaluateExpression(BoundExpression node)
         {
@@ -169,6 +100,9 @@ namespace Minsk.CodeAnalysis
 
                 BoundNodeKind.BinaryExpression
                     => EvaluateBinaryExpression(node as BoundBinaryExpression),
+
+                BoundNodeKind.CallExpression
+                    => EvaluateCallExpression(node as BoundCallExpression),
 
                 BoundNodeKind.LiteralExpression
                     => EvaluateLiteralExpression(node as BoundLiteralExpression),
@@ -229,6 +163,24 @@ namespace Minsk.CodeAnalysis
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateBinaryExpression")
             };
+        }
+
+        private object EvaluateCallExpression(BoundCallExpression node)
+        {
+            if (node.Function == BuiltinFunctions.Input)
+            {
+                return Console.ReadLine();
+            }
+            else if (node.Function == BuiltinFunctions.Print)
+            {
+                var value = (string)EvaluateExpression(node.Arguments[0]);
+                Console.WriteLine(value);
+                return null;
+            }
+            else
+            {
+                throw new Exception($"Unexpected function '{node.Function.Name}'");
+            }
         }
 
         private object EvaluateLiteralExpression(BoundLiteralExpression node)

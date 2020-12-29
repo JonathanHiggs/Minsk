@@ -16,6 +16,6 @@ namespace Minsk.CodeAnalysis.Symbols
 
         public abstract SymbolKind Kind { get; }
 
-        public override string ToString() => $"{Kind}:{Name}";
+        public override string ToString() => Name;
     }
 }

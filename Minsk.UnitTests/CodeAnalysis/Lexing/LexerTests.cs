@@ -156,7 +156,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
 
         private static IEnumerable<Token> SpecialTokens
             => new List<Token> {
-                (TokenKind.EoF,                 "\0"),
+                //(TokenKind.EoF,                 "\0"),
                 (TokenKind.Unknown,             "`"),
             };
 

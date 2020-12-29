@@ -5,6 +5,7 @@ namespace Minsk.CodeAnalysis.Parsing
         // Expressions
         AssignmentExpression,
         BinaryExpression,
+        CallExpression,
         LiteralExpression,
         NameExpression,
         ParenthesesExpression,

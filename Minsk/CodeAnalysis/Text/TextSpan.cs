@@ -1,3 +1,5 @@
+using System;
+
 namespace Minsk.CodeAnalysis.Text
 {
     public struct TextSpan
@@ -17,5 +19,8 @@ namespace Minsk.CodeAnalysis.Text
         public int Start { get; }
         public int Length { get; }
         public int End => Start + Length;
+
+        public TextSpan To(TextSpan span)
+            => FromBounds(Math.Min(Start, span.Start), Math.Max(End, span.End));
     }
 }

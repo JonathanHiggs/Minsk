@@ -171,6 +171,9 @@ namespace Minsk.CodeAnalysis.Binding
                 SyntaxKind.BinaryExpression
                     => BindBinaryExpression(node as BinaryExpression),
 
+                SyntaxKind.CallExpression
+                    => BindCallExpression(node as CallExpression),
+
                 SyntaxKind.LiteralExpression
                     => BindLiteralExpression(node as LiteralExpression),
 
@@ -241,6 +244,47 @@ namespace Minsk.CodeAnalysis.Binding
             }
 
             return new BoundBinaryExpression(left, op, right);
+        }
+
+        private BoundExpression BindCallExpression(CallExpression node)
+        {
+            var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
+
+            foreach (var argument in node.Arguments)
+                boundArguments.Add(BindExpression(argument));
+
+            var function = BuiltinFunctions.All.SingleOrDefault(f => f.Name == node.Identifier.Text);
+
+            if (function is null)
+            {
+                diagnostics.Binding.UndefinedFunction(node);
+                return new BoundErrorExpression();
+            }
+
+            if (node.Arguments.Count != function.Parameters.Length)
+            {
+                diagnostics.Binding.MismatchingArgumentCount(node, function);
+                return new BoundErrorExpression();
+            }
+
+            var hasError = false;
+
+            for (var i = 0; i < function.Parameters.Length; i++)
+            {
+                var parameter = function.Parameters[i];
+                var argument = boundArguments[i];
+
+                if (parameter.Type != argument.Type && !argument.Type.IsErrorType)
+                {
+                    hasError = true;
+                    diagnostics.Binding.ArgumentTypeMismatch(node.Arguments[i], argument.Type, parameter);
+                }
+            }
+
+            if (hasError)
+                return new BoundErrorExpression();
+
+            return new BoundCallExpression(function, boundArguments.ToImmutable());
         }
 
         private BoundExpression BindLiteralExpression(LiteralExpression node)

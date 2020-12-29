@@ -29,6 +29,15 @@ namespace Minsk.CodeAnalysis.Parsing
                 .ToImmutableArray();
         }
 
+        public static CompilationUnit Parse(string text, DiagnosticBag diagnostics)
+            => Parse(SourceText.From(text), diagnostics);
+
+        public static CompilationUnit Parse(SourceText source, DiagnosticBag diagnostics)
+        {
+            var parser = new Parser(source, diagnostics);
+            return parser.ParseCompilationUnit();
+        }
+
         public CompilationUnit ParseCompilationUnit()
         {
             var statement = ParseStatement();
@@ -203,7 +212,7 @@ namespace Minsk.CodeAnalysis.Parsing
                     => ParseBooleanLiteral(),
 
                 TokenKind.Identifier
-                    => ParseNameExpression(),
+                    => ParseNameOrCallExpression(),
 
                 TokenKind.Number
                     => ParseNumberLiteral(),
@@ -234,10 +243,51 @@ namespace Minsk.CodeAnalysis.Parsing
             return new LiteralExpression(token, isTrue);
         }
 
+        private Expression ParseNameOrCallExpression()
+        {
+            if (Current == TokenKind.Identifier && Next == TokenKind.OpenParenthesis)
+                return ParseCallExpression();
+
+            return ParseNameExpression();
+        }
+
         private Expression ParseNameExpression()
         {
-            var identifierToke = MatchToken(TokenKind.Identifier);
-            return new NameExpression(identifierToke);
+            var identifierToken = MatchToken(TokenKind.Identifier);
+            return new NameExpression(identifierToken);
+        }
+
+        private Expression ParseCallExpression()
+        {
+            var identifier = MatchToken(TokenKind.Identifier);
+            var openParens = MatchToken(TokenKind.OpenParenthesis);
+            var arguments = ParseArguments();
+            var closeParens = MatchToken(TokenKind.CloseParenthesis);
+
+            return new CallExpression(identifier, openParens, arguments, closeParens);
+        }
+
+        private SeparatedSyntaxList<Expression> ParseArguments()
+        {
+            var expressions = ImmutableArray.CreateBuilder<SeparatedSyntaxNode<Expression>>();
+
+            while (Current != TokenKind.CloseParenthesis && Current != TokenKind.EoF)
+            {
+                expressions.Add(ParseSeparatedExpression());
+            }
+
+            return new SeparatedSyntaxList<Expression>(expressions.ToImmutable());
+        }
+
+        private SeparatedSyntaxNode<Expression> ParseSeparatedExpression()
+        {
+            var expression = ParseExpression();
+            var comma = Current == TokenKind.Comma ? MatchToken(TokenKind.Comma) : null;
+
+            if (comma is not null && (Current == TokenKind.CloseParenthesis || Current == TokenKind.EoF))
+                diagnostics.Syntax.UnexpectedToken(comma, "Unexpected comma");
+
+            return new SeparatedSyntaxNode<Expression>(expression, comma);
         }
 
         private Expression ParseNumberLiteral()

@@ -60,6 +60,7 @@ namespace Minsk.CodeAnalysis.Lexing
                 case ')':   return EmitToken(TokenKind.CloseParenthesis, 1);
                 case '{':   return EmitToken(TokenKind.OpenBrace, 1);
                 case '}':   return EmitToken(TokenKind.CloseBrace, 1);
+                case ',':   return EmitToken(TokenKind.Comma, 1);
 
                 case '"':
                     return ReadStringToken();

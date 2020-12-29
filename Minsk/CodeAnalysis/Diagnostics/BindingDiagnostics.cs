@@ -19,6 +19,12 @@ namespace Minsk.CodeAnalysis.Diagnostics
         private void Error(SyntaxNode node, TextSpan span, string message)
             => bag.Report(new BindError(node, span, message));
 
+        public void ArgumentTypeMismatch(Expression node, TypeSymbol argumentType, ParameterSymbol parameter)
+            => Error(
+                node,
+                node.Span,
+                $"Argument type '{argumentType}' does not match the '{parameter.Name}' parameter type '{parameter.Type}'");
+
         public void CannotAssignToReadOnlyVariable(AssignmentExpression node)
             => Error(
                 node,
@@ -36,6 +42,15 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node,
                 node.EqualsToken.Span,
                 $"Cannot assign {expressionType} to {node.IdentifierToken.Text}:{variable.Type}");
+
+        public void MismatchingArgumentCount(CallExpression node, FunctionSymbol function)
+            => Error(
+                node,
+                node.OpenParens.Span.To(node.CloseParens.Span),
+                $"Function '{function.Name}' requires {function.Parameters.Length} parameters");
+
+        internal void UndefinedFunction(CallExpression node)
+            => Error(node, node.Identifier.Span, "UndefinedFunction");
 
         public void UndefinedOperator(SyntaxNode node, TextSpan span, string message)
             => Error(node, span, message);

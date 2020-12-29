@@ -37,6 +37,7 @@ namespace Minsk.CodeAnalysis.Lexing
         [Description("}")]      CloseBrace,
         //OpenBracket,
         //CloseBracket,
+        [Description(",")]      Comma,
 
         // Keywords
         [Description("true")]   TrueKeyword,
