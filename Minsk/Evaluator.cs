@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using Minsk.CodeAnalysis.Binding;
 using Minsk.CodeAnalysis.Symbols;
 
+using BinOp = Minsk.CodeAnalysis.Binding.BoundBinaryOperatorKind;
+using UnaOp = Minsk.CodeAnalysis.Binding.BoundUnaryOperatorKind;
+
 namespace Minsk.CodeAnalysis
 {
     internal sealed class Evaluator
@@ -196,28 +199,27 @@ namespace Minsk.CodeAnalysis
             var op = node.Op.Kind;
 
             return op switch {
-                BoundBinaryOperatorKind.Addition        => (int)left  +  (int)right,
-                BoundBinaryOperatorKind.Subtraction     => (int)left  -  (int)right,
-                BoundBinaryOperatorKind.Multiplication  => (int)left  *  (int)right,
-                BoundBinaryOperatorKind.Division        => (int)left  /  (int)right,
+                BinOp.Addition        => (int)left  +  (int)right,
+                BinOp.Subtraction     => (int)left  -  (int)right,
+                BinOp.Multiplication  => (int)left  *  (int)right,
+                BinOp.Division        => (int)left  /  (int)right,
 
-                BoundBinaryOperatorKind.LogicalAnd      => (bool)left && (bool)right,
-                BoundBinaryOperatorKind.LogicalOr       => (bool)left || (bool)right,
-                BoundBinaryOperatorKind.Less            => (int)left  <  (int)right,
-                BoundBinaryOperatorKind.LessOrEquals    => (int)left  <= (int)right,
-                BoundBinaryOperatorKind.Greater         => (int)left  >  (int)right,
-                BoundBinaryOperatorKind.GreaterOrEquals => (int)left  >= (int)right,
+                BinOp.LogicalAnd      => (bool)left && (bool)right,
+                BinOp.LogicalOr       => (bool)left || (bool)right,
+                BinOp.Less            => (int)left  <  (int)right,
+                BinOp.LessOrEquals    => (int)left  <= (int)right,
+                BinOp.Greater         => (int)left  >  (int)right,
+                BinOp.GreaterOrEquals => (int)left  >= (int)right,
 
-                BoundBinaryOperatorKind.Equals          => Equals(left, right),
-                BoundBinaryOperatorKind.NotEquals       => !Equals(left, right),
+                BinOp.Equals          => Equals(left, right),
+                BinOp.NotEquals       => !Equals(left, right),
 
-                BoundBinaryOperatorKind.BitwiseAnd when node.Left.Type == typeof(int)   => (int) left & (int) right,
-                BoundBinaryOperatorKind.BitwiseOr  when node.Left.Type == typeof(int)   => (int) left | (int) right,
-                BoundBinaryOperatorKind.BitwiseXor when node.Left.Type == typeof(int)   => (int) left ^ (int) right,
-
-                BoundBinaryOperatorKind.BitwiseAnd when node.Left.Type == typeof(bool)  => (bool)left & (bool)right,
-                BoundBinaryOperatorKind.BitwiseOr  when node.Left.Type == typeof(bool)  => (bool)left | (bool)right,
-                BoundBinaryOperatorKind.BitwiseXor when node.Left.Type == typeof(bool)  => (bool)left ^ (bool)right,
+                BinOp.BitwiseAnd when node.Left.Type == TypeSymbol.Int   => (int) left & (int) right,
+                BinOp.BitwiseOr  when node.Left.Type == TypeSymbol.Int   => (int) left | (int) right,
+                BinOp.BitwiseXor when node.Left.Type == TypeSymbol.Int   => (int) left ^ (int) right,
+                BinOp.BitwiseAnd when node.Left.Type == TypeSymbol.Bool  => (bool)left & (bool)right,
+                BinOp.BitwiseOr  when node.Left.Type == TypeSymbol.Bool  => (bool)left | (bool)right,
+                BinOp.BitwiseXor when node.Left.Type == TypeSymbol.Bool  => (bool)left ^ (bool)right,
 
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateBinaryExpression")
@@ -236,12 +238,12 @@ namespace Minsk.CodeAnalysis
             var op = node.Op.Kind;
 
             return op switch {
-                BoundUnaryOperatorKind.Identity => (int)value,
-                BoundUnaryOperatorKind.Negation => -(int)value,
+                UnaOp.Identity           => (int)value,
+                UnaOp.Negation           => -(int)value,
 
-                BoundUnaryOperatorKind.LogicalNegation => !(bool)value,
+                UnaOp.LogicalNegation    => !(bool)value,
 
-                BoundUnaryOperatorKind.OnesCompliment => ~(int)value,
+                UnaOp.OnesCompliment     => ~(int)value,
 
                 _ => throw new NotImplementedException(
                     $"'{op}' not implemented in EvaluateUnaryExpression")

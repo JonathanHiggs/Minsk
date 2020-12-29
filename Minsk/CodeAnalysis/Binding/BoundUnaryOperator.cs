@@ -1,7 +1,10 @@
-using System;
 using System.Linq;
 
 using Minsk.CodeAnalysis.Lexing;
+using Minsk.CodeAnalysis.Symbols;
+
+using Op = Minsk.CodeAnalysis.Binding.BoundUnaryOperatorKind;
+using Token = Minsk.CodeAnalysis.Lexing.TokenKind;
 
 namespace Minsk.CodeAnalysis.Binding
 {
@@ -10,7 +13,7 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundUnaryOperator(
             TokenKind tokenKind,
             BoundUnaryOperatorKind kind,
-            Type operandType
+            TypeSymbol operandType
         )
             : this(tokenKind, kind, operandType, operandType)
         { }
@@ -18,8 +21,8 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundUnaryOperator(
             TokenKind tokenKind,
             BoundUnaryOperatorKind kind,
-            Type operandType,
-            Type resultType)
+            TypeSymbol operandType,
+            TypeSymbol resultType)
         {
             TokenKind = tokenKind;
             Kind = kind;
@@ -29,23 +32,26 @@ namespace Minsk.CodeAnalysis.Binding
 
         public TokenKind TokenKind { get; }
         public BoundUnaryOperatorKind Kind { get; }
-        public Type OperandType { get; }
-        public Type Type { get; }
+        public TypeSymbol OperandType { get; }
+        public TypeSymbol Type { get; }
 
-        public static BoundUnaryOperator Bind(TokenKind tokenKind, Type operandType)
+        public static BoundUnaryOperator Bind(TokenKind tokenKind, TypeSymbol operandType)
             => operators.FirstOrDefault(
                 op => op.TokenKind == tokenKind && op.OperandType == operandType);
 
+        private static BoundUnaryOperator From(TokenKind tokenKind, BoundUnaryOperatorKind op, TypeSymbol type)
+            => new BoundUnaryOperator(tokenKind, op, type);
+
         private static BoundUnaryOperator[] operators = {
             // Logical
-            new BoundUnaryOperator(TokenKind.Bang,  BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
+            From(Token.Bang,    Op.LogicalNegation, TypeSymbol.Bool),
 
             // Numerical
-            new BoundUnaryOperator(TokenKind.Plus,  BoundUnaryOperatorKind.Identity,        typeof(int)),
-            new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negation,        typeof(int)),
+            From(Token.Plus,    Op.Identity,        TypeSymbol.Int),
+            From(Token.Minus,   Op.Negation,        TypeSymbol.Int),
 
             // Bitwise
-            new BoundUnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesCompliment,  typeof(int)),
+            From(Token.Tilde,   Op.OnesCompliment,  TypeSymbol.Int),
         };
     }
 }

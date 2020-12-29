@@ -15,7 +15,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         public VariableSymbol Variable { get; }
         public override BoundNodeKind Kind => BoundNodeKind.VariableExpression;
-        public override Type Type => Variable?.Type;
+        public override TypeSymbol Type => Variable?.Type ?? TypeSymbol.Unknown;
 
         public override IEnumerable<BoundNode> Children
             => Enumerable.Empty<BoundNode>();

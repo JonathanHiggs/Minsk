@@ -1,6 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using Minsk.CodeAnalysis.Symbols;
 
 namespace Minsk.CodeAnalysis.Binding
 {
@@ -9,9 +10,10 @@ namespace Minsk.CodeAnalysis.Binding
         public BoundLiteralExpression(object value)
         {
             Value = value;
+            Type = TypeSymbol.FromValue(value);
         }
 
-        public override Type Type => Value.GetType();
+        public override TypeSymbol Type { get; }
         public override BoundNodeKind Kind => BoundNodeKind.LiteralExpression;
         public object Value { get; }
 

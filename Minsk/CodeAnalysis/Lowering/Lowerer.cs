@@ -114,13 +114,13 @@ namespace Minsk.CodeAnalysis.Lowering
             // }
 
             var variableDeclaration = new BoundVariableDeclarationStatement(node.Variable, node.LowerBound);
-            var upperBoundSymbol = new VariableSymbol("upperBound", true, typeof(int));
+            var upperBoundSymbol = new VariableSymbol("upperBound", true, TypeSymbol.Int);
             var upperBoundDeclaration = new BoundVariableDeclarationStatement(upperBoundSymbol, node.UpperBound);
             var upperBoundExpression = new BoundVariableExpression(upperBoundSymbol);
 
             var condition = new BoundBinaryExpression(
                 new BoundVariableExpression(node.Variable),
-                BoundBinaryOperator.Bind(Lexing.TokenKind.LessOrEquals, typeof(int), typeof(int)),
+                BoundBinaryOperator.Bind(Lexing.TokenKind.LessOrEquals, TypeSymbol.Int, TypeSymbol.Int),
                 upperBoundExpression);
 
             var increment = new BoundExpressionStatement(
@@ -128,7 +128,7 @@ namespace Minsk.CodeAnalysis.Lowering
                     node.Variable,
                     new BoundBinaryExpression(
                         new BoundVariableExpression(node.Variable),
-                        BoundBinaryOperator.Bind(Lexing.TokenKind.Plus, typeof(int), typeof(int)),
+                        BoundBinaryOperator.Bind(Lexing.TokenKind.Plus, TypeSymbol.Int, TypeSymbol.Int),
                         new BoundLiteralExpression(1))));
 
             var whileBlock =

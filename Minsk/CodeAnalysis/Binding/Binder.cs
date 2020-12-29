@@ -98,7 +98,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         private BoundStatement BindConditionalStatement(ConditionalStatement node)
         {
-            var condition = BindExpression(node.Condition, typeof(bool));
+            var condition = BindExpression(node.Condition, TypeSymbol.Bool);
             var statement = BindStatement(node.ThenStatement);
             var elseStatement = BindOptionalElseClause(node.ElseClause);
 
@@ -121,13 +121,13 @@ namespace Minsk.CodeAnalysis.Binding
 
         private BoundStatement BindForToStatement(ForToStatement node)
         {
-            var lowerBound = BindExpression(node.LowerBound, typeof(int));
-            var upperBound = BindExpression(node.UpperBound, typeof(int));
+            var lowerBound = BindExpression(node.LowerBound, TypeSymbol.Int);
+            var upperBound = BindExpression(node.UpperBound, TypeSymbol.Int);
 
             scope = new BoundScope(scope);
 
             var name = node.Identifier.Text;
-            var variable = new VariableSymbol(name, true, typeof(int));
+            var variable = new VariableSymbol(name, true, TypeSymbol.Int);
 
             if (!scope.TryDeclare(variable))
                 diagnostics.Binding.VariableRedeclaration(node);
@@ -161,7 +161,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         private BoundStatement BindWhileStatement(WhileStatement node)
         {
-            var condition = BindExpression(node.Condition, typeof(bool));
+            var condition = BindExpression(node.Condition, TypeSymbol.Bool);
             var body = BindStatement(node.Body);
             return new BoundWhileStatement(condition, body);
         }
@@ -191,7 +191,7 @@ namespace Minsk.CodeAnalysis.Binding
             };
         }
 
-        public BoundExpression BindExpression(Expression node, Type targetType)
+        public BoundExpression BindExpression(Expression node, TypeSymbol targetType)
         {
             var expression = BindExpression(node);
 
