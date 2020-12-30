@@ -37,5 +37,14 @@ namespace Minsk.CodeAnalysis.Symbols
                 string  => String,
                 _       => throw new NotImplementedException($"Type: {value.GetType().Name}")
             };
+
+        public static TypeSymbol From<T>()
+        {
+            if      (typeof(T) == typeof(bool))     return Bool;
+            else if (typeof(T) == typeof(int))      return Int;
+            else if (typeof(T) == typeof(string))   return String;
+
+            throw new Exception($"Unexpected type '{typeof(T).Name}'");
+        }
     }
 }

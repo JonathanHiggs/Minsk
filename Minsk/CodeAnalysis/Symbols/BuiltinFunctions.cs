@@ -7,11 +7,11 @@ namespace Minsk.CodeAnalysis.Symbols
 {
     internal static class BuiltinFunctions
     {
-        public static readonly FunctionSymbol Print = "Print".Function("text".OfType(TypeSymbol.String));
+        public static readonly FunctionSymbol Print = "Print".WithParameters("text".OfType<string>());
 
-        public static readonly FunctionSymbol Input = "Input".Function(TypeSymbol.String);
+        public static readonly FunctionSymbol Input = "Input".Returns<string>();
 
-        public static readonly FunctionSymbol Rand = "Rand".Function(TypeSymbol.Int);
+        public static readonly FunctionSymbol Rand = "Rand".WithParameters("value".OfType<int>()).Returns<int>();
 
         internal static IEnumerable<FunctionSymbol> All
             => typeof(BuiltinFunctions)
@@ -21,14 +21,50 @@ namespace Minsk.CodeAnalysis.Symbols
 
         #region Helpers
 
-        private static ParameterSymbol OfType(this string name, TypeSymbol type)
-            => new ParameterSymbol(name, type);
+        private static FunctionSymbolBuilder WithParameters(this string name, params ParameterSymbol[] parameters)
+        {
+            var builder = new FunctionSymbolBuilder(name);
+            builder.Parameters(parameters);
+            return builder;
+        }
 
-        private static FunctionSymbol Function(this string name, params ParameterSymbol[] parameters)
-            => new FunctionSymbol(name, parameters.ToImmutableArray(), TypeSymbol.Void);
+        private static ParameterSymbol OfType<T>(this string name)
+            => new ParameterSymbol(name, TypeSymbol.From<T>());
 
-        private static FunctionSymbol Function(this string name, TypeSymbol returnType, params ParameterSymbol[] parameters)
-            => new FunctionSymbol(name, parameters.ToImmutableArray(), returnType);
+        private static FunctionSymbol Returns<T>(this string name)
+            => new FunctionSymbol(name, TypeSymbol.From<T>());
+
+        private class FunctionSymbolBuilder
+        {
+            private string name;
+            private TypeSymbol returnType = TypeSymbol.Void;
+            private List<ParameterSymbol> parameters = new List<ParameterSymbol>();
+
+            public FunctionSymbolBuilder(string name)
+            {
+                this.name = name;
+            }
+
+            public static implicit operator FunctionSymbol(FunctionSymbolBuilder builder)
+                => new FunctionSymbol(
+                    builder.name, 
+                    builder.parameters.ToImmutableArray(), 
+                    builder.returnType);
+
+            public FunctionSymbolBuilder Parameters(params ParameterSymbol[] parameters)
+            {
+                foreach (var parameter in parameters)
+                    this.parameters.Add(parameter);
+
+                return this;
+            }
+
+            public FunctionSymbolBuilder Returns<T>()
+            {
+                returnType = TypeSymbol.From<T>();
+                return this;
+            }
+        }
 
         #endregion
     }

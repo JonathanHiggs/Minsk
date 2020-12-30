@@ -184,7 +184,8 @@ namespace Minsk.CodeAnalysis
             }
             else if (node.Function == BuiltinFunctions.Rand)
             {
-                return random.Next();
+                var value = (int)EvaluateExpression(node.Arguments[0]);
+                return random.Next(value);
             }
             else
             {

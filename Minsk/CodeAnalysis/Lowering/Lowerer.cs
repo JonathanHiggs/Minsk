@@ -120,7 +120,7 @@ namespace Minsk.CodeAnalysis.Lowering
 
             var condition = new BoundBinaryExpression(
                 new BoundVariableExpression(node.Variable),
-                BoundBinaryOperator.Bind(Lexing.TokenKind.Less, TypeSymbol.Int, TypeSymbol.Int),
+                BoundBinaryOperator.Bind(Lexing.TokenKind.LessOrEquals, TypeSymbol.Int, TypeSymbol.Int),
                 upperBoundExpression);
 
             var increment = new BoundExpressionStatement(
