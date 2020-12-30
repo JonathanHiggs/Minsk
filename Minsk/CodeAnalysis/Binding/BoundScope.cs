@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 using Minsk.CodeAnalysis.Symbols;
 
@@ -7,7 +6,10 @@ namespace Minsk.CodeAnalysis.Binding
 {
     internal sealed class BoundScope
     {
-        private Dictionary<string, VariableSymbol> variables
+        private readonly Dictionary<string, FunctionSymbol> functions
+            = new Dictionary<string, FunctionSymbol>();
+
+        private readonly Dictionary<string, VariableSymbol> variables
             = new Dictionary<string, VariableSymbol>();
 
         public BoundScope(BoundScope parent)
@@ -17,21 +19,48 @@ namespace Minsk.CodeAnalysis.Binding
 
         public BoundScope Parent { get; }
 
-        public ImmutableArray<VariableSymbol> DeclaredVariables
-            => variables.Values.ToImmutableArray();
+        #region Functions
 
-        public (bool Success, VariableSymbol Variable) TryLookup(string name)
+        public IEnumerable<FunctionSymbol> DeclaredFunctions => functions.Values;
+
+        public (bool Success, FunctionSymbol Function) TryLookupFunction(string name)
+        {
+            if (functions.TryGetValue(name, out var function))
+                return (true, function);
+
+            if (Parent is not null)
+                return Parent.TryLookupFunction(name);
+
+            return (false, null);
+        }
+
+        public bool TryDeclareFunction(FunctionSymbol function)
+        {
+            if (functions.ContainsKey(function.Name))
+                return false;
+
+            functions.Add(function.Name, function);
+            return true;
+        }
+
+        #endregion
+
+        #region Variables
+
+        public IEnumerable<VariableSymbol> DeclaredVariables => variables.Values;
+
+        public (bool Success, VariableSymbol Variable) TryLookupVariable(string name)
         {
             if (variables.TryGetValue(name, out var variable))
                 return (true, variable);
 
             if (Parent is not null)
-                return Parent.TryLookup(name);
+                return Parent.TryLookupVariable(name);
 
             return (false, null);
         }
 
-        public bool TryDeclare(VariableSymbol variable)
+        public bool TryDeclareVariable(VariableSymbol variable)
         {
             if (variables.ContainsKey(variable.Name))
                 return false;
@@ -39,5 +68,7 @@ namespace Minsk.CodeAnalysis.Binding
             variables.Add(variable.Name, variable);
             return true;
         }
+
+        #endregion
     }
 }

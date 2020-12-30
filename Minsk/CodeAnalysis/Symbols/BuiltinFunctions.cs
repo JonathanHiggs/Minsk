@@ -11,6 +11,8 @@ namespace Minsk.CodeAnalysis.Symbols
 
         public static readonly FunctionSymbol Input = "Input".Function(TypeSymbol.String);
 
+        public static readonly FunctionSymbol Rand = "Rand".Function(TypeSymbol.Int);
+
         internal static IEnumerable<FunctionSymbol> All
             => typeof(BuiltinFunctions)
                 .GetFields(BindingFlags.Public | BindingFlags.Static)

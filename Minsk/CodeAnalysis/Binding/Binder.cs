@@ -45,7 +45,7 @@ namespace Minsk.CodeAnalysis.Binding
                 globalScope = globalScope.Previous;
             }
 
-            BoundScope scope = null;
+            var scope = CreateRootScope();
             while (stack.Any())
             {
                 globalScope = stack.Pop();
@@ -53,8 +53,18 @@ namespace Minsk.CodeAnalysis.Binding
                 scope = new BoundScope(scope);
 
                 foreach (var variable in globalScope.Variables)
-                    scope.TryDeclare(variable);
+                    scope.TryDeclareVariable(variable);
             }
+
+            return scope;
+        }
+
+        private static BoundScope CreateRootScope()
+        {
+            var scope = new BoundScope(null);
+
+            foreach (var function in BuiltinFunctions.All)
+                scope.TryDeclareFunction(function);
 
             return scope;
         }
@@ -140,7 +150,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             var variable = new VariableSymbol(name, isReadOnly, type);
 
-            if (!isMissing && !scope.TryDeclare(variable))
+            if (!isMissing && !scope.TryDeclareVariable(variable))
                 diagnostics.Binding.VariableRedeclaration(node, identifier);
 
             return variable;
@@ -221,7 +231,7 @@ namespace Minsk.CodeAnalysis.Binding
             if (expression is BoundErrorExpression)
                 return new BoundErrorExpression();
 
-            var (success, variable) = scope.TryLookup(name);
+            var (success, variable) = scope.TryLookupVariable(name);
 
             if (!success)
                 diagnostics.Binding.UndeclaredIdentifier(node);
@@ -269,9 +279,8 @@ namespace Minsk.CodeAnalysis.Binding
             foreach (var argument in node.Arguments)
                 boundArguments.Add(BindExpression(argument));
 
-            var function = BuiltinFunctions.All.SingleOrDefault(f => f.Name == node.Identifier.Text);
-
-            if (function is null)
+            var (success, function) = scope.TryLookupFunction(node.Identifier.Text);
+            if (!success)
             {
                 diagnostics.Binding.UndefinedFunction(node);
                 return new BoundErrorExpression();
@@ -320,7 +329,7 @@ namespace Minsk.CodeAnalysis.Binding
             if (string.IsNullOrEmpty(name))
                 return new BoundErrorExpression();
 
-            var (found, variable) = scope.TryLookup(name);
+            var (found, variable) = scope.TryLookupVariable(name);
 
             if (!found)
             {

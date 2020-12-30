@@ -13,6 +13,8 @@ namespace Minsk.CodeAnalysis
     {
         private readonly BoundBlockStatement root;
         private readonly Dictionary<VariableSymbol, object> variables;
+        private readonly Random random = new Random();
+
         private object lastValue = null;
 
         public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
@@ -176,6 +178,10 @@ namespace Minsk.CodeAnalysis
                 var value = (string)EvaluateExpression(node.Arguments[0]);
                 Console.WriteLine(value);
                 return null;
+            }
+            else if (node.Function == BuiltinFunctions.Rand)
+            {
+                return random.Next();
             }
             else
             {
