@@ -26,9 +26,13 @@ namespace Minsk.CodeAnalysis.Symbols
         public override SymbolKind Kind => SymbolKind.Type;
 
         public bool IsErrorType { get; }
+        public bool IsNotErrorType => !IsErrorType;
+
         public bool IsVoidType { get; }
         public bool IsNotVoidType => !IsVoidType;
+
         public bool IsInternalType { get; }
+        public bool IsNotInternalType => !IsInternalType;
 
         public static TypeSymbol FromValue(object value)
             => value switch {

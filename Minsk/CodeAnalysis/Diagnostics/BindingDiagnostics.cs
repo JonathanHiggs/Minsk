@@ -31,10 +31,10 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node.IdentifierToken.Span,
                 $"Cannot assign to a read-only variable");
 
-        public void CannotConvert(Expression node, TypeSymbol expressionType, TypeSymbol targetType)
+        public void CannotConvert(Expression node, TextSpan span, TypeSymbol expressionType, TypeSymbol targetType)
             => Error(
                 node,
-                node.FirstToken.Span.To(node.LastToken.Span),
+                span,
                 $"{expressionType} to {targetType}");
 
         public void CannotConvert(AssignmentExpression node, TypeSymbol expressionType, VariableSymbol variable)

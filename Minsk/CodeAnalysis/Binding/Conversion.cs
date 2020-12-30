@@ -22,9 +22,16 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
         public bool Exists { get; }
+        public bool DoesNotExist => !Exists;
+
         public bool IsIdentity { get; }
+        public bool IsNotIdentity => !IsIdentity;
+
         public bool IsImplicit { get; }
+        public bool IsNotImplicit => !IsImplicit;
+
         public bool IsExplicit { get; }
+        public bool IsNotExplicit => !IsExplicit;
 
 
         public static Conversion Classify(TypeSymbol from, TypeSymbol to)

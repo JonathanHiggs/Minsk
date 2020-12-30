@@ -7,6 +7,7 @@ using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
 using Minsk.CodeAnalysis.Symbols;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Binding
 {
@@ -164,7 +165,7 @@ namespace Minsk.CodeAnalysis.Binding
             var expression = BindExpression(node);
 
             if (!targetType.IsErrorType && !expression.Type.IsErrorType && expression.Type != targetType)
-                diagnostics.Binding.CannotConvert(node, expression.Type, targetType);
+                Report.CannotConvert(node, node.Span, expression.Type, targetType);
 
             return expression;
         }
@@ -175,7 +176,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             if (!canBeVoid && expression.Type.IsVoidType)
             {
-                diagnostics.Binding.VoidExpression(node);
+                Report.VoidExpression(node);
                 return new BoundErrorExpression();
             }
 
@@ -221,13 +222,13 @@ namespace Minsk.CodeAnalysis.Binding
             var (success, variable) = scope.TryLookupVariable(name);
 
             if (!success)
-                diagnostics.Binding.UndeclaredIdentifier(node);
+                Report.UndeclaredIdentifier(node);
             else if (variable.IsReadOnly)
-                diagnostics.Binding.CannotAssignToReadOnlyVariable(node);
-            else if (expression.Type != variable.Type)
-                diagnostics.Binding.CannotConvert(node, expression.Type, variable);
+                Report.CannotAssignToReadOnlyVariable(node);
 
-            return new BoundAssignmentExpression(variable, expression);
+            var convertedExpression = BindConversion(node.Span, node, expression, variable.Type);
+
+            return new BoundAssignmentExpression(variable, convertedExpression);
         }
 
         private BoundExpression BindBinaryExpression(BinaryExpression node)
@@ -248,7 +249,7 @@ namespace Minsk.CodeAnalysis.Binding
             if (op is null)
             {
                 // ToDo: move into the call, and check whether left or right is a BoundNameExpression
-                diagnostics.Binding.UndefinedOperator(
+                Report.UndefinedOperator(
                     node,
                     opToken.Span,
                     $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}");
@@ -273,13 +274,13 @@ namespace Minsk.CodeAnalysis.Binding
             var (success, function) = scope.TryLookupFunction(node.Identifier.Text);
             if (!success)
             {
-                diagnostics.Binding.UndefinedFunction(node);
+                Report.UndefinedFunction(node);
                 return new BoundErrorExpression();
             }
 
             if (node.Arguments.Count != function.Parameters.Length)
             {
-                diagnostics.Binding.MismatchingArgumentCount(node, function);
+                Report.MismatchingArgumentCount(node, function);
                 return new BoundErrorExpression();
             }
 
@@ -290,10 +291,12 @@ namespace Minsk.CodeAnalysis.Binding
                 var parameter = function.Parameters[i];
                 var argument = boundArguments[i];
 
-                if (parameter.Type != argument.Type && !argument.Type.IsErrorType)
+                if (parameter.Type != argument.Type && argument.Type.IsNotErrorType)
                 {
+                    // ToDo: allow implicit casts?
+
                     hasError = true;
-                    diagnostics.Binding.ArgumentTypeMismatch(node.Arguments[i], argument.Type, parameter);
+                    Report.ArgumentTypeMismatch(node.Arguments[i], argument.Type, parameter);
                 }
             }
 
@@ -324,7 +327,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             if (!found)
             {
-                diagnostics.Binding.UndeclaredIdentifier(node);
+                Report.UndeclaredIdentifier(node);
                 return new BoundErrorExpression();
             }
 
@@ -349,7 +352,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             if (op is null)
             {
-                diagnostics.Binding.UndefinedOperator(
+                Report.UndefinedOperator(
                     node,
                     opToken.Span,
                     $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}");
@@ -363,18 +366,43 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundExpression BindConversion(Expression node, TypeSymbol toType)
         {
             var expression = BindExpression(node);
+            return BindConversion(node.Span, node, expression, toType);
+        }
+
+        private BoundExpression BindConversion(
+            TextSpan span,
+            Expression node,
+            BoundExpression expression,
+            TypeSymbol toType,
+            bool allowExplicit = false)
+        {
             var conversion = Conversion.Classify(expression.Type, toType);
 
-            if (!conversion.Exists)
+            if (conversion.IsIdentity)
+                return expression;
+
+            if (conversion.DoesNotExist)
             {
-                diagnostics.Binding.CannotConvert(node, expression.Type, toType);
+                if (expression.Type.IsNotErrorType && toType.IsNotErrorType)
+                    Report.CannotConvert(node, span, expression.Type, toType);
+
+                return new BoundErrorExpression();
+            }
+
+            if (conversion.IsExplicit && !allowExplicit)
+            {
+                Report.CannotConvert(node, span, expression.Type, toType);
                 return new BoundErrorExpression();
             }
 
             return new BoundConversionExpression(expression, toType);
         }
 
-        private VariableSymbol BindVariable(SyntaxNode node, LexToken identifier, TypeSymbol type, bool isReadOnly = false)
+        private VariableSymbol BindVariable(
+            SyntaxNode node,
+            LexToken identifier,
+            TypeSymbol type,
+            bool isReadOnly = false)
         {
             var isMissing = identifier.IsMissing;
             var name = identifier.Text ?? "?";
@@ -382,7 +410,7 @@ namespace Minsk.CodeAnalysis.Binding
             var variable = new VariableSymbol(name, isReadOnly, type);
 
             if (!isMissing && !scope.TryDeclareVariable(variable))
-                diagnostics.Binding.VariableRedeclaration(node, identifier);
+                Report.VariableRedeclaration(node, identifier);
 
             return variable;
         }
@@ -398,5 +426,8 @@ namespace Minsk.CodeAnalysis.Binding
                 _           => null
             };
         }
+
+
+        private BindingDiagnostics Report => diagnostics.Binding;
     }
 }
