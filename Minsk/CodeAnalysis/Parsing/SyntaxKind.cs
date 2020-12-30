@@ -23,5 +23,12 @@ namespace Minsk.CodeAnalysis.Parsing
         ForToStatement,
         VariableDeclaration,
         WhileStatement,
+
+        // Top-level statements
+        GlobalStatement,
+        FunctionDeclaration,
+
+        // Definitions
+        Parameter,
     }
 }

@@ -65,30 +65,32 @@ namespace Minsk.CodeAnalysis.Parsing
         public static TokenKind KeywordOrIdentifierKind(string tokenText)
             => tokenText switch {
                 // ToDo: Add Keyword attributes to TokenKind and Debug.Assert false cases
-                "true"  => TokenKind.TrueKeyword,
-                "false" => TokenKind.FalseKeyword,
-                "var"   => TokenKind.VarKeyword,
-                "let"   => TokenKind.LetKeyword,
-                "if"    => TokenKind.IfKeyword,
-                "else"  => TokenKind.ElseKeyword,
-                "while" => TokenKind.WhileKeyword,
-                "for"   => TokenKind.ForKeyword,
-                "to"    => TokenKind.ToKeyword,
+                "true"      => TokenKind.TrueKeyword,
+                "false"     => TokenKind.FalseKeyword,
+                "var"       => TokenKind.VarKeyword,
+                "let"       => TokenKind.LetKeyword,
+                "if"        => TokenKind.IfKeyword,
+                "else"      => TokenKind.ElseKeyword,
+                "while"     => TokenKind.WhileKeyword,
+                "for"       => TokenKind.ForKeyword,
+                "to"        => TokenKind.ToKeyword,
+                "function"  => TokenKind.FunctionKeyword,
 
-                _       => TokenKind.Identifier
+                _           => TokenKind.Identifier
             };
 
         public static bool IsKeyword(this TokenKind kind)
             => kind switch {
-                TokenKind.TrueKeyword   => true,
-                TokenKind.FalseKeyword  => true,
-                TokenKind.VarKeyword    => true,
-                TokenKind.LetKeyword    => true,
-                TokenKind.IfKeyword     => true,
-                TokenKind.ElseKeyword   => true,
-                TokenKind.WhileKeyword  => true,
-                TokenKind.ForKeyword    => true,
-                TokenKind.ToKeyword     => true,
+                TokenKind.TrueKeyword       => true,
+                TokenKind.FalseKeyword      => true,
+                TokenKind.VarKeyword        => true,
+                TokenKind.LetKeyword        => true,
+                TokenKind.IfKeyword         => true,
+                TokenKind.ElseKeyword       => true,
+                TokenKind.WhileKeyword      => true,
+                TokenKind.ForKeyword        => true,
+                TokenKind.ToKeyword         => true,
+                TokenKind.FunctionKeyword   => true,
 
                 _ => false
             };

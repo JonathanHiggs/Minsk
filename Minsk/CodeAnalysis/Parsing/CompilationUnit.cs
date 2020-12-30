@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 using Minsk.CodeAnalysis.Lexing;
 
@@ -7,23 +8,22 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class CompilationUnit : SyntaxNode
     {
-        public CompilationUnit(Statement statement, LexToken endOfFileToken)
+        public CompilationUnit(IEnumerable<MemberSyntax> members, LexToken endOfFileToken)
         {
-            Statement = statement;
+            Members = members.ToImmutableArray();
             EndOfFileToken = endOfFileToken;
         }
 
-        public Statement Statement { get; }
+        public ImmutableArray<MemberSyntax> Members { get; }
         public LexToken EndOfFileToken { get; }
 
         public override SyntaxKind Kind => SyntaxKind.CompilationUnit;
 
         public override string Text => string.Empty;
 
-        public override IEnumerable<SyntaxNode> Children
-        { get { yield return Statement; } }
+        public override IEnumerable<SyntaxNode> Children => Members;
 
-        public override LexToken FirstToken => Statement.FirstToken;
+        public override LexToken FirstToken => Members.First()?.FirstToken ?? EndOfFileToken;
 
         public override LexToken LastToken => EndOfFileToken;
     }

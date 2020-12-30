@@ -31,7 +31,10 @@ namespace Minsk.CodeAnalysis.Binding
         {
             var parentScope = CreateParentScope(previous);
             var binder = new Binder(diagnostics, parentScope);
-            var statement = binder.BindStatement(compilationUnit.Statement);
+
+            var globalStatementMember = compilationUnit.Members.First() as GlobalStatementSyntax;
+            var statement = binder.BindStatement(globalStatementMember.Statement);
+
             var variables = binder.scope.DeclaredVariables;
 
             return new BoundGlobalScope(previous, diagnostics, variables, statement);
@@ -68,6 +71,26 @@ namespace Minsk.CodeAnalysis.Binding
                 scope.TryDeclareFunction(function);
 
             return scope;
+        }
+
+        private BoundCompilationUnit BindCompilationUnit()
+        {
+            throw new NotImplementedException();
+        }
+
+        private BoundMember BindMember()
+        {
+            throw new NotImplementedException();
+        }
+
+        private BoundFunction BindFunction()
+        {
+            throw new NotImplementedException();
+        }
+
+        private BoundGlobalStatement BindGlobalStatement()
+        {
+            throw new NotImplementedException();
         }
 
         private BoundStatement BindStatement(Statement node)

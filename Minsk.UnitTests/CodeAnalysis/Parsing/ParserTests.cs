@@ -168,11 +168,13 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
         private Expression ParseExpression(string text)
         {
             var syntaxTree = SyntaxTree.Parse(text);
-            var root = syntaxTree.Root.Statement;
+            var root = syntaxTree.Root.Members.First();
 
-            Assert.That(root, Is.TypeOf<ExpressionStatement>());
+            Assert.That(root, Is.TypeOf<GlobalStatementSyntax>());
 
-            return (root as ExpressionStatement).Expression;
+            var expression = ((GlobalStatementSyntax)root).Statement;
+
+            return (expression as ExpressionStatement).Expression;
         }
 
         private static IEnumerable<TokenKind> TokenKinds

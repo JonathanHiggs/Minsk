@@ -166,7 +166,7 @@ namespace Minsk.Compiler
         private void HandleEnter(ObservableCollection<string> document, SubmissionView view)
         {
             var submissionText = string.Join(Environment.NewLine, document);
-            if (submissionText.StartsWith("#") || IsCompleteSubmission(submissionText))
+            if (submissionText.StartsWith("#")) // || IsCompleteSubmission(submissionText))
             {
                 done = true;
                 return;
@@ -287,7 +287,8 @@ namespace Minsk.Compiler
 
         private void HandleControlEnter(ObservableCollection<string> document, SubmissionView view)
         {
-            InsertLine(document, view);
+            done = true;
+            //InsertLine(document, view);
         }
 
         private void HandleTyping(ObservableCollection<string> document, SubmissionView view, string text)

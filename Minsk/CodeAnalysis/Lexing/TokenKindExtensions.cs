@@ -51,6 +51,7 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.WhileKeyword:
                 case TokenKind.ForKeyword:
                 case TokenKind.ToKeyword:
+                case TokenKind.FunctionKeyword:
                     return true;
 
                 default:

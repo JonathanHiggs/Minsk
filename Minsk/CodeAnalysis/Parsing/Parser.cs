@@ -40,10 +40,77 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public CompilationUnit ParseCompilationUnit()
         {
-            var statement = ParseStatement();
+            var members = ParseMembers();
             var eofToken = MatchToken(TokenKind.EoF);
 
-            return new CompilationUnit(statement, eofToken);
+            return new CompilationUnit(members, eofToken);
+        }
+
+        private ImmutableArray<MemberSyntax> ParseMembers()
+        {
+            var members = ImmutableArray.CreateBuilder<MemberSyntax>();
+
+            while (Current != TokenKind.EoF)
+            {
+                members.Add(ParseMember());
+            }
+
+            return members.ToImmutableArray();
+        }
+
+        private MemberSyntax ParseMember()
+        {
+            if (Current == TokenKind.FunctionKeyword)
+                return ParseFunction();
+
+            return ParseGlobalStatement();
+        }
+
+        private FunctionDeclaration ParseFunction()
+        {
+            var functionKeyword = MatchToken(TokenKind.FunctionKeyword);
+            var identifer = MatchToken(TokenKind.Identifier);
+            var openParentheses = MatchToken(TokenKind.OpenParenthesis);
+            var parameters = ParseSeparatedParameters();
+            var closeParentheses = MatchToken(TokenKind.CloseParenthesis);
+            var body = ParseBlockStatement();
+
+            return new FunctionDeclaration(functionKeyword, identifer, openParentheses, parameters, closeParentheses, body);
+        }
+
+        private SeparatedSyntaxList<ParameterSyntax> ParseSeparatedParameters()
+        {
+            var parameters = ImmutableArray.CreateBuilder<SeparatedSyntaxNode<ParameterSyntax>>();
+
+            while (Current != TokenKind.CloseParenthesis && Current != TokenKind.EoF)
+                parameters.Add(ParseSeparatedParameterSyntax());
+
+            return new SeparatedSyntaxList<ParameterSyntax>(parameters.ToImmutable());
+        }
+
+        private SeparatedSyntaxNode<ParameterSyntax> ParseSeparatedParameterSyntax()
+        {
+            var parameter = ParseParameterSyntax();
+            var comma = Current == TokenKind.Comma ? MatchToken(TokenKind.Comma) : null;
+
+            if (comma is not null && (Current == TokenKind.CloseParenthesis || Current == TokenKind.EoF))
+                diagnostics.Syntax.UnexpectedToken(comma, "Unexpected comma");
+
+            return new SeparatedSyntaxNode<ParameterSyntax>(parameter, comma);
+        }
+
+        private ParameterSyntax ParseParameterSyntax()
+        {
+            var identifier = MatchToken(TokenKind.Identifier);
+            var typeClause = ParseTypeClause();
+
+            return new ParameterSyntax(identifier, typeClause);
+        }
+
+        private GlobalStatementSyntax ParseGlobalStatement()
+        {
+            var statement = ParseStatement();
+            return new GlobalStatementSyntax(statement);
         }
 
         private Statement ParseStatement()

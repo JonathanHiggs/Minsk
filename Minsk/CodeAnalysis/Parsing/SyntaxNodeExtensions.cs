@@ -41,10 +41,10 @@ namespace Minsk.CodeAnalysis.Parsing
                 {
                     var binary = node as BinaryExpression;
                     return new BinaryVisualNode(
-                        binary.Text, 
-                        binary.OperatorToken.Kind.ToString(), 
-                        binary.Left.ToVisualTree(settings), 
-                        binary.Right.ToVisualTree(settings), 
+                        binary.Text,
+                        binary.OperatorToken.Kind.ToString(),
+                        binary.Left.ToVisualTree(settings),
+                        binary.Right.ToVisualTree(settings),
                         settings);
                 }
 
@@ -52,7 +52,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 {
                     var literal = node as LiteralExpression;
                     return new TerminalVisualNode(
-                        literal.Text ?? "<empty>", 
+                        literal.Text ?? "<empty>",
                         literal.Token.Kind.ToString(),
                         settings);
                 }
@@ -82,15 +82,15 @@ namespace Minsk.CodeAnalysis.Parsing
                         settings);
                 }
 
-                case SyntaxKind.CompilationUnit:
-                {
-                    var unit = node as CompilationUnit;
-                    return new UnaryVisualNode(
-                        string.Empty,
-                        "CompilationUnit",
-                        unit.Statement.ToVisualTree(settings),
-                        settings);
-                }
+                //case SyntaxKind.CompilationUnit:
+                //{
+                //    var unit = node as CompilationUnit;
+                //    return new UnaryVisualNode(
+                //        string.Empty,
+                //        "CompilationUnit",
+                //        unit.Members.ToVisualTree(settings),
+                //        settings);
+                //}
 
                 case SyntaxKind.ExpressionStatement:
                 {

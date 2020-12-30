@@ -208,24 +208,24 @@ namespace Minsk.Compiler
 
         protected override bool IsCompleteSubmission(string text)
         {
-            if (string.IsNullOrEmpty(text))
-                return true;
+            //if (string.IsNullOrEmpty(text))
+            //    return true;
 
-            var lastTwoLinesAreBlank =
-                text.Split(Environment.NewLine)
-                    .Reverse()
-                    .TakeWhile(s => string.IsNullOrEmpty(s))
-                    .Take(2)
-                    .Count() == 2;
+            //var lastTwoLinesAreBlank =
+            //    text.Split(Environment.NewLine)
+            //        .Reverse()
+            //        .TakeWhile(s => string.IsNullOrEmpty(s))
+            //        .Take(2)
+            //        .Count() == 2;
 
-            if (lastTwoLinesAreBlank)
-                return true;
+            //if (lastTwoLinesAreBlank)
+            //    return true;
 
-            var syntaxTree = SyntaxTree.Parse(text);
+            //var syntaxTree = SyntaxTree.Parse(text);
 
-            var lastMember = syntaxTree.Root.Statement.LastToken;
-            if (lastMember is null || lastMember.IsMissing)
-                return false;
+            //var lastMember = syntaxTree.Root.Members.Last().LastToken;
+            //if (lastMember is null || lastMember.IsMissing)
+            //    return false;
 
             return true;
         }
