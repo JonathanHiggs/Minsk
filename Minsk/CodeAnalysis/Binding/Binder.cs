@@ -143,19 +143,6 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundForToStatement(variable, lowerBound, upperBound, body);
         }
 
-        private VariableSymbol BindVariable(SyntaxNode node, LexToken identifier, TypeSymbol type, bool isReadOnly = false)
-        {
-            var isMissing = identifier.IsMissing;
-            var name = identifier.Text ?? "?";
-
-            var variable = new VariableSymbol(name, isReadOnly, type);
-
-            if (!isMissing && !scope.TryDeclareVariable(variable))
-                diagnostics.Binding.VariableRedeclaration(node, identifier);
-
-            return variable;
-        }
-
         private BoundStatement BindVariableDeclaration(VariableDeclarationStatement node)
         {
             var isReadOnly = node.KeywordToken.Kind == TokenKind.LetKeyword;
@@ -274,6 +261,10 @@ namespace Minsk.CodeAnalysis.Binding
 
         private BoundExpression BindCallExpression(CallExpression node)
         {
+            var lookupType = LookupType(node.Identifier.Text);
+            if (node.Arguments.Count == 1 && lookupType is not null && lookupType.IsNotVoidType)
+                return BindConversion(node.Arguments[0], lookupType);
+
             var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
             foreach (var argument in node.Arguments)
@@ -367,6 +358,45 @@ namespace Minsk.CodeAnalysis.Binding
             }
 
             return new BoundUnaryExpression(op, operand);
+        }
+
+        private BoundExpression BindConversion(Expression node, TypeSymbol toType)
+        {
+            var expression = BindExpression(node);
+            var conversion = Conversion.Classify(expression.Type, toType);
+
+            if (!conversion.Exists)
+            {
+                diagnostics.Binding.CannotConvert(node, expression.Type, toType);
+                return new BoundErrorExpression();
+            }
+
+            return new BoundConversionExpression(expression, toType);
+        }
+
+        private VariableSymbol BindVariable(SyntaxNode node, LexToken identifier, TypeSymbol type, bool isReadOnly = false)
+        {
+            var isMissing = identifier.IsMissing;
+            var name = identifier.Text ?? "?";
+
+            var variable = new VariableSymbol(name, isReadOnly, type);
+
+            if (!isMissing && !scope.TryDeclareVariable(variable))
+                diagnostics.Binding.VariableRedeclaration(node, identifier);
+
+            return variable;
+        }
+
+        private TypeSymbol LookupType(string name)
+        {
+            return name switch
+            {
+                "bool"      => TypeSymbol.Bool,
+                "int"       => TypeSymbol.Int,
+                "string"    => TypeSymbol.String,
+                "void"      => TypeSymbol.Void,
+                _           => null
+            };
         }
     }
 }

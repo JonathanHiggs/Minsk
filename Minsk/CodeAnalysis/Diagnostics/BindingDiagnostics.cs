@@ -34,7 +34,7 @@ namespace Minsk.CodeAnalysis.Diagnostics
         public void CannotConvert(Expression node, TypeSymbol expressionType, TypeSymbol targetType)
             => Error(
                 node,
-                TextSpan.FromBounds(node.FirstToken.Span.Start, node.LastToken.Span.End),
+                node.FirstToken.Span.To(node.LastToken.Span),
                 $"{expressionType} to {targetType}");
 
         public void CannotConvert(AssignmentExpression node, TypeSymbol expressionType, VariableSymbol variable)

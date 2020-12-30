@@ -27,6 +27,7 @@ namespace Minsk.CodeAnalysis.Symbols
 
         public bool IsErrorType { get; }
         public bool IsVoidType { get; }
+        public bool IsNotVoidType => !IsVoidType;
         public bool IsInternalType { get; }
 
         public static TypeSymbol FromValue(object value)

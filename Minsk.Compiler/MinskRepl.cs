@@ -263,7 +263,7 @@ namespace Minsk.Compiler
 
                 previous = compilation;
 
-                SaveSubmission(text);
+                //SaveSubmission(text);
             }
         }
 

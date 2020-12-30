@@ -28,6 +28,8 @@ namespace Minsk.CodeAnalysis.Binding
             {
                 case BoundNodeKind.AssignmentExpression:
                 case BoundNodeKind.BinaryExpression:
+                case BoundNodeKind.CallExpression:
+                case BoundNodeKind.ConversionExpression:
                 case BoundNodeKind.LiteralExpression:
                 case BoundNodeKind.UnaryExpression:
                 case BoundNodeKind.VariableExpression:
@@ -60,6 +62,9 @@ namespace Minsk.CodeAnalysis.Binding
 
                 BoundNodeKind.CallExpression
                     => RewriteCallExpression(node as BoundCallExpression),
+
+                BoundNodeKind.ConversionExpression
+                    => RewriteConversionExpression(node as BoundConversionExpression),
 
                 BoundNodeKind.ErrorExpression
                     => RewriteErrorExpression(node as BoundErrorExpression),
@@ -124,6 +129,15 @@ namespace Minsk.CodeAnalysis.Binding
                 return node;
 
             return new BoundCallExpression(node.Function, builder.ToImmutable());
+        }
+
+        protected virtual BoundExpression RewriteConversionExpression(BoundConversionExpression node)
+        {
+            var expression = RewriteExpression(node.Expression);
+            if (expression == node.Expression)
+                return node;
+
+            return new BoundConversionExpression(expression, node.Type);
         }
 
         protected virtual BoundExpression RewriteErrorExpression(BoundErrorExpression node)

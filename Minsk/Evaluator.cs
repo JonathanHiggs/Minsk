@@ -106,6 +106,9 @@ namespace Minsk.CodeAnalysis
                 BoundNodeKind.CallExpression
                     => EvaluateCallExpression(node as BoundCallExpression),
 
+                BoundNodeKind.ConversionExpression
+                    => EvaluateConversionExpression(node as BoundConversionExpression),
+
                 BoundNodeKind.LiteralExpression
                     => EvaluateLiteralExpression(node as BoundLiteralExpression),
 
@@ -187,6 +190,20 @@ namespace Minsk.CodeAnalysis
             {
                 throw new Exception($"Unexpected function '{node.Function.Name}'");
             }
+        }
+
+        private object EvaluateConversionExpression(BoundConversionExpression node)
+        {
+            var value = EvaluateExpression(node.Expression);
+
+            if (node.Type == TypeSymbol.Bool)
+                return Convert.ToBoolean(value);
+            else if (node.Type == TypeSymbol.Int)
+                return Convert.ToInt32(value);
+            else if (node.Type == TypeSymbol.String)
+                return Convert.ToString(value);
+
+            throw new Exception($"Unexpected type '{node.Type}'");
         }
 
         private object EvaluateLiteralExpression(BoundLiteralExpression node)
