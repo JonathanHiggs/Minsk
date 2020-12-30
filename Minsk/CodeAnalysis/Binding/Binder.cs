@@ -147,10 +147,31 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundStatement BindVariableDeclaration(VariableDeclarationStatement node)
         {
             var isReadOnly = node.KeywordToken.Kind == TokenKind.LetKeyword;
+            var type = BindTypeClause(node.OptionalTypeClause);
             var expression = BindExpression(node.Expression);
-            var variable = BindVariable(node, node.Identifier, expression.Type, isReadOnly);
 
-            return new BoundVariableDeclarationStatement(variable, expression);
+            var variableType = type ?? expression.Type;
+            var convertedInitializer = BindConversion(node.Expression.Span, node, expression, variableType);
+
+            var variable = BindVariable(node, node.Identifier, variableType, isReadOnly);
+
+            return new BoundVariableDeclarationStatement(variable, convertedInitializer);
+        }
+
+        private TypeSymbol BindTypeClause(TypeClauseSyntax node)
+        {
+            if (node is null)
+                return null;
+
+            var type = LookupType(node.Identifier.Text);
+
+            if (type is null)
+            {
+                Report.UndefinedType(node, node.Identifier);
+                return TypeSymbol.Error;
+            }
+
+            return type;
         }
 
         private BoundStatement BindWhileStatement(WhileStatement node)
@@ -264,7 +285,7 @@ namespace Minsk.CodeAnalysis.Binding
         {
             var lookupType = LookupType(node.Identifier.Text);
             if (node.Arguments.Count == 1 && lookupType is not null && lookupType.IsNotVoidType)
-                return BindConversion(node.Arguments[0], lookupType);
+                return BindConversion(node.Arguments[0], lookupType, allowExplicit: true);
 
             var boundArguments = ImmutableArray.CreateBuilder<BoundExpression>();
 
@@ -293,10 +314,17 @@ namespace Minsk.CodeAnalysis.Binding
 
                 if (parameter.Type != argument.Type && argument.Type.IsNotErrorType)
                 {
-                    // ToDo: allow implicit casts?
+                    var convertedArgument = BindConversion(node.Arguments[i].Span, node.Arguments[i], argument, parameter.Type);
 
-                    hasError = true;
-                    Report.ArgumentTypeMismatch(node.Arguments[i], argument.Type, parameter);
+                    if (convertedArgument.Type == parameter.Type)
+                    {
+                        boundArguments[i] = convertedArgument;
+                    }
+                    else
+                    {
+                        hasError = true;
+                        Report.ArgumentTypeMismatch(node.Arguments[i], argument.Type, parameter);
+                    }
                 }
             }
 
@@ -363,15 +391,18 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundUnaryExpression(op, operand);
         }
 
-        private BoundExpression BindConversion(Expression node, TypeSymbol toType)
+        private BoundExpression BindConversion(
+            Expression node,
+            TypeSymbol toType,
+            bool allowExplicit = false)
         {
             var expression = BindExpression(node);
-            return BindConversion(node.Span, node, expression, toType);
+            return BindConversion(node.Span, node, expression, toType, allowExplicit);
         }
 
         private BoundExpression BindConversion(
             TextSpan span,
-            Expression node,
+            SyntaxNode node,
             BoundExpression expression,
             TypeSymbol toType,
             bool allowExplicit = false)
@@ -391,7 +422,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             if (conversion.IsExplicit && !allowExplicit)
             {
-                Report.CannotConvert(node, span, expression.Type, toType);
+                Report.CannotImplicitlyConvert(node, span, expression.Type, toType);
                 return new BoundErrorExpression();
             }
 

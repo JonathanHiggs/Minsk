@@ -133,9 +133,26 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             var keyword = MatchTokenFrom(TokenKind.VarKeyword, TokenKind.LetKeyword);
             var identifier = MatchToken(TokenKind.Identifier);
+            var optionalTypeClause = ParseOptionalTypeClause();
             var equals = MatchToken(TokenKind.Equals);
             var expression = ParseExpression();
-            return new VariableDeclarationStatement(keyword, identifier, equals, expression);
+
+            return new VariableDeclarationStatement(keyword, identifier, optionalTypeClause, equals, expression);
+        }
+
+        private TypeClauseSyntax ParseOptionalTypeClause()
+        {
+            if (Current != TokenKind.Colon)
+                return null;
+
+            return ParseTypeClause();
+        }
+
+        private TypeClauseSyntax ParseTypeClause()
+        {
+            var colon = MatchToken(TokenKind.Colon);
+            var identifier = MatchToken(TokenKind.Identifier);
+            return new TypeClauseSyntax(colon, identifier);
         }
 
         private Statement ParseWhileStatement()

@@ -32,6 +32,8 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.OpenBrace:
                 case TokenKind.CloseBrace:
                 case TokenKind.Comma:
+                case TokenKind.Colon:
+                case TokenKind.SemiColon:
                 case TokenKind.Less:
                 case TokenKind.LessOrEquals:
                 case TokenKind.Greater:

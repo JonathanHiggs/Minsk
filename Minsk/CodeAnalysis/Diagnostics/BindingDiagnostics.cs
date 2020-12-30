@@ -31,17 +31,23 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node.IdentifierToken.Span,
                 $"Cannot assign to a read-only variable");
 
-        public void CannotConvert(Expression node, TextSpan span, TypeSymbol expressionType, TypeSymbol targetType)
+        public void CannotConvert(SyntaxNode node, TextSpan span, TypeSymbol expressionType, TypeSymbol targetType)
             => Error(
                 node,
                 span,
-                $"{expressionType} to {targetType}");
+                $"Cannot convert from '{expressionType}' to '{targetType}'");
 
         public void CannotConvert(AssignmentExpression node, TypeSymbol expressionType, VariableSymbol variable)
             => Error(
                 node,
                 node.EqualsToken.Span,
                 $"Cannot assign {expressionType} to {node.IdentifierToken.Text}:{variable.Type}");
+
+        public void CannotImplicitlyConvert(SyntaxNode node, TextSpan span, TypeSymbol expressionType, TypeSymbol targetType)
+            => Error(
+                node,
+                span,
+                $"Cannot implicitly convert from '{expressionType}' to '{targetType}'. An explicit conversion exists (are you missing a cast?)");
 
         public void MismatchingArgumentCount(CallExpression node, FunctionSymbol function)
             => Error(
@@ -60,6 +66,9 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node,
                 node.IdentifierToken.Span,
                 $"Undefined identifier {node.IdentifierToken.Text}");
+
+        internal void UndefinedType(SyntaxNode node, LexToken identifier)
+            => Error(node, identifier.Span, $"Type '{identifier.Text}' does not exist");
 
         public void UndeclaredIdentifier(AssignmentExpression node)
             => Error(

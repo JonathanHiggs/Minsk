@@ -38,6 +38,8 @@ namespace Minsk.CodeAnalysis.Lexing
         //OpenBracket,
         //CloseBracket,
         [Description(",")]      Comma,
+        [Description(":")]      Colon,
+        [Description(";")]      SemiColon,
 
         // Keywords
         [Description("true")]   TrueKeyword,

@@ -1,4 +1,6 @@
-﻿using Minsk.CodeAnalysis.Symbols;
+﻿using System.Diagnostics;
+
+using Minsk.CodeAnalysis.Symbols;
 
 namespace Minsk.CodeAnalysis.Binding
 {
@@ -19,6 +21,8 @@ namespace Minsk.CodeAnalysis.Binding
             IsIdentity = isIdentity;
             IsImplicit = isImplicit;
             IsExplicit = isExplicit;
+
+            Debug.Assert(!(IsImplicit && IsExplicit));
         }
 
         public bool Exists { get; }
@@ -42,7 +46,7 @@ namespace Minsk.CodeAnalysis.Binding
             if (from == TypeSymbol.Bool || from == TypeSymbol.Int)
             {
                 if (to == TypeSymbol.String)
-                    return Explicit;
+                    return Implicit;
             }
             else if (from == TypeSymbol.String)
             {

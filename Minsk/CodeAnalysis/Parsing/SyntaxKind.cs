@@ -14,6 +14,7 @@ namespace Minsk.CodeAnalysis.Parsing
         // Nodes
         CompilationUnit,
         ElseNode,
+        TypeClause,
 
         // Statements
         BlockStatement,

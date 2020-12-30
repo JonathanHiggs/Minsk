@@ -4,24 +4,25 @@ using Minsk.CodeAnalysis.Lexing;
 
 namespace Minsk.CodeAnalysis.Parsing
 {
-    // var x = 10
-    // let x = 10
     public sealed class VariableDeclarationStatement : Statement
     {
         public VariableDeclarationStatement(
-            LexToken keywordToken, 
-            LexToken identifierToken, 
-            LexToken equalsToken, 
+            LexToken keywordToken,
+            LexToken identifierToken,
+            TypeClauseSyntax optionalTypeClause,
+            LexToken equalsToken,
             Expression expression)
         {
             KeywordToken = keywordToken;
             Identifier = identifierToken;
+            OptionalTypeClause = optionalTypeClause;
             EqualsToken = equalsToken;
             Expression = expression;
         }
 
         public LexToken KeywordToken { get; }
         public LexToken Identifier { get; }
+        public TypeClauseSyntax OptionalTypeClause { get; }
         public LexToken EqualsToken { get; }
         public Expression Expression { get; }
 
