@@ -75,13 +75,17 @@ namespace Minsk.CodeAnalysis
         {
             var program = Binder.BindProgram(GlobalScope, new DiagnosticBag());
             var tree = program.Functions[function];
-            tree.PrettyPrint(writer);
+
+            tree.WriteTo(writer);
+            //tree.PrettyPrint(writer);
         }
 
         public void EmitTree(TextWriter writer)
         {
             var program = Binder.BindProgram(GlobalScope, new DiagnosticBag());
-            program.Statement.PrettyPrint(writer);
+
+            program.WriteTo(writer);
+            //program.Statement.PrettyPrint(writer);
         }
     }
 }

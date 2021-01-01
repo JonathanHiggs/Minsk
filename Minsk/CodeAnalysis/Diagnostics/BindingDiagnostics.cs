@@ -96,5 +96,11 @@ namespace Minsk.CodeAnalysis.Diagnostics
 
         public void SymbolAlreadyDeclared(FunctionDeclaration node)
             => Error(node, node.Identifier.Span, $"A symbol with the name '{node.Identifier.Text}' was already declared");
+
+        public void InvalidBreak(BreakStatement node)
+            => Error(node, node.Span, $"Invalid break statement; not in a loop");
+
+        public void InvalidContinue(ContinueStatement node)
+            => Error(node, node.Span, $"Invalid continue statement; not in a loop");
     }
 }

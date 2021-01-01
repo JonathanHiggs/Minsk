@@ -18,7 +18,9 @@ namespace Minsk.CodeAnalysis.Parsing
 
         // Statements
         BlockStatement,
+        BreakStatement,
         ConditionalStatement,
+        ContinueStatement,
         ExpressionStatement,
         ForToStatement,
         VariableDeclaration,

@@ -110,18 +110,24 @@ namespace Minsk.CodeAnalysis.Lowering
             // let upperBound = <upper>
             // while <var> <= upperBound
             //     <body>
+            //     continue:
             //     <var> = <var> + 1
             // }
 
-            var variableDeclaration = new BoundVariableDeclarationStatement(node.Variable, node.LowerBound);
+            var variableDeclaration
+                = new BoundVariableDeclarationStatement(node.Variable, node.LowerBound);
+
             var upperBoundSymbol = new LocalVariableSymbol("upperBound", true, TypeSymbol.Int);
-            var upperBoundDeclaration = new BoundVariableDeclarationStatement(upperBoundSymbol, node.UpperBound);
+            var upperBoundDeclaration
+                = new BoundVariableDeclarationStatement(upperBoundSymbol, node.UpperBound);
             var upperBoundExpression = new BoundVariableExpression(upperBoundSymbol);
 
             var condition = new BoundBinaryExpression(
                 new BoundVariableExpression(node.Variable),
                 BoundBinaryOperator.Bind(Lexing.TokenKind.LessOrEquals, TypeSymbol.Int, TypeSymbol.Int),
                 upperBoundExpression);
+
+            var continueStatement = new BoundLabelStatement(node.ContinueLabel);
 
             var increment = new BoundExpressionStatement(
                 new BoundAssignmentExpression(
@@ -134,9 +140,11 @@ namespace Minsk.CodeAnalysis.Lowering
             var whileBlock =
                 new BoundBlockStatement(
                     node.Body,
+                    continueStatement,
                     increment);
 
-            var whileStatement = new BoundWhileStatement(condition, whileBlock);
+            var whileStatement
+                = new BoundWhileStatement(condition, whileBlock, node.BreakLabel, GenerateLabel("ignored"));
 
             var result = new BoundBlockStatement(
                 variableDeclaration,
@@ -156,18 +164,18 @@ namespace Minsk.CodeAnalysis.Lowering
             // <body>
             // check:
             // gotoTrue <condition> continue
-            // end:
+            // break:
             // }
 
-            var continueLabel = GenerateLabel("continue");
+            var continueLabel = node.ContinueLabel;
             var checkLabel = GenerateLabel("check");
-            var endLabel = GenerateLabel("end");
+            var breakLabel = node.BreakLabel;
 
             var gotoCheck = new BoundGotoStatement(checkLabel);
             var continueStatement = new BoundLabelStatement(continueLabel);
             var checkStatement = new BoundLabelStatement(checkLabel);
             var gotoTrueStatement = new BoundConditionalGotoStatement(continueLabel, node.Condition, true);
-            var endStatement = new BoundLabelStatement(endLabel);
+            var breakStatement = new BoundLabelStatement(breakLabel);
 
             var result = new BoundBlockStatement(
                 gotoCheck,
@@ -175,7 +183,7 @@ namespace Minsk.CodeAnalysis.Lowering
                 node.Body,
                 checkStatement,
                 gotoTrueStatement,
-                endStatement);
+                breakStatement);
 
             return RewriteStatement(result);
         }

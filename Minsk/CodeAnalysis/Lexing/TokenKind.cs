@@ -42,16 +42,18 @@ namespace Minsk.CodeAnalysis.Lexing
         [Description(";")]          SemiColon,
 
         // Keywords
-        [Description("true")]       TrueKeyword,
-        [Description("false")]      FalseKeyword,
-        [Description("var")]        VarKeyword,
-        [Description("let")]        LetKeyword,
-        [Description("if")]         IfKeyword,
+        [Description("break")]      BreakKeyword,
+        [Description("continue")]   ContinueKeyword,
         [Description("else")]       ElseKeyword,
-        [Description("while")]      WhileKeyword,
+        [Description("false")]      FalseKeyword,
         [Description("for")]        ForKeyword,
-        [Description("to")]         ToKeyword,
         [Description("function")]   FunctionKeyword,
+        [Description("if")]         IfKeyword,
+        [Description("let")]        LetKeyword,
+        [Description("to")]         ToKeyword,
+        [Description("true")]       TrueKeyword,
+        [Description("var")]        VarKeyword,
+        [Description("while")]      WhileKeyword,
 
         // Literals
         Number,

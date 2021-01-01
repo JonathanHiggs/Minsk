@@ -133,6 +133,12 @@ namespace Minsk.CodeAnalysis.Parsing
         private Statement ParseStatement()
         {
             return Current switch {
+                TokenKind.BreakKeyword
+                    => ParseBreakStatement(),
+
+                TokenKind.ContinueKeyword
+                    => ParseContinueStatement(),
+
                 TokenKind.OpenBrace
                     => ParseBlockStatement(),
 
@@ -150,6 +156,20 @@ namespace Minsk.CodeAnalysis.Parsing
 
                 _   => ParseExpressionStatement()
             };
+        }
+
+        private Statement ParseBreakStatement()
+        {
+            // ToDo: want to walk up the tree to check in a loop
+            var keyword = MatchToken(TokenKind.BreakKeyword);
+            return new BreakStatement(keyword);
+        }
+
+        private Statement ParseContinueStatement()
+        {
+            // ToDo: want to walk up the tree to check in a loop
+            var keyword = MatchToken(TokenKind.ContinueKeyword);
+            return new ContinueStatement(keyword);
         }
 
         private Statement ParseBlockStatement()

@@ -18,6 +18,9 @@ namespace Minsk.CodeAnalysis.Binding
         private readonly FunctionSymbol function;
 
         private BoundScope scope;
+        private int labelCounter = 1;
+        private Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> loopStack
+            = new Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)>();
 
         public Binder(DiagnosticBag diagnostics, BoundScope parent, FunctionSymbol function)
         {
@@ -163,8 +166,14 @@ namespace Minsk.CodeAnalysis.Binding
                 SyntaxKind.BlockStatement
                     => BindBlockStatement(node as BlockStatement),
 
+                SyntaxKind.BreakStatement
+                    => BindBreakStatement(node as BreakStatement),
+
                 SyntaxKind.ConditionalStatement
                     => BindConditionalStatement(node as ConditionalStatement),
+
+                SyntaxKind.ContinueStatement
+                    => BindContinueStatement(node as ContinueStatement),
 
                 SyntaxKind.ExpressionStatement
                     => BindExpressionStatement(node as ExpressionStatement),
@@ -194,6 +203,18 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundBlockStatement(boundStatements.ToImmutable());
         }
 
+        private BoundStatement BindBreakStatement(BreakStatement node)
+        {
+            if (loopStack.Count == 0)
+            {
+                Report.InvalidBreak(node);
+                return new BoundErrorStatement();
+            }
+
+            var currentLoop = loopStack.Peek();
+            return new BoundGotoStatement(currentLoop.BreakLabel);
+        }
+
         private BoundStatement BindConditionalStatement(ConditionalStatement node)
         {
             var condition = BindExpression(node.Condition, TypeSymbol.Bool);
@@ -201,6 +222,18 @@ namespace Minsk.CodeAnalysis.Binding
             var elseStatement = BindOptionalElseClause(node.ElseClause);
 
             return new BoundConditionalStatement(condition, statement, elseStatement);
+        }
+
+        private BoundStatement BindContinueStatement(ContinueStatement node)
+        {
+            if (loopStack.Count == 0)
+            {
+                Report.InvalidContinue(node);
+                return new BoundErrorStatement();
+            }
+
+            var currentLoop = loopStack.Peek();
+            return new BoundGotoStatement(currentLoop.ContinueLabel);
         }
 
         private BoundStatement BindOptionalElseClause(ElseClauseSyntax node)
@@ -225,10 +258,11 @@ namespace Minsk.CodeAnalysis.Binding
             scope = new BoundScope(scope);
 
             var variable = BindVariable(node, node.Identifier, TypeSymbol.Int, true);
-            var body = BindStatement(node.Body);
+            var (body, breakLabel, continueLabel) = BindLoopBody(node.Body);
             scope = scope.Parent;
 
-            return new BoundForToStatement(variable, lowerBound, upperBound, body);
+            return new BoundForToStatement(
+                variable, lowerBound, upperBound, body, breakLabel, continueLabel);
         }
 
         private BoundStatement BindVariableDeclaration(VariableDeclarationStatement node)
@@ -261,8 +295,21 @@ namespace Minsk.CodeAnalysis.Binding
         private BoundStatement BindWhileStatement(WhileStatement node)
         {
             var condition = BindExpression(node.Condition, TypeSymbol.Bool);
-            var body = BindStatement(node.Body);
-            return new BoundWhileStatement(condition, body);
+            var (body, breakLabel, continueLabel) = BindLoopBody(node.Body);
+            return new BoundWhileStatement(condition, body, breakLabel, continueLabel);
+        }
+
+        private (BoundStatement Statement, BoundLabel BreakLabel, BoundLabel ContinueLabel)
+            BindLoopBody(Statement node)
+        {
+            var breakLabel = new BoundLabel($"break-{labelCounter++}");
+            var continueLabel = new BoundLabel($"continue={labelCounter++}");
+
+            loopStack.Push((breakLabel, continueLabel));
+            var boundBody = BindStatement(node);
+            loopStack.Pop();
+
+            return (boundBody, breakLabel, continueLabel);
         }
 
         private BoundExpression BindExpression(Expression node, TypeSymbol targetType)

@@ -2,19 +2,20 @@ using System.Collections.Generic;
 
 namespace Minsk.CodeAnalysis.Binding
 {
-    internal sealed class BoundWhileStatement : BoundStatement
+    internal sealed class BoundWhileStatement : BoundLoopStatement
     {
-        public BoundWhileStatement(BoundExpression condition, BoundStatement body)
+        public BoundWhileStatement(
+            BoundExpression condition,
+            BoundStatement body,
+            BoundLabel breakLabel,
+            BoundLabel continueLabel)
+            : base(body, breakLabel, continueLabel)
         {
             Condition = condition;
-            Body = body;
-
             Condition.Parent = this;
-            Body.Parent = this;
         }
 
         public BoundExpression Condition { get; }
-        public BoundStatement Body { get; }
 
         public override BoundNodeKind Kind => BoundNodeKind.WhileStatement;
 
@@ -22,8 +23,10 @@ namespace Minsk.CodeAnalysis.Binding
         {
             get
             {
+                //yield return ContinueLabel;
                 yield return Condition;
                 yield return Body;
+                //yield return BreakLabel;
             }
         }
 

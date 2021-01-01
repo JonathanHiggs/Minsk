@@ -170,6 +170,9 @@ namespace Minsk.CodeAnalysis.Binding
                 BoundNodeKind.ConditionalGotoStatement
                     => RewriteConditionalGotoStatement(node as BoundConditionalGotoStatement),
 
+                BoundNodeKind.ErrorStatement
+                    => RewriteErrorStatement(node as BoundErrorStatement),
+
                 BoundNodeKind.ExpressionStatement
                     => RewriteExpressionStatement(node as BoundExpressionStatement),
 
@@ -246,6 +249,9 @@ namespace Minsk.CodeAnalysis.Binding
             return new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfTrue);
         }
 
+        protected virtual BoundStatement RewriteErrorStatement(BoundErrorStatement node)
+            => node;
+
         protected virtual BoundStatement RewriteExpressionStatement(BoundExpressionStatement node)
         {
             var expression = RewriteExpression(node.Expression);
@@ -264,7 +270,8 @@ namespace Minsk.CodeAnalysis.Binding
             if (lowerBound == node.LowerBound && upperBound == node.UpperBound && body == node.Body)
                 return node;
 
-            return new BoundForToStatement(node.Variable, lowerBound, upperBound, body);
+            return new BoundForToStatement(
+                node.Variable, lowerBound, upperBound, body, node.BreakLabel, node.ContinueLabel);
         }
 
         protected virtual BoundStatement RewriteGotoStatement(BoundGotoStatement node)
@@ -292,7 +299,7 @@ namespace Minsk.CodeAnalysis.Binding
             if (condition == node.Condition && body == node.Body)
                 return node;
 
-            return new BoundWhileStatement(condition, body);
+            return new BoundWhileStatement(condition, body, node.BreakLabel, node.ContinueLabel);
         }
     }
 }

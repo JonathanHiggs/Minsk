@@ -42,16 +42,18 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.Hat:
                     return true;
 
-                case TokenKind.TrueKeyword:
-                case TokenKind.FalseKeyword:
-                case TokenKind.VarKeyword:
-                case TokenKind.LetKeyword:
-                case TokenKind.IfKeyword:
+                case TokenKind.BreakKeyword:
+                case TokenKind.ContinueKeyword:
                 case TokenKind.ElseKeyword:
-                case TokenKind.WhileKeyword:
+                case TokenKind.IfKeyword:
+                case TokenKind.FalseKeyword:
                 case TokenKind.ForKeyword:
-                case TokenKind.ToKeyword:
                 case TokenKind.FunctionKeyword:
+                case TokenKind.LetKeyword:
+                case TokenKind.ToKeyword:
+                case TokenKind.TrueKeyword:
+                case TokenKind.VarKeyword:
+                case TokenKind.WhileKeyword:
                     return true;
 
                 default:
