@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,8 +21,8 @@ namespace Minsk.IO
             if (writer == Console.Error)
                 return !Console.IsErrorRedirected && !Console.IsOutputRedirected;
 
-            //if (writer is IndentedTextWriter iw && iw.InnerWriter.IsConsole())
-            //    return true;
+            if (writer is IndentedTextWriter iw && iw.InnerWriter.IsConsole())
+                return true;
 
             return false;
         }
