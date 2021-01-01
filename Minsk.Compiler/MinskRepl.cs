@@ -176,35 +176,35 @@ namespace Minsk.Compiler
             EvaluateSubmittion(text);
         }
 
-        //[MetaCommand("ls", "Lists all symbols")]
-        //private void EvaluateLs()
-        //{
-        //    var compilation = previous ?? emptyCompilation;
-        //    var symbols = compilation.GetSymbols().OrderBy(s => s.Kind).ThenBy(s => s.Name);
+        [MetaCommand("ls", "Lists all symbols")]
+        private void EvaluateLs()
+        {
+            var compilation = previous ?? emptyCompilation;
+            var symbols = compilation.Symbols.OrderBy(s => s.Kind).ThenBy(s => s.Name);
 
-        //    foreach (var symbol in symbols)
-        //    {
-        //        symbol.WriteTo(Console.Out);
-        //        Console.WriteLine();
-        //    }
-        //}
+            foreach (var symbol in symbols)
+            {
+                symbol.WriteTo(Console.Out);
+                Console.WriteLine();
+            }
+        }
 
-        //[MetaCommand("dump", "Shows the bound tree for a given function")]
-        //private void EvaluateDump(string functionName)
-        //{
-        //    var compilation = previous ?? emptyCompilation;
-        //    var symbol = compilation.GetSymbols().OfType<FunctionSymbol>().SingleOrDefault(f => f.Name == functionName);
+        [MetaCommand("dump", "Shows the bound tree for a given function")]
+        private void EvaluateDump(string functionName)
+        {
+            var compilation = previous ?? emptyCompilation;
+            var symbol = compilation.Symbols.OfType<FunctionSymbol>().SingleOrDefault(f => f.Name == functionName);
 
-        //    if (symbol is null)
-        //    {
-        //        Console.ForegroundColor = ConsoleColor.Red;
-        //        Console.WriteLine($"error: function '{functionName}' does not exist");
-        //        Console.ResetColor();
-        //        return;
-        //    }
+            if (symbol is null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"error: function '{functionName}' does not exist");
+                Console.ResetColor();
+                return;
+            }
 
-        //    compilation.EmitTree(symbol, Console.Out);
-        //}
+            compilation.EmitTree(symbol, Console.Out);
+        }
 
         protected override bool IsCompleteSubmission(string text)
         {

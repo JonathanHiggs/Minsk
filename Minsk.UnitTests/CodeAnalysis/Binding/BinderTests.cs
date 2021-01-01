@@ -36,7 +36,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Binding
             Assert.That(tree.Diagnostics, Is.Empty);
 
             // Assert
-            using var e = new AssertingEnumerator(compilation.GlobalScope.Statement);
+            using var e = new AssertingEnumerator(compilation.GlobalScope.Statements[0]);
 
             e.AssertParentNull();
 

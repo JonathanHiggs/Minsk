@@ -11,30 +11,37 @@ namespace Minsk.CodeAnalysis.Parsing
             LexToken identifierToken,
             TypeClauseSyntax optionalTypeClause,
             LexToken equalsToken,
-            Expression expression)
+            Expression initializer)
         {
             KeywordToken = keywordToken;
             Identifier = identifierToken;
             OptionalTypeClause = optionalTypeClause;
             EqualsToken = equalsToken;
-            Expression = expression;
+            Initializer = initializer;
         }
 
         public LexToken KeywordToken { get; }
         public LexToken Identifier { get; }
         public TypeClauseSyntax OptionalTypeClause { get; }
         public LexToken EqualsToken { get; }
-        public Expression Expression { get; }
+        public Expression Initializer { get; }
 
         public override SyntaxKind Kind => SyntaxKind.VariableDeclaration;
 
         public override string Text => string.Empty;
 
         public override IEnumerable<SyntaxNode> Children
-        { get { yield return Expression; } }
+        {
+            get
+            {
+                if (OptionalTypeClause is not null)
+                    yield return OptionalTypeClause;
+                yield return Initializer;
+            }
+        }
 
         public override LexToken FirstToken => KeywordToken;
 
-        public override LexToken LastToken => Expression.LastToken;
+        public override LexToken LastToken => Initializer.LastToken;
     }
 }

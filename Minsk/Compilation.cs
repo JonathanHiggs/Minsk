@@ -49,6 +49,9 @@ namespace Minsk.CodeAnalysis
             }
         }
 
+        public IEnumerable<Symbol> Symbols
+            => Enumerable.Concat<Symbol>(GlobalScope.Functions, GlobalScope.Variables);
+
         public Compilation ContinueWith(SyntaxTree syntaxTree)
             => new Compilation(this, syntaxTree);
 
@@ -58,23 +61,27 @@ namespace Minsk.CodeAnalysis
             if (diagnostics.Any())
                 return new EvaluationResult(null, diagnostics.ToImmutableArray());
 
-            var statement = GetStatement();
-            var evaluator = new Evaluator(statement, variables);
+            var program = Binder.BindProgram(GlobalScope, diagnostics);
+            if (program.Diagnostics.Any())
+                return new EvaluationResult(null, diagnostics.ToImmutableArray());
+
+            var evaluator = new Evaluator(program, variables);
             var value = evaluator.Evaluate();
 
             return new EvaluationResult(value, ImmutableArray<Diagnostic>.Empty);
         }
 
-        public void EmitTree(TextWriter writer)
+        public void EmitTree(FunctionSymbol function, TextWriter writer)
         {
-            var statement = GetStatement();
-            statement.PrettyPrint(writer);
+            var program = Binder.BindProgram(GlobalScope, new DiagnosticBag());
+            var tree = program.Functions[function];
+            tree.PrettyPrint(writer);
         }
 
-        private BoundBlockStatement GetStatement()
+        public void EmitTree(TextWriter writer)
         {
-            var result = GlobalScope.Statement;
-            return Lowerer.Lower(result);
+            var program = Binder.BindProgram(GlobalScope, new DiagnosticBag());
+            program.Statement.PrettyPrint(writer);
         }
     }
 }

@@ -9,8 +9,12 @@ namespace Minsk.CodeAnalysis.Parsing
     public sealed class CompilationUnit : SyntaxNode
     {
         public CompilationUnit(IEnumerable<MemberSyntax> members, LexToken endOfFileToken)
+            : this(members.ToImmutableArray(), endOfFileToken)
+        { }
+
+        public CompilationUnit(ImmutableArray<MemberSyntax> members, LexToken endOfFileToken)
         {
-            Members = members.ToImmutableArray();
+            Members = members;
             EndOfFileToken = endOfFileToken;
         }
 

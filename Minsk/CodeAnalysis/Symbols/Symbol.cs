@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Minsk.CodeAnalysis.Symbols
 {
@@ -17,5 +18,10 @@ namespace Minsk.CodeAnalysis.Symbols
         public abstract SymbolKind Kind { get; }
 
         public override string ToString() => Name;
+
+        public virtual void WriteTo(TextWriter writer)
+        {
+            writer.WriteLine($"{Kind}: {Name}");
+        }
     }
 }

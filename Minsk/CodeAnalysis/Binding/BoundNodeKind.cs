@@ -22,5 +22,8 @@ namespace Minsk.CodeAnalysis.Binding
         LabelStatement,
         VariableDeclarationStatement,
         WhileStatement,
+
+        // High-level
+        Program,
     }
 }

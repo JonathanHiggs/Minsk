@@ -12,32 +12,39 @@ namespace Minsk.CodeAnalysis.Binding
         public BoundGlobalScope(
             BoundGlobalScope previous,
             DiagnosticBag diagnostics,
+            IEnumerable<FunctionSymbol> functions,
             IEnumerable<VariableSymbol> variables,
-            BoundStatement statement
+            IEnumerable<BoundStatement> statements
         )
-            : this(previous, diagnostics, variables.ToImmutableArray(), statement)
+            : this(
+                  previous,
+                  diagnostics,
+                  functions.ToImmutableArray(),
+                  variables.ToImmutableArray(),
+                  statements.ToImmutableArray())
         { }
 
         public BoundGlobalScope(
             BoundGlobalScope previous,
             DiagnosticBag diagnostics,
+            ImmutableArray<FunctionSymbol> functions,
             ImmutableArray<VariableSymbol> variables,
-            BoundStatement statement)
+            ImmutableArray<BoundStatement> statements)
         {
             Previous = previous;
 
             Diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
+            Functions = functions;
             Variables = variables;
-
-            Statement = statement
-                ?? throw new ArgumentNullException(nameof(statement));
+            Statements = statements;
         }
 
         public BoundGlobalScope Previous { get; }
         public DiagnosticBag Diagnostics { get; }
+        public ImmutableArray<FunctionSymbol> Functions { get; }
         public ImmutableArray<VariableSymbol> Variables { get; }
-        public BoundStatement Statement { get; }
+        public ImmutableArray<BoundStatement> Statements { get; }
     }
 }

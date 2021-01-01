@@ -5,6 +5,7 @@ using System.Linq;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
+using Minsk.CodeAnalysis.Lowering;
 using Minsk.CodeAnalysis.Parsing;
 using Minsk.CodeAnalysis.Symbols;
 using Minsk.CodeAnalysis.Text;
@@ -14,14 +15,24 @@ namespace Minsk.CodeAnalysis.Binding
     internal sealed class Binder
     {
         private readonly DiagnosticBag diagnostics;
+        private readonly FunctionSymbol function;
+
         private BoundScope scope;
 
-        public Binder(DiagnosticBag diagnostics, BoundScope parent)
+        public Binder(DiagnosticBag diagnostics, BoundScope parent, FunctionSymbol function)
         {
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
+            this.function = function;
+
             scope = new BoundScope(parent);
+
+            if (function is not null)
+            {
+                foreach (var p in function.Parameters)
+                    scope.TryDeclareVariable(p);
+            }
         }
 
         public static BoundGlobalScope BindGlobalScope(
@@ -30,14 +41,84 @@ namespace Minsk.CodeAnalysis.Binding
             DiagnosticBag diagnostics)
         {
             var parentScope = CreateParentScope(previous);
-            var binder = new Binder(diagnostics, parentScope);
+            var binder = new Binder(diagnostics, parentScope, function: null);
 
-            var globalStatementMember = compilationUnit.Members.First() as GlobalStatementSyntax;
-            var statement = binder.BindStatement(globalStatementMember.Statement);
+            foreach (var function in compilationUnit.Members.OfType<FunctionDeclaration>())
+                binder.BindFunctionDeclaration(function);
 
+            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+
+            foreach (var globalStatement in compilationUnit.Members.OfType<GlobalStatementSyntax>())
+            {
+                var statement = binder.BindStatement(globalStatement.Statement);
+                statements.Add(statement);
+            }
+
+            var functions = binder.scope.DeclaredFunctions;
             var variables = binder.scope.DeclaredVariables;
 
-            return new BoundGlobalScope(previous, diagnostics, variables, statement);
+            return new BoundGlobalScope(previous, diagnostics, functions, variables, statements);
+        }
+
+        public static BoundProgram BindProgram(
+            BoundGlobalScope globalScope,
+            DiagnosticBag diagnostics)
+        {
+            var parentScope = CreateParentScope(globalScope);
+
+            var functionBodies
+                = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
+
+            var scope = globalScope;
+
+            while (scope != null)
+            {
+                foreach(var function in scope.Functions)
+                {
+                    var binder = new Binder(diagnostics, parentScope, function);
+                    var body = binder.BindStatement(function.Declaration.Body);
+                    var loweredBody = Lowerer.Lower(body);
+                    functionBodies.Add(function, loweredBody);
+                }
+
+                scope = scope.Previous;
+            }
+
+            var statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
+
+            return new BoundProgram(diagnostics, functionBodies.ToImmutable(), statement);
+        }
+
+        private void BindFunctionDeclaration(FunctionDeclaration node)
+        {
+            var name = node.Identifier.Text;
+            var parameters = ImmutableArray.CreateBuilder<ParameterSymbol>();
+
+            var seenParameterNames = new HashSet<string>();
+
+            foreach (var parameterSyntax in node.Parameters)
+            {
+                var parameterName = parameterSyntax.Identifier.Text;
+                var parameterType = BindTypeClause(parameterSyntax.Type);
+                if (!seenParameterNames.Add(parameterName))
+                {
+                    Report.ParameterAlreadyDeclared(parameterSyntax);
+                }
+                else
+                {
+                    var parameter = new ParameterSymbol(parameterName, parameterType);
+                    parameters.Add(parameter);
+                }
+            }
+
+            var returnType = BindTypeClause(node.TypeClause) ?? TypeSymbol.Void;
+
+            if (returnType.IsNotVoidType)
+                throw new Exception();
+
+            var function = new FunctionSymbol(name, parameters.ToImmutable(), returnType, node);
+            if (!scope.TryDeclareFunction(function))
+                Report.SymbolAlreadyDeclared(node);
         }
 
         private static BoundScope CreateParentScope(BoundGlobalScope globalScope)
@@ -56,6 +137,9 @@ namespace Minsk.CodeAnalysis.Binding
 
                 scope = new BoundScope(scope);
 
+                foreach (var function in globalScope.Functions)
+                    scope.TryDeclareFunction(function);
+
                 foreach (var variable in globalScope.Variables)
                     scope.TryDeclareVariable(variable);
             }
@@ -71,26 +155,6 @@ namespace Minsk.CodeAnalysis.Binding
                 scope.TryDeclareFunction(function);
 
             return scope;
-        }
-
-        private BoundCompilationUnit BindCompilationUnit()
-        {
-            throw new NotImplementedException();
-        }
-
-        private BoundMember BindMember()
-        {
-            throw new NotImplementedException();
-        }
-
-        private BoundFunction BindFunction()
-        {
-            throw new NotImplementedException();
-        }
-
-        private BoundGlobalStatement BindGlobalStatement()
-        {
-            throw new NotImplementedException();
         }
 
         private BoundStatement BindStatement(Statement node)
@@ -171,12 +235,12 @@ namespace Minsk.CodeAnalysis.Binding
         {
             var isReadOnly = node.KeywordToken.Kind == TokenKind.LetKeyword;
             var type = BindTypeClause(node.OptionalTypeClause);
-            var expression = BindExpression(node.Expression);
+            var initializer = BindExpression(node.Initializer);
 
-            var variableType = type ?? expression.Type;
-            var convertedInitializer = BindConversion(node.Expression.Span, node, expression, variableType);
-
+            var variableType = type ?? initializer.Type;
             var variable = BindVariable(node, node.Identifier, variableType, isReadOnly);
+
+            var convertedInitializer = BindConversion(node.Initializer.Span, node, initializer, variableType);
 
             return new BoundVariableDeclarationStatement(variable, convertedInitializer);
         }
@@ -189,10 +253,7 @@ namespace Minsk.CodeAnalysis.Binding
             var type = LookupType(node.Identifier.Text);
 
             if (type is null)
-            {
                 Report.UndefinedType(node, node.Identifier);
-                return TypeSymbol.Error;
-            }
 
             return type;
         }
@@ -206,12 +267,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         private BoundExpression BindExpression(Expression node, TypeSymbol targetType)
         {
-            var expression = BindExpression(node);
-
-            if (!targetType.IsErrorType && !expression.Type.IsErrorType && expression.Type != targetType)
-                Report.CannotConvert(node, node.Span, expression.Type, targetType);
-
-            return expression;
+            return BindConversion(node, targetType);
         }
 
         private BoundExpression BindExpression(Expression node, bool canBeVoid = false)
@@ -335,19 +391,9 @@ namespace Minsk.CodeAnalysis.Binding
                 var parameter = function.Parameters[i];
                 var argument = boundArguments[i];
 
-                if (parameter.Type != argument.Type && argument.Type.IsNotErrorType)
+                if (argument.Type != parameter.Type)
                 {
-                    var convertedArgument = BindConversion(node.Arguments[i].Span, node.Arguments[i], argument, parameter.Type);
-
-                    if (convertedArgument.Type == parameter.Type)
-                    {
-                        boundArguments[i] = convertedArgument;
-                    }
-                    else
-                    {
-                        hasError = true;
-                        Report.ArgumentTypeMismatch(node.Arguments[i], argument.Type, parameter);
-                    }
+                    Report.ArgumentTypeMismatch(node.Arguments[i], argument.Type, parameter);
                 }
             }
 
@@ -432,9 +478,6 @@ namespace Minsk.CodeAnalysis.Binding
         {
             var conversion = Conversion.Classify(expression.Type, toType);
 
-            if (conversion.IsIdentity)
-                return expression;
-
             if (conversion.DoesNotExist)
             {
                 if (expression.Type.IsNotErrorType && toType.IsNotErrorType)
@@ -444,10 +487,10 @@ namespace Minsk.CodeAnalysis.Binding
             }
 
             if (conversion.IsExplicit && !allowExplicit)
-            {
                 Report.CannotImplicitlyConvert(node, span, expression.Type, toType);
-                return new BoundErrorExpression();
-            }
+
+            if (conversion.IsIdentity)
+                return expression;
 
             return new BoundConversionExpression(expression, toType);
         }
@@ -458,10 +501,12 @@ namespace Minsk.CodeAnalysis.Binding
             TypeSymbol type,
             bool isReadOnly = false)
         {
-            var isMissing = identifier.IsMissing;
             var name = identifier.Text ?? "?";
+            var isMissing = identifier.IsMissing;
 
-            var variable = new VariableSymbol(name, isReadOnly, type);
+            var variable = function is null
+                ? (VariableSymbol)new GlobalVariableSymbol(name, isReadOnly, type)
+                : (VariableSymbol)new LocalVariableSymbol(name, isReadOnly, type);
 
             if (!isMissing && !scope.TryDeclareVariable(variable))
                 Report.VariableRedeclaration(node, identifier);

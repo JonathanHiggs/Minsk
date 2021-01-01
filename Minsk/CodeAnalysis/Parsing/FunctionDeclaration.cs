@@ -12,6 +12,7 @@ namespace Minsk.CodeAnalysis.Parsing
             LexToken openParentheses,
             SeparatedSyntaxList<ParameterSyntax> parameters,
             LexToken closeParentheses,
+            TypeClauseSyntax typeClause,
             Statement body)
         {
             FunctionKeyword = functionKeyword;
@@ -19,6 +20,7 @@ namespace Minsk.CodeAnalysis.Parsing
             OpenParentheses = openParentheses;
             Parameters = parameters;
             CloseParentheses = closeParentheses;
+            TypeClause = typeClause;
             Body = body;
         }
 
@@ -27,6 +29,7 @@ namespace Minsk.CodeAnalysis.Parsing
         public LexToken OpenParentheses { get; }
         public SeparatedSyntaxList<ParameterSyntax> Parameters { get; }
         public LexToken CloseParentheses { get; }
+        public TypeClauseSyntax TypeClause { get; }
         public Statement Body { get; }
 
         public override string Text => Identifier.Text;

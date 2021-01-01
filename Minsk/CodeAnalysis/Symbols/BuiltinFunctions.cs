@@ -32,7 +32,7 @@ namespace Minsk.CodeAnalysis.Symbols
             => new ParameterSymbol(name, TypeSymbol.From<T>());
 
         private static FunctionSymbol Returns<T>(this string name)
-            => new FunctionSymbol(name, TypeSymbol.From<T>());
+            => new FunctionSymbol(name, TypeSymbol.From<T>(), null, isBuiltin: true);
 
         private class FunctionSymbolBuilder
         {
@@ -49,7 +49,9 @@ namespace Minsk.CodeAnalysis.Symbols
                 => new FunctionSymbol(
                     builder.name, 
                     builder.parameters.ToImmutableArray(), 
-                    builder.returnType);
+                    builder.returnType,
+                    null,
+                    isBuiltin: true);
 
             public FunctionSymbolBuilder Parameters(params ParameterSymbol[] parameters)
             {

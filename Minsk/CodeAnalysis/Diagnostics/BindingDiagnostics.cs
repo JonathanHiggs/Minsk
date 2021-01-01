@@ -88,7 +88,13 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node.Identifier.Span,
                 $"Variable {node.Identifier.Text} already declared");
 
+        public void ParameterAlreadyDeclared(ParameterSyntax node)
+            => Error(node, node.Identifier.Span, $"A parameter with the name '{node.Identifier.Text}' was already declared");
+
         public void VoidExpression(Expression node)
             => Error(node, node.Span, "Expression must return a value");
+
+        public void SymbolAlreadyDeclared(FunctionDeclaration node)
+            => Error(node, node.Identifier.Span, $"A symbol with the name '{node.Identifier.Text}' was already declared");
     }
 }

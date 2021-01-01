@@ -11,27 +11,34 @@ namespace Minsk.CodeAnalysis
 {
     internal sealed class Evaluator
     {
-        private readonly BoundBlockStatement root;
-        private readonly Dictionary<VariableSymbol, object> variables;
+        private readonly BoundProgram program;
+        private readonly Dictionary<VariableSymbol, object> globals;
+        private readonly Stack<Dictionary<VariableSymbol, object>> stack
+            = new Stack<Dictionary<VariableSymbol, object>>();
+
         private readonly Random random = new Random();
 
         private object lastValue = null;
 
-        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
+        public Evaluator(BoundProgram program, Dictionary<VariableSymbol, object> globalVariables)
         {
-            this.root = root ?? throw new ArgumentNullException(nameof(root));
+            this.program = program ?? throw new ArgumentNullException(nameof(program));
 
-            this.variables = variables
-                ?? throw new ArgumentNullException(nameof(variables));
+            globals = globalVariables;
         }
 
         public object Evaluate()
         {
+            return EvaluateStatement(program.Statement);
+        }
+
+        private object EvaluateStatement(BoundBlockStatement body)
+        {
             var labelToIndex = new Dictionary<BoundLabel, int>();
 
-            for (var i = 0; i < root.Statements.Length; i++)
+            for (var i = 0; i < body.Statements.Length; i++)
             {
-                if (root.Statements[i] is BoundLabelStatement l)
+                if (body.Statements[i] is BoundLabelStatement l)
                 {
                     labelToIndex.Add(l.Label, i + 1);
                 }
@@ -39,9 +46,9 @@ namespace Minsk.CodeAnalysis
 
             var index = 0;
 
-            while (index < root.Statements.Length)
+            while (index < body.Statements.Length)
             {
-                var s = root.Statements[index];
+                var s = body.Statements[index];
 
                 switch (s.Kind)
                 {
@@ -90,8 +97,8 @@ namespace Minsk.CodeAnalysis
         private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement node)
         {
             var value = EvaluateExpression(node.Initializer);
-            variables[node.Variable] = value;
             lastValue = value;
+            Assign(node.Variable, value);
         }
 
         private object EvaluateExpression(BoundExpression node)
@@ -113,7 +120,7 @@ namespace Minsk.CodeAnalysis
                     => EvaluateLiteralExpression(node as BoundLiteralExpression),
 
                 BoundNodeKind.VariableExpression
-                    => EvaluateNameExpression(node as BoundVariableExpression),
+                    => EvaluateVariableExpression(node as BoundVariableExpression),
 
                 BoundNodeKind.UnaryExpression
                     => EvaluateUnaryExpression(node as BoundUnaryExpression),
@@ -126,7 +133,7 @@ namespace Minsk.CodeAnalysis
         private object EvaluateAssignmentExpression(BoundAssignmentExpression node)
         {
             var value = EvaluateExpression(node.Expression);
-            variables[node.Variable] = value;
+            Assign(node.Variable, value);
             return value;
         }
 
@@ -172,6 +179,30 @@ namespace Minsk.CodeAnalysis
 
         private object EvaluateCallExpression(BoundCallExpression node)
         {
+            if (node.Function.IsBuiltin)
+                return EvaluateBuiltinFunction(node);
+
+            var locals = new Dictionary<VariableSymbol, object>();
+            for (var i = 0; i < node.Arguments.Length; i++)
+            {
+                var argumentExpression = node.Arguments[i];
+                var value = EvaluateExpression(argumentExpression);
+                var parameter = node.Function.Parameters[i];
+                locals.Add(parameter, value);
+            }
+
+            stack.Push(locals);
+
+            var statement = program.Functions[node.Function];
+            var result = EvaluateStatement(statement);
+
+            stack.Pop();
+
+            return result;
+        }
+
+        private object EvaluateBuiltinFunction(BoundCallExpression node)
+        {
             if (node.Function == BuiltinFunctions.Input)
             {
                 return Console.ReadLine();
@@ -210,8 +241,16 @@ namespace Minsk.CodeAnalysis
         private object EvaluateLiteralExpression(BoundLiteralExpression node)
             => node.Value;
 
-        private object EvaluateNameExpression(BoundVariableExpression node)
-            => variables[node.Variable];
+        private object EvaluateVariableExpression(BoundVariableExpression node)
+        {
+            if (node.Variable.Kind == SymbolKind.GlobalVariable)
+                return globals[node.Variable];
+            else
+            {
+                var locals = stack.Peek();
+                return locals[node.Variable];
+            }
+        }
 
         private object EvaluateUnaryExpression(BoundUnaryExpression node)
         {
@@ -231,5 +270,15 @@ namespace Minsk.CodeAnalysis
             };
         }
 
+        private void Assign(VariableSymbol variable, object value)
+        {
+            if (variable.Kind == SymbolKind.GlobalVariable)
+                globals[variable] = value;
+            else
+            {
+                var locals = stack.Peek();
+                locals[variable] = value;
+            }
+        }
     }
 }

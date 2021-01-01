@@ -52,7 +52,14 @@ namespace Minsk.CodeAnalysis.Parsing
 
             while (Current != TokenKind.EoF)
             {
-                members.Add(ParseMember());
+                var startToken = Current;
+
+                var member = ParseMember();
+                members.Add(member);
+
+                // Guard against infinite loops
+                if (Current == startToken)
+                    NextToken();
             }
 
             return members.ToImmutableArray();
@@ -61,21 +68,29 @@ namespace Minsk.CodeAnalysis.Parsing
         private MemberSyntax ParseMember()
         {
             if (Current == TokenKind.FunctionKeyword)
-                return ParseFunction();
+                return ParseFunctionDeclaration();
 
             return ParseGlobalStatement();
         }
 
-        private FunctionDeclaration ParseFunction()
+        private FunctionDeclaration ParseFunctionDeclaration()
         {
             var functionKeyword = MatchToken(TokenKind.FunctionKeyword);
             var identifer = MatchToken(TokenKind.Identifier);
             var openParentheses = MatchToken(TokenKind.OpenParenthesis);
             var parameters = ParseSeparatedParameters();
             var closeParentheses = MatchToken(TokenKind.CloseParenthesis);
+            var typeClause = ParseOptionalTypeClause();
             var body = ParseBlockStatement();
 
-            return new FunctionDeclaration(functionKeyword, identifer, openParentheses, parameters, closeParentheses, body);
+            return new FunctionDeclaration(
+                functionKeyword,
+                identifer,
+                openParentheses,
+                parameters,
+                closeParentheses,
+                typeClause,
+                body);
         }
 
         private SeparatedSyntaxList<ParameterSyntax> ParseSeparatedParameters()

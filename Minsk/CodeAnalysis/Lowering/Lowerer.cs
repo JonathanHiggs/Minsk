@@ -114,7 +114,7 @@ namespace Minsk.CodeAnalysis.Lowering
             // }
 
             var variableDeclaration = new BoundVariableDeclarationStatement(node.Variable, node.LowerBound);
-            var upperBoundSymbol = new VariableSymbol("upperBound", true, TypeSymbol.Int);
+            var upperBoundSymbol = new LocalVariableSymbol("upperBound", true, TypeSymbol.Int);
             var upperBoundDeclaration = new BoundVariableDeclarationStatement(upperBoundSymbol, node.UpperBound);
             var upperBoundExpression = new BoundVariableExpression(upperBoundSymbol);
 
