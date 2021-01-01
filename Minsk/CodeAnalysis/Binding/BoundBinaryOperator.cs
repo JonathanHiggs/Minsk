@@ -62,16 +62,16 @@ namespace Minsk.CodeAnalysis.Binding
             From(Token.AmpersandAmperand,   Op.LogicalAnd,      TypeSymbol.Bool),
             From(Token.PipePipe,            Op.LogicalOr,       TypeSymbol.Bool),
 
-            From(Token.EqualsEquals,        Op.Equals,          TypeSymbol.Int,  TypeSymbol.Bool),
-            From(Token.BangEquals,          Op.NotEquals,       TypeSymbol.Int,  TypeSymbol.Bool),
+            From(Token.EqualsEquals,        Op.Equals,          TypeSymbol.Int,     TypeSymbol.Bool),
+            From(Token.BangEquals,          Op.NotEquals,       TypeSymbol.Int,     TypeSymbol.Bool),
 
             From(Token.EqualsEquals,        Op.Equals,          TypeSymbol.Bool),
             From(Token.BangEquals,          Op.NotEquals,       TypeSymbol.Bool),
 
-            From(Token.Less,                Op.Less,            TypeSymbol.Int,  TypeSymbol.Bool),
-            From(Token.LessOrEquals,        Op.LessOrEquals,    TypeSymbol.Int,  TypeSymbol.Bool),
-            From(Token.Greater,             Op.Greater,         TypeSymbol.Int,  TypeSymbol.Bool),
-            From(Token.GreaterOrEquals,     Op.GreaterOrEquals, TypeSymbol.Int,  TypeSymbol.Bool),
+            From(Token.Less,                Op.Less,            TypeSymbol.Int,     TypeSymbol.Bool),
+            From(Token.LessOrEquals,        Op.LessOrEquals,    TypeSymbol.Int,     TypeSymbol.Bool),
+            From(Token.Greater,             Op.Greater,         TypeSymbol.Int,     TypeSymbol.Bool),
+            From(Token.GreaterOrEquals,     Op.GreaterOrEquals, TypeSymbol.Int,     TypeSymbol.Bool),
 
             // Numerical
             From(Token.Plus,                Op.Addition,        TypeSymbol.Int),
@@ -89,6 +89,8 @@ namespace Minsk.CodeAnalysis.Binding
 
             // String
             From(Token.Plus,                Op.Addition,        TypeSymbol.String),
+            From(Token.EqualsEquals,        Op.Equals,          TypeSymbol.String,  TypeSymbol.Bool),
+            From(Token.BangEquals,          Op.NotEquals,       TypeSymbol.String,  TypeSymbol.Bool),
         };
     }
 }
