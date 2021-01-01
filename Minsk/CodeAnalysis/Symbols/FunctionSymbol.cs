@@ -1,7 +1,10 @@
 ﻿using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 
+using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.IO;
 
 namespace Minsk.CodeAnalysis.Symbols
 {
@@ -40,5 +43,33 @@ namespace Minsk.CodeAnalysis.Symbols
         public TypeSymbol ReturnType { get; }
         public FunctionDeclaration Declaration { get; }
         public bool IsBuiltin { get; }
+
+        public override void WriteTo(TextWriter writer)
+        {
+            writer.WriteKeyword(TokenKind.FunctionKeyword);
+            writer.WriteSpace();
+            writer.WriteIdentifier(Name);
+            writer.WritePunctuation(TokenKind.OpenParenthesis);
+
+            for (var i = 0; i < Parameters.Length; i++)
+            {
+                Parameters[i].WriteTo(writer);
+                if (i < Parameters.Length - 1)
+                {
+                    writer.WritePunctuation(TokenKind.Comma);
+                    writer.WriteSpace();
+                }
+            }
+
+            writer.WritePunctuation(TokenKind.CloseParenthesis);
+
+            if (ReturnType.IsNotVoidType)
+            {
+                writer.WriteSpace();
+                writer.WritePunctuation(TokenKind.Colon);
+                writer.WriteSpace();
+                ReturnType.WriteTo(writer);
+            }
+        }
     }
 }

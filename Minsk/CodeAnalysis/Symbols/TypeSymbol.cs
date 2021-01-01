@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+
+using Minsk.IO;
 
 namespace Minsk.CodeAnalysis.Symbols
 {
@@ -49,6 +52,11 @@ namespace Minsk.CodeAnalysis.Symbols
             else if (typeof(T) == typeof(string))   return String;
 
             throw new Exception($"Unexpected type '{typeof(T).Name}'");
+        }
+
+        public override void WriteTo(TextWriter writer)
+        {
+            writer.WriteIdentifier(Name);
         }
     }
 }

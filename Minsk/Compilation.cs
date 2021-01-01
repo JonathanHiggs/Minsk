@@ -76,16 +76,31 @@ namespace Minsk.CodeAnalysis
             var program = Binder.BindProgram(GlobalScope, new DiagnosticBag());
             var tree = program.Functions[function];
 
+            function.WriteTo(writer);
+            writer.WriteLine();
             tree.WriteTo(writer);
-            //tree.PrettyPrint(writer);
         }
 
         public void EmitTree(TextWriter writer)
         {
             var program = Binder.BindProgram(GlobalScope, new DiagnosticBag());
 
-            program.WriteTo(writer);
-            //program.Statement.PrettyPrint(writer);
+            if (program.Statement.Statements.Any())
+            {
+                program.WriteTo(writer);
+            }
+            else
+            {
+                foreach (var function in program.Functions)
+                {
+                    if (!GlobalScope.Functions.Contains(function.Key))
+                        continue;
+
+                    function.Key.WriteTo(writer);
+                    writer.WriteLine();
+                    function.Value.WriteTo(writer);
+                }
+            }
         }
     }
 }

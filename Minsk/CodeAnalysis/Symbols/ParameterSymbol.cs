@@ -1,4 +1,9 @@
-﻿namespace Minsk.CodeAnalysis.Symbols
+﻿using System.IO;
+
+using Minsk.CodeAnalysis.Lexing;
+using Minsk.IO;
+
+namespace Minsk.CodeAnalysis.Symbols
 {
     public sealed class ParameterSymbol : LocalVariableSymbol
     {
@@ -7,5 +12,13 @@
         { }
 
         public override SymbolKind Kind => SymbolKind.Parameter;
+
+        public override void WriteTo(TextWriter writer)
+        {
+            writer.WriteIdentifier(Name);
+            writer.WritePunctuation(TokenKind.Colon);
+            writer.WriteSpace();
+            Type?.WriteTo(writer);
+        }
     }
 }

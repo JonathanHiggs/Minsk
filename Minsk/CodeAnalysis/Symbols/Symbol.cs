@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 
+using Minsk.CodeAnalysis.Lexing;
+using Minsk.IO;
+
 namespace Minsk.CodeAnalysis.Symbols
 {
     public abstract class Symbol
@@ -19,9 +22,6 @@ namespace Minsk.CodeAnalysis.Symbols
 
         public override string ToString() => Name;
 
-        public virtual void WriteTo(TextWriter writer)
-        {
-            writer.WriteLine($"{Kind}: {Name}");
-        }
+        public abstract void WriteTo(TextWriter writer);
     }
 }
