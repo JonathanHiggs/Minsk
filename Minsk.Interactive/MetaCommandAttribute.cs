@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minsk.Compiler
+namespace Minsk.Interactive
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     internal sealed class MetaCommandAttribute : Attribute

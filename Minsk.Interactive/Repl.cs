@@ -7,7 +7,7 @@ using System.Text;
 
 using Minsk.IO;
 
-namespace Minsk.Compiler
+namespace Minsk.Interactive
 {
     internal delegate object LineRenderHandler(IReadOnlyList<string> lines, int lineIndex, object state);
 

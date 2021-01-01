@@ -1,4 +1,4 @@
-﻿namespace Minsk.Compiler
+﻿namespace Minsk.Interactive
 {
     class Program
     {

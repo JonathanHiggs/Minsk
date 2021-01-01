@@ -10,7 +10,7 @@ using Minsk.CodeAnalysis.Symbols;
 using Minsk.CodeAnalysis.Text;
 using Minsk.IO;
 
-namespace Minsk.Compiler
+namespace Minsk.Interactive
 {
     internal sealed class MinskRepl : Repl
     {

@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace Minsk.Compiler
+namespace Minsk.Interactive
 {
     internal sealed class SubmissionView
     {

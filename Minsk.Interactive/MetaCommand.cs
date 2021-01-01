@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Minsk.Compiler
+namespace Minsk.Interactive
 {
     internal sealed class MetaCommand
     {

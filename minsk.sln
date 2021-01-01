@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minsk.Compiler", "Minsk.Compiler\Minsk.Compiler.csproj", "{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minsk.Interactive", "Minsk.Interactive\Minsk.Interactive.csproj", "{71C6780C-E12A-4A4A-B4BC-02C2EE3CD273}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minsk", "Minsk\Minsk.csproj", "{915C3DDE-836D-4334-91CF-BE1633E4E23C}"
 EndProject
