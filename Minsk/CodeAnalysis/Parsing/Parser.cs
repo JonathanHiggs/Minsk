@@ -97,21 +97,23 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             var parameters = ImmutableArray.CreateBuilder<SeparatedSyntaxNode<ParameterSyntax>>();
 
-            while (Current != TokenKind.CloseParenthesis && Current != TokenKind.EoF)
-                parameters.Add(ParseSeparatedParameterSyntax());
+            var parseNext = true;
+            while (parseNext = Current != TokenKind.CloseParenthesis && Current != TokenKind.EoF)
+            {
+                var parameter = ParseParameterSyntax();
+
+                parseNext = Current == TokenKind.Comma;
+
+                var comma = Current == TokenKind.Comma ? MatchToken(TokenKind.Comma) : null;
+
+                if (parseNext && Current == TokenKind.CloseParenthesis)
+                    diagnostics.Syntax.UnexpectedToken(comma, "Unexpected comma");
+
+                var separatedParameter = new SeparatedSyntaxNode<ParameterSyntax>(parameter, comma);
+                parameters.Add(separatedParameter);
+            }
 
             return new SeparatedSyntaxList<ParameterSyntax>(parameters.ToImmutable());
-        }
-
-        private SeparatedSyntaxNode<ParameterSyntax> ParseSeparatedParameterSyntax()
-        {
-            var parameter = ParseParameterSyntax();
-            var comma = Current == TokenKind.Comma ? MatchToken(TokenKind.Comma) : null;
-
-            if (comma is not null && (Current == TokenKind.CloseParenthesis || Current == TokenKind.EoF))
-                diagnostics.Syntax.UnexpectedToken(comma, "Unexpected comma");
-
-            return new SeparatedSyntaxNode<ParameterSyntax>(parameter, comma);
         }
 
         private ParameterSyntax ParseParameterSyntax()
@@ -370,23 +372,23 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             var expressions = ImmutableArray.CreateBuilder<SeparatedSyntaxNode<Expression>>();
 
-            while (Current != TokenKind.CloseParenthesis && Current != TokenKind.EoF)
+            var parseNext = true;
+            while (parseNext && Current != TokenKind.CloseParenthesis && Current != TokenKind.EoF)
             {
-                expressions.Add(ParseSeparatedExpression());
+                var expression = ParseExpression();
+
+                parseNext = Current == TokenKind.Comma;
+
+                var comma = Current == TokenKind.Comma ? MatchToken(TokenKind.Comma) : null;
+
+                if (parseNext && Current == TokenKind.CloseParenthesis)
+                    diagnostics.Syntax.UnexpectedToken(comma, "Unexpected comma");
+
+                var separatedExpression = new SeparatedSyntaxNode<Expression>(expression, comma);
+                expressions.Add(separatedExpression);
             }
 
             return new SeparatedSyntaxList<Expression>(expressions.ToImmutable());
-        }
-
-        private SeparatedSyntaxNode<Expression> ParseSeparatedExpression()
-        {
-            var expression = ParseExpression();
-            var comma = Current == TokenKind.Comma ? MatchToken(TokenKind.Comma) : null;
-
-            if (comma is not null && (Current == TokenKind.CloseParenthesis || Current == TokenKind.EoF))
-                diagnostics.Syntax.UnexpectedToken(comma, "Unexpected comma");
-
-            return new SeparatedSyntaxNode<Expression>(expression, comma);
         }
 
         private Expression ParseNumberLiteral()
