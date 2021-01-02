@@ -77,6 +77,11 @@ namespace Minsk.CodeAnalysis
                         index++;
                         break;
 
+                    case BoundNodeKind.ReturnStatement:
+                        var rs = s as BoundReturnStatement;
+                        var value = rs.Expression is not null ? EvaluateExpression(rs.Expression) : null;
+                        return value;
+
                     case BoundNodeKind.VariableDeclarationStatement:
                         EvaluateVariableDeclarationStatement(s as BoundVariableDeclarationStatement);
                         index++;

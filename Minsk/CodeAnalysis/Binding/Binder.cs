@@ -116,9 +116,6 @@ namespace Minsk.CodeAnalysis.Binding
 
             var returnType = BindTypeClause(node.TypeClause) ?? TypeSymbol.Void;
 
-            if (returnType.IsNotVoidType)
-                throw new Exception();
-
             var function = new FunctionSymbol(name, parameters.ToImmutable(), returnType, node);
             if (!scope.TryDeclareFunction(function))
                 Report.SymbolAlreadyDeclared(node);
@@ -180,6 +177,9 @@ namespace Minsk.CodeAnalysis.Binding
 
                 SyntaxKind.ForToStatement
                     => BindForToStatement(node as ForToStatement),
+
+                SyntaxKind.ReturnStatement
+                    => BindReturnStatement(node as ReturnStatement),
 
                 SyntaxKind.VariableDeclaration
                     => BindVariableDeclaration(node as VariableDeclarationStatement),
@@ -263,6 +263,33 @@ namespace Minsk.CodeAnalysis.Binding
 
             return new BoundForToStatement(
                 variable, lowerBound, upperBound, body, breakLabel, continueLabel);
+        }
+
+        private BoundStatement BindReturnStatement(ReturnStatement node)
+        {
+            var expression = node.Expression is not null ? BindExpression(node.Expression) : null;
+
+            if (function is null)
+            {
+                Report.UnexpectedReturnStatement(node);
+            }
+            else
+            {
+                if (function.ReturnType.IsVoidType)
+                {
+                    if (expression is not null)
+                        Report.InvalidReturnType(node, function.ReturnType, expression.Type);
+                }
+                else
+                {
+                    if (expression is null)
+                        Report.MissingReturnExpression(node);
+                    else
+                        expression = BindConversion(node.Expression, function.ReturnType);
+                }
+            }
+
+            return new BoundReturnStatement(expression);
         }
 
         private BoundStatement BindVariableDeclaration(VariableDeclarationStatement node)

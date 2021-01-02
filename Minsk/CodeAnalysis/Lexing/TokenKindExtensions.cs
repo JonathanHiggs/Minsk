@@ -50,6 +50,7 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.ForKeyword:
                 case TokenKind.FunctionKeyword:
                 case TokenKind.LetKeyword:
+                case TokenKind.ReturnKeyword:
                 case TokenKind.ToKeyword:
                 case TokenKind.TrueKeyword:
                 case TokenKind.VarKeyword:

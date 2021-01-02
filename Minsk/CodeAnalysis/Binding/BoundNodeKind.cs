@@ -21,6 +21,7 @@ namespace Minsk.CodeAnalysis.Binding
         ForToStatement,
         GotoStatement,
         LabelStatement,
+        ReturnStatement,
         VariableDeclarationStatement,
         WhileStatement,
 

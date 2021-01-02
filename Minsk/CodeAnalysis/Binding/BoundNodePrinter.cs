@@ -79,6 +79,10 @@ namespace Minsk.CodeAnalysis.Binding
                     WriteLiteralExpression(node as BoundLiteralExpression, writer);
                     break;
 
+                case BoundNodeKind.ReturnStatement:
+                    WriteReturnStatement(node as BoundReturnStatement, writer);
+                    break;
+
                 case BoundNodeKind.Program:
                     WriteProgram(node as BoundProgram, writer);
                     break;
@@ -318,6 +322,16 @@ namespace Minsk.CodeAnalysis.Binding
             else
             {
                 throw new Exception($"Unexpected type {node.Type}");
+            }
+        }
+
+        private static void WriteReturnStatement(BoundReturnStatement node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword(TokenKind.ReturnKeyword);
+            if (node.Expression is not null)
+            {
+                writer.WriteSpace();
+                node.Expression.WriteTo(writer);
             }
         }
 

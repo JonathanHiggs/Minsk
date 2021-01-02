@@ -148,6 +148,9 @@ namespace Minsk.CodeAnalysis.Parsing
                 TokenKind.ForKeyword
                     => ParseForToStatement(),
 
+                TokenKind.ReturnKeyword
+                    => ParseReturnStatement(),
+
                 TokenKind.VarKeyword or TokenKind.LetKeyword
                     => ParseVariableDeclarationStatement(),
 
@@ -231,6 +234,22 @@ namespace Minsk.CodeAnalysis.Parsing
             var expression = ParseExpression();
             // Note: Can prevent particular expressions from being valid statements
             return new ExpressionStatement(expression);
+        }
+
+        private Statement ParseReturnStatement()
+        {
+            var returnKeyword = MatchToken(TokenKind.ReturnKeyword);
+
+            // Cheat
+            var keywordLine = source.LineIndexOf(returnKeyword.Span.Start);
+            var currentLine = source.LineIndexOf(PeekToken(0).Span.Start);
+            var isEoF = Current == TokenKind.EoF;
+            var isCloseBrace = Current == TokenKind.CloseBrace;
+            var sameLine = keywordLine == currentLine;
+
+            var expression = sameLine && !isEoF && !isCloseBrace ? ParseExpression() : null;
+
+            return new ReturnStatement(returnKeyword, expression);
         }
 
         private Statement ParseVariableDeclarationStatement()

@@ -23,6 +23,7 @@ namespace Minsk.CodeAnalysis.Parsing
         ContinueStatement,
         ExpressionStatement,
         ForToStatement,
+        ReturnStatement,
         VariableDeclaration,
         WhileStatement,
 

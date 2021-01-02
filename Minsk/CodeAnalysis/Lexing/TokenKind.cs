@@ -50,6 +50,7 @@ namespace Minsk.CodeAnalysis.Lexing
         [Description("function")]   FunctionKeyword,
         [Description("if")]         IfKeyword,
         [Description("let")]        LetKeyword,
+        [Description("return")]     ReturnKeyword,
         [Description("to")]         ToKeyword,
         [Description("true")]       TrueKeyword,
         [Description("var")]        VarKeyword,

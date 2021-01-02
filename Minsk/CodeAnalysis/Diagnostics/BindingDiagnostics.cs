@@ -102,5 +102,14 @@ namespace Minsk.CodeAnalysis.Diagnostics
 
         public void InvalidContinue(ContinueStatement node)
             => Error(node, node.Span, $"Invalid continue statement; not in a loop");
+
+        public void InvalidReturnType(ReturnStatement node, TypeSymbol expected, TypeSymbol actual)
+            => Error(node, node.Expression.Span, $"Invalid return type; expected '{expected}' but was '{actual}'");
+
+        public void UnexpectedReturnStatement(ReturnStatement node)
+            => Error(node, node.ReturnKeyword.Span, $"Unexpected return statement");
+
+        internal void MissingReturnExpression(ReturnStatement node)
+            => Error(node, node.Span, $"Missing return expression");
     }
 }

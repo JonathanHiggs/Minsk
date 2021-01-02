@@ -5,52 +5,6 @@ namespace Minsk.CodeAnalysis.Binding
 {
     internal class BoundTreeRewriter
     {
-        public virtual BoundNode RewriteNode(BoundNode node)
-        {
-            //return node.Kind switch
-            //{
-            //    BoundNodeKind.AssignmentExpression
-            //        => RewriteExpression
-            //    BoundNodeKind.BinaryExpression
-            //    BoundNodeKind.LiteralExpression
-            //    BoundNodeKind.UnaryExpression
-            //    BoundNodeKind.VariableExpression
-            //
-            //    BoundNodeKind.BlockStatement
-            //    BoundNodeKind.ConditionalStatement
-            //    BoundNodeKind.ExpressionStatement
-            //    BoundNodeKind.ForToStatement
-            //    BoundNodeKind.VariableDeclarationStatement
-            //    BoundNodeKind.WhileStatement
-            //}
-
-            switch (node.Kind)
-            {
-                case BoundNodeKind.AssignmentExpression:
-                case BoundNodeKind.BinaryExpression:
-                case BoundNodeKind.CallExpression:
-                case BoundNodeKind.ConversionExpression:
-                case BoundNodeKind.LiteralExpression:
-                case BoundNodeKind.UnaryExpression:
-                case BoundNodeKind.VariableExpression:
-                    return RewriteExpression(node as BoundExpression);
-
-                case BoundNodeKind.BlockStatement:
-                case BoundNodeKind.ConditionalStatement:
-                case BoundNodeKind.ConditionalGotoStatement:
-                case BoundNodeKind.ExpressionStatement:
-                case BoundNodeKind.ForToStatement:
-                case BoundNodeKind.GotoStatement:
-                case BoundNodeKind.LabelStatement:
-                case BoundNodeKind.VariableDeclarationStatement:
-                case BoundNodeKind.WhileStatement:
-                    return RewriteStatement(node as BoundStatement);
-
-                default:
-                    throw new NotImplementedException(node.Kind.ToString());
-            }
-        }
-
         protected virtual BoundExpression RewriteExpression(BoundExpression node)
         {
             return node.Kind switch {
@@ -185,6 +139,9 @@ namespace Minsk.CodeAnalysis.Binding
                 BoundNodeKind.LabelStatement
                     => RewriteLabelStatement(node as BoundLabelStatement),
 
+                BoundNodeKind.ReturnStatement
+                    => RewriteReturnStatement(node as BoundReturnStatement),
+
                 BoundNodeKind.VariableDeclarationStatement
                     => RewriteVariableDeclarationStatement(node as BoundVariableDeclarationStatement),
 
@@ -279,6 +236,16 @@ namespace Minsk.CodeAnalysis.Binding
 
         protected virtual BoundStatement RewriteLabelStatement(BoundLabelStatement node)
             => node;
+
+        protected virtual BoundStatement RewriteReturnStatement(BoundReturnStatement node)
+        {
+            var expression = node.Expression is not null ? RewriteExpression(node.Expression) : null;
+
+            if (expression == node.Expression)
+                return node;
+
+            return new BoundReturnStatement(expression);
+        }
 
         protected virtual BoundStatement RewriteVariableDeclarationStatement(
             BoundVariableDeclarationStatement node)
