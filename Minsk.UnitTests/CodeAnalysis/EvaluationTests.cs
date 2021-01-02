@@ -82,6 +82,7 @@ namespace Minsk.UnitTests.CodeAnalysis
                 ("{ var sum = 0 for i = 1 to (5 - 1) sum = sum + i sum }", 10),
                 ("{ var a = 10 for i = 0 to (a = a - 1) { } a }", 9),
                 ("{ var result = 0 for i = 0 to (result + 2) result = i result }", 2),
+                ("{ var i = 0 while i < 5 { i = i + 1 if i == 5 continue } i }", 5),
                 //("", ),
             };
 
@@ -125,8 +126,7 @@ namespace Minsk.UnitTests.CodeAnalysis
         private static IEnumerable<AnnotatedText> BadCode
             => (new List<string> {
                 // Unexpected character
-                "[]",
-                "[@][][]",
+                "[@][]",
                 "{ [@][] }",
                 "{[)][]",
                 // Undefined operator

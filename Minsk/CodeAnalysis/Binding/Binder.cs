@@ -303,7 +303,7 @@ namespace Minsk.CodeAnalysis.Binding
             BindLoopBody(Statement node)
         {
             var breakLabel = new BoundLabel($"break-{labelCounter++}");
-            var continueLabel = new BoundLabel($"continue={labelCounter++}");
+            var continueLabel = new BoundLabel($"continue-{labelCounter++}");
 
             loopStack.Push((breakLabel, continueLabel));
             var boundBody = BindStatement(node);
@@ -373,7 +373,9 @@ namespace Minsk.CodeAnalysis.Binding
             else if (variable.IsReadOnly)
                 Report.CannotAssignToReadOnlyVariable(node);
 
-            var convertedExpression = BindConversion(node.Span, node, expression, variable.Type);
+            var type = variable?.Type ?? TypeSymbol.Error;
+
+            var convertedExpression = BindConversion(node.Span, node, expression, type);
 
             return new BoundAssignmentExpression(variable, convertedExpression);
         }

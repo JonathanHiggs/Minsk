@@ -159,30 +159,26 @@ namespace Minsk.CodeAnalysis.Lowering
             // while <condition> <body>
             // --- to --->
             // {
-            // goto check
             // continue:
+            // gotoFalse <condition> break
             // <body>
-            // check:
-            // gotoTrue <condition> continue
+            // goto continue
             // break:
             // }
 
             var continueLabel = node.ContinueLabel;
-            var checkLabel = GenerateLabel("check");
             var breakLabel = node.BreakLabel;
 
-            var gotoCheck = new BoundGotoStatement(checkLabel);
             var continueStatement = new BoundLabelStatement(continueLabel);
-            var checkStatement = new BoundLabelStatement(checkLabel);
-            var gotoTrueStatement = new BoundConditionalGotoStatement(continueLabel, node.Condition, true);
+            var gotoFalseStatement = new BoundConditionalGotoStatement(breakLabel, node.Condition, jumpIfTrue: false);
+            var gotoContinue = new BoundGotoStatement(continueLabel);
             var breakStatement = new BoundLabelStatement(breakLabel);
 
             var result = new BoundBlockStatement(
-                gotoCheck,
                 continueStatement,
+                gotoFalseStatement,
                 node.Body,
-                checkStatement,
-                gotoTrueStatement,
+                gotoContinue,
                 breakStatement);
 
             return RewriteStatement(result);
@@ -190,7 +186,7 @@ namespace Minsk.CodeAnalysis.Lowering
 
         private BoundLabel GenerateLabel(string name)
         {
-            var id = $"Label-{name}-{labelCount++}";
+            var id = $"{name}-{labelCount++}";
             return new BoundLabel(id);
         }
     }
