@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -62,6 +63,9 @@ namespace Minsk.CodeAnalysis
                 return new EvaluationResult(null, diagnostics.ToImmutableArray());
 
             var program = Binder.BindProgram(GlobalScope, diagnostics);
+
+            EmitControlFlowGraph(program);
+
             if (program.Diagnostics.Any())
                 return new EvaluationResult(null, diagnostics.ToImmutableArray());
 
@@ -69,6 +73,24 @@ namespace Minsk.CodeAnalysis
             var value = evaluator.Evaluate();
 
             return new EvaluationResult(value, ImmutableArray<Diagnostic>.Empty);
+        }
+
+        internal void EmitControlFlowGraph(BoundProgram program)
+        {
+            var cfgStatement = program.Statement.Statements.Any()
+                ? program.Statement
+                : program.Functions.Any()
+                    ? program.Functions.Last().Value
+                    : null;
+
+            var cfg = ControlFlowGraph.Create(cfgStatement);
+
+            var appPath = Environment.GetCommandLineArgs()[0];
+            var appDirectory = Path.GetDirectoryName(appPath);
+            var cfgPath = Path.Combine(appDirectory, "cfg.dot");
+            using var streamWriter = new StreamWriter(cfgPath);
+
+            cfg.WriteTo(streamWriter);
         }
 
         public void EmitTree(FunctionSymbol function, TextWriter writer)

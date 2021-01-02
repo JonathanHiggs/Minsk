@@ -81,6 +81,10 @@ namespace Minsk.CodeAnalysis.Binding
                     var binder = new Binder(diagnostics, parentScope, function);
                     var body = binder.BindStatement(function.Declaration.Body);
                     var loweredBody = Lowerer.Lower(body);
+
+                    if (function.ReturnType.IsNotVoidType && !ControlFlowGraph.AllPathsReturn(loweredBody))
+                        binder.Report.AllPathsMustReturn(function);
+
                     functionBodies.Add(function, loweredBody);
                 }
 

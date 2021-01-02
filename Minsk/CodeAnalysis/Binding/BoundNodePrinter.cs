@@ -333,6 +333,7 @@ namespace Minsk.CodeAnalysis.Binding
                 writer.WriteSpace();
                 node.Expression.WriteTo(writer);
             }
+            writer.WriteLine();
         }
 
         private static void WriteProgram(BoundProgram node, IndentedTextWriter writer)

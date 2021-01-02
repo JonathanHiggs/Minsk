@@ -127,8 +127,6 @@ namespace Minsk.CodeAnalysis.Lowering
                 BoundBinaryOperator.Bind(Lexing.TokenKind.LessOrEquals, TypeSymbol.Int, TypeSymbol.Int),
                 upperBoundExpression);
 
-            var continueStatement = new BoundLabelStatement(node.ContinueLabel);
-
             var increment = new BoundExpressionStatement(
                 new BoundAssignmentExpression(
                     node.Variable,
@@ -140,11 +138,10 @@ namespace Minsk.CodeAnalysis.Lowering
             var whileBlock =
                 new BoundBlockStatement(
                     node.Body,
-                    continueStatement,
                     increment);
 
             var whileStatement
-                = new BoundWhileStatement(condition, whileBlock, node.BreakLabel, GenerateLabel("ignored"));
+                = new BoundWhileStatement(condition, whileBlock, node.BreakLabel, node.ContinueLabel);
 
             var result = new BoundBlockStatement(
                 variableDeclaration,

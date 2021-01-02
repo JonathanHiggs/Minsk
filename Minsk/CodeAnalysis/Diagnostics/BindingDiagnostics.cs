@@ -76,6 +76,9 @@ namespace Minsk.CodeAnalysis.Diagnostics
                 node.IdentifierToken.Span,
                 $"Undeclared identifier {node.IdentifierToken.Text}");
 
+        public void AllPathsMustReturn(FunctionSymbol function)
+            => Error(function.Declaration, function.Declaration.Identifier.Span, $"All code paths must return a value");
+
         public void VariableRedeclaration(SyntaxNode node, LexToken identifierToken)
             => Error(
                 node,
