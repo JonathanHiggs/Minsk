@@ -52,13 +52,13 @@ namespace Minsk.CodeAnalysis.Parsing
 
             while (Current != TokenKind.EoF)
             {
-                var startToken = Current;
+                var startToken = CurrentToken;
 
                 var member = ParseMember();
                 members.Add(member);
 
                 // Guard against infinite loops
-                if (Current == startToken)
+                if (CurrentToken == startToken)
                     NextToken();
             }
 
@@ -456,6 +456,8 @@ namespace Minsk.CodeAnalysis.Parsing
         }
 
         private TokenKind Current => PeekToken(0).Kind;
+
+        private LexToken CurrentToken => PeekToken(0);
 
         private TokenKind Next => PeekToken(1).Kind;
 
