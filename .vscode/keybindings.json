@@ -1,0 +1,7 @@
+[
+    {
+        "key": "ctrl+alt+m",
+        "command": "workbench.actions.tasks.runTask",
+        "args": "mkc"
+    }
+]

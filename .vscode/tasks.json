@@ -37,6 +37,19 @@
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "mkc",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/Minsk.Compiler/Minsk.Compiler.csproj",
+                "--",
+                "${file}"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }
