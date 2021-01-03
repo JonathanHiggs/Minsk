@@ -1,4 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Minsk.UnitTests")]
-[assembly: InternalsVisibleTo("Minsk.Compiler")]
+[assembly: InternalsVisibleTo("Minsk.Interactive")]
