@@ -33,6 +33,9 @@ namespace Minsk.CodeAnalysis
         public static Compilation CreateScript(Compilation previous, SyntaxTree syntaxTree)
             => new Compilation(previous, syntaxTree);
 
+        public static Compilation Compile(SyntaxTree syntaxTree)
+            => new Compilation(null, syntaxTree);
+
         public Compilation Previous { get; }
 
         public SyntaxTree SyntaxTree { get; }
@@ -55,6 +58,9 @@ namespace Minsk.CodeAnalysis
 
         public Compilation ContinueWith(SyntaxTree syntaxTree)
             => new Compilation(this, syntaxTree);
+
+        public EvaluationResult Evaluate()
+            => Evaluate(new Dictionary<VariableSymbol, object>());
 
         public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {

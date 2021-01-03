@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minsk", "Minsk\Minsk.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minsk.UnitTests", "Minsk.UnitTests\Minsk.UnitTests.csproj", "{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minsk.Compiler", "Minsk.Compiler\Minsk.Compiler.csproj", "{9365AF42-5D44-40BD-A69A-F55B30C7642F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}.Release|x64.Build.0 = Release|Any CPU
 		{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}.Release|x86.ActiveCfg = Release|Any CPU
 		{FF255B63-5DE2-4402-8BD2-6FC4CCAE4F51}.Release|x86.Build.0 = Release|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Debug|x64.Build.0 = Debug|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Debug|x86.Build.0 = Debug|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Release|x64.ActiveCfg = Release|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Release|x64.Build.0 = Release|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Release|x86.ActiveCfg = Release|Any CPU
+		{9365AF42-5D44-40BD-A69A-F55B30C7642F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
