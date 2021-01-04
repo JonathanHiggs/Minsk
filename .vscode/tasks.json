@@ -14,34 +14,12 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "${workspaceFolder}/Minsk.Compiler/Minsk.Compiler.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "watch",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "${workspaceFolder}/Minsk.Compiler/Minsk.Compiler.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
             "label": "mkc",
             "command": "dotnet",
             "type": "process",
+            "options": {
+                "cwd": "${workspaceFolder}/samples"
+            },
             "args": [
                 "run",
                 "--project",
@@ -49,7 +27,40 @@
                 "--",
                 "${file}"
             ],
-            "problemMatcher": "$msCompile"
+            "presentation": {
+                "focus": true,
+                "clear": true
+            },
+            "problemMatcher": {
+                "owner": "minsk",
+                "fileLocation": "absolute",
+                "pattern": [
+                    {
+                        "regexp": "^(.+)\\((\\d+,\\d+,\\d+,\\d+)\\):\\s+(.+)$",
+                        "file": 1,
+                        "location": 2,
+                        "message": 3
+                    }
+                ]
+            }
+        },
+        {
+            "label": "mki",
+            "command": "dotnet",
+            "type": "process",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/samples"
+            },
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/Minsk.Interactive"
+            ],
+            "presentation": {
+                "focus": true,
+                "clear": true
+            }
         }
     ]
 }
