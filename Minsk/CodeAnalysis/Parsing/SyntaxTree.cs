@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Text;
@@ -7,27 +8,32 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class SyntaxTree
     {
-        private SyntaxTree(SourceText source, CompilationUnit root, DiagnosticBag diagnostics)
+        public SyntaxTree(SourceText source, DiagnosticBag diagnostics)
         {
             Source = source
                 ?? throw new ArgumentNullException(nameof(source));
 
-            Root = root
-                ?? throw new ArgumentNullException(nameof(root));
-
             Diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
+
+            var parser = new Parser(this, source, diagnostics);
+            Root = parser.ParseCompilationUnit();
         }
 
-        public static SyntaxTree Parse(string text)
-            => Parse(SourceText.From(text));
-
-        public static SyntaxTree Parse(SourceText source)
+        public static SyntaxTree Load(string filename)
         {
-            var diagnostics = new DiagnosticBag();
-            var parser = new Parser(source, diagnostics);
-            var root = parser.ParseCompilationUnit();
-            return new SyntaxTree(source, root, diagnostics);
+            var text = File.ReadAllText(filename);
+            var sourceText = SourceText.From(text, filename);
+            return Parse(sourceText);
+        }
+
+        public static SyntaxTree Parse(string text, DiagnosticBag diagnostics = null)
+            => Parse(SourceText.From(text), diagnostics);
+
+        public static SyntaxTree Parse(SourceText source, DiagnosticBag diagnostics = null)
+        {
+            diagnostics ??= new DiagnosticBag();
+            return new SyntaxTree(source, diagnostics);
         }
 
         public SourceText Source { get; }

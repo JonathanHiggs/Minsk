@@ -2,6 +2,7 @@ using System;
 
 using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Diagnostics
 {
@@ -14,6 +15,6 @@ namespace Minsk.CodeAnalysis.Diagnostics
             => this.bag = bag ?? throw new ArgumentNullException(nameof(bag));
 
         public void UnexpectedToken(LexToken token, string message)
-            => bag.Report(new SyntaxError(token, message));
+            => bag.Report(new SyntaxError(token, token.Location, message));
     }
 }

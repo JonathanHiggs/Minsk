@@ -8,14 +8,26 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class CompilationUnit : SyntaxNode
     {
-        public CompilationUnit(IEnumerable<MemberSyntax> members, LexToken endOfFileToken)
-            : this(members.ToImmutableArray(), endOfFileToken)
+        public CompilationUnit(
+            SyntaxTree syntaxTree,
+            IEnumerable<MemberSyntax> members,
+            LexToken endOfFileToken
+        )
+            : this(syntaxTree, members.ToImmutableArray(), endOfFileToken)
         { }
 
-        public CompilationUnit(ImmutableArray<MemberSyntax> members, LexToken endOfFileToken)
+        public CompilationUnit(
+            SyntaxTree syntaxTree,
+            ImmutableArray<MemberSyntax> members,
+            LexToken endOfFileToken
+        )
+            : base(syntaxTree)
         {
             Members = members;
             EndOfFileToken = endOfFileToken;
+
+            foreach (var member in members)
+                member.Parent = this;
         }
 
         public ImmutableArray<MemberSyntax> Members { get; }

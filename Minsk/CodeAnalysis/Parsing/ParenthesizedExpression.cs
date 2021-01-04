@@ -7,9 +7,12 @@ namespace Minsk.CodeAnalysis.Parsing
     public sealed class ParenthesizedExpression : Expression
     {
         public ParenthesizedExpression(
+            SyntaxTree syntaxTree,
             LexToken openParentheses,
             Expression expression,
-            LexToken closeParenteses)
+            LexToken closeParenteses
+        )
+            : base(syntaxTree)
         {
             OpenParentheses = openParentheses
                 ?? throw new ArgumentNullException(nameof(openParentheses));

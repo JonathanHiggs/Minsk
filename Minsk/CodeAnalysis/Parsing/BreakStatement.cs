@@ -7,7 +7,8 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class BreakStatement : Statement
     {
-        public BreakStatement(LexToken keyword)
+        public BreakStatement(SyntaxTree syntaxTree, LexToken keyword)
+            : base(syntaxTree)
         {
             Keyword = keyword;
         }

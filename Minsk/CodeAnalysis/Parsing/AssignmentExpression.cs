@@ -4,17 +4,21 @@ using Minsk.CodeAnalysis.Lexing;
 
 namespace Minsk.CodeAnalysis.Parsing
 {
-    // ToDo: maybe change to statement in the future
     public sealed class AssignmentExpression : Expression
     {
         public AssignmentExpression(
+            SyntaxTree syntaxTree,
             LexToken identifierToken,
             LexToken equalsToken,
-            Expression expression)
+            Expression expression
+        )
+            : base(syntaxTree)
         {
             IdentifierToken = identifierToken;
             EqualsToken = equalsToken;
             Expression = expression;
+
+            Expression.Parent = this;
         }
 
         public override SyntaxKind Kind

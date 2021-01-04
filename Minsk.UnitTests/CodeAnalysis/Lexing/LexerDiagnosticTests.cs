@@ -28,8 +28,8 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
 
             var lexError = messages[0] as LexError;
             Assert.That(lexError.ErrorKind, Is.EqualTo(LexErrorKind.UnexpectedNullTerminator));
-            Assert.That(lexError.Span.Start, Is.EqualTo(0));
-            Assert.That(lexError.Span.End, Is.EqualTo(1));
+            Assert.That(lexError.Location.Span.Start, Is.EqualTo(0));
+            Assert.That(lexError.Location.Span.End, Is.EqualTo(1));
         }
 
         [Test]
@@ -49,8 +49,8 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
 
             var lexError = messages[0] as LexError;
             Assert.That(lexError.ErrorKind, Is.EqualTo(LexErrorKind.UnterminatedString));
-            Assert.That(lexError.Span.Start, Is.EqualTo(0));
-            Assert.That(lexError.Span.End, Is.EqualTo(1));
+            Assert.That(lexError.Location.Span.Start, Is.EqualTo(0));
+            Assert.That(lexError.Location.Span.End, Is.EqualTo(1));
         }
 
         // ToDo: Add tests that check emission of other diagnostics

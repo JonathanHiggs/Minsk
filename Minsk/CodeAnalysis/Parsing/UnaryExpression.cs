@@ -7,7 +7,8 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class UnaryExpression : Expression
     {
-        public UnaryExpression(LexToken operatorToken, Expression operand)
+        public UnaryExpression(SyntaxTree syntaxTree, LexToken operatorToken, Expression operand)
+            : base(syntaxTree)
         {
             OperatorToken = operatorToken
                 ?? throw new ArgumentNullException(nameof(operatorToken));

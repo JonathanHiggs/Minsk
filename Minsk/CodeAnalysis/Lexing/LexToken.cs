@@ -6,20 +6,20 @@ namespace Minsk.CodeAnalysis.Lexing
     {
         public LexToken(
             TokenKind tokenKind,
-            TextSpan span,
+            TextLocation location,
             string text,
             object value = null,
             bool isMissing = false)
         {
             Kind = tokenKind;
-            Span = span;
+            Location = location;
             Text = text;
             Value = value;
             IsMissing = isMissing;
         }
 
         public TokenKind Kind { get; }
-        public TextSpan Span { get; }
+        public TextLocation Location { get; }
         public string Text { get; }
         public object Value { get; }
         public bool IsMissing { get; }

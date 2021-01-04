@@ -6,11 +6,20 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class WhileStatement : Statement
     {
-        public WhileStatement(LexToken whileKeyword, Expression condition, Statement body)
+        public WhileStatement(
+            SyntaxTree syntaxTree,
+            LexToken whileKeyword,
+            Expression condition,
+            Statement body
+        )
+            : base(syntaxTree)
         {
             WhileKeyword = whileKeyword;
             Condition = condition;
             Body = body;
+
+            Condition.Parent = this;
+            Body.Parent = this;
         }
 
         public LexToken WhileKeyword { get; }

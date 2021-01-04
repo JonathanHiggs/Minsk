@@ -7,17 +7,25 @@ namespace Minsk.CodeAnalysis.Parsing
     public sealed class VariableDeclarationStatement : Statement
     {
         public VariableDeclarationStatement(
+            SyntaxTree syntaxTree,
             LexToken keywordToken,
             LexToken identifierToken,
             TypeClauseSyntax optionalTypeClause,
             LexToken equalsToken,
-            Expression initializer)
+            Expression initializer
+        )
+            : base(syntaxTree)
         {
             KeywordToken = keywordToken;
             Identifier = identifierToken;
             OptionalTypeClause = optionalTypeClause;
             EqualsToken = equalsToken;
             Initializer = initializer;
+
+            if (OptionalTypeClause is not null)
+                OptionalTypeClause.Parent = this;
+
+            Initializer.Parent = this;
         }
 
         public LexToken KeywordToken { get; }

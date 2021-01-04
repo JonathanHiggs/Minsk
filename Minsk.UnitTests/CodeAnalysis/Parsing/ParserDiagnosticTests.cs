@@ -20,7 +20,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
             var diagnostics = new DiagnosticBag();
 
             // Act
-            var _ = Parser.Parse(source, diagnostics);
+            var _ = SyntaxTree.Parse(source, diagnostics);
             var messages = diagnostics.ToList();
 
             // Assert
@@ -29,8 +29,8 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
 
             var unexpectedComma = messages[0] as SyntaxError;
             //Assert.That(syntaxError.ErrorKind, Is.EqualTo(SyntaxErrorKind.UnexpectedComma));
-            Assert.That(unexpectedComma.Span.Start, Is.EqualTo(5));
-            Assert.That(unexpectedComma.Span.Length, Is.EqualTo(1));
+            Assert.That(unexpectedComma.Location.Span.Start, Is.EqualTo(5));
+            Assert.That(unexpectedComma.Location.Span.Length, Is.EqualTo(1));
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
             var diagnostics = new DiagnosticBag();
 
             // Act
-            var _ = Parser.Parse(source, diagnostics);
+            var _ = SyntaxTree.Parse(source, diagnostics);
             var messages = diagnostics.ToList();
 
             // Assert
@@ -51,8 +51,8 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
 
             var missingParentheses = messages[0] as SyntaxError;
             //Assert.That(syntaxError.ErrorKind, Is.EqualTo(SyntaxErrorKind.MissingCloseParentheses));
-            Assert.That(missingParentheses.Span.Start, Is.EqualTo(5));
-            Assert.That(missingParentheses.Span.Length, Is.EqualTo(0));
+            Assert.That(missingParentheses.Location.Span.Start, Is.EqualTo(5));
+            Assert.That(missingParentheses.Location.Span.Length, Is.EqualTo(0));
         }
     }
 }

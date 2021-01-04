@@ -7,13 +7,16 @@ namespace Minsk.CodeAnalysis.Parsing
     public sealed class FunctionDeclaration : MemberSyntax
     {
         public FunctionDeclaration(
+            SyntaxTree syntaxTree,
             LexToken functionKeyword,
             LexToken identifier,
             LexToken openParentheses,
             SeparatedSyntaxList<ParameterSyntax> parameters,
             LexToken closeParentheses,
             TypeClauseSyntax typeClause,
-            Statement body)
+            Statement body
+        )
+            : base(syntaxTree)
         {
             FunctionKeyword = functionKeyword;
             Identifier = identifier;
@@ -22,6 +25,12 @@ namespace Minsk.CodeAnalysis.Parsing
             CloseParentheses = closeParentheses;
             TypeClause = typeClause;
             Body = body;
+
+            foreach (var parameter in Parameters)
+                parameter.Parent = this;
+
+            TypeClause.Parent = this;
+            Body.Parent = this;
         }
 
         public LexToken FunctionKeyword { get; }

@@ -10,14 +10,18 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class Parser
     {
+        private readonly SyntaxTree syntaxTree;
         private readonly SourceText source;
         private readonly DiagnosticBag diagnostics;
         private readonly ImmutableArray<LexToken> tokens;
 
         private int position = 0;
 
-        public Parser(SourceText source, DiagnosticBag diagnostics)
+        public Parser(SyntaxTree syntaxTree, SourceText source, DiagnosticBag diagnostics)
         {
+            this.syntaxTree = syntaxTree
+                ?? throw new ArgumentNullException(nameof(syntaxTree));
+
             this.source = source
                 ?? throw new ArgumentNullException(nameof(source));
 
@@ -29,21 +33,12 @@ namespace Minsk.CodeAnalysis.Parsing
                 .ToImmutableArray();
         }
 
-        public static CompilationUnit Parse(string text, DiagnosticBag diagnostics)
-            => Parse(SourceText.From(text), diagnostics);
-
-        public static CompilationUnit Parse(SourceText source, DiagnosticBag diagnostics)
-        {
-            var parser = new Parser(source, diagnostics);
-            return parser.ParseCompilationUnit();
-        }
-
         public CompilationUnit ParseCompilationUnit()
         {
             var members = ParseMembers();
             var eofToken = MatchToken(TokenKind.EoF);
 
-            return new CompilationUnit(members, eofToken);
+            return new CompilationUnit(syntaxTree, members, eofToken);
         }
 
         private ImmutableArray<MemberSyntax> ParseMembers()
@@ -84,6 +79,7 @@ namespace Minsk.CodeAnalysis.Parsing
             var body = ParseBlockStatement();
 
             return new FunctionDeclaration(
+                syntaxTree,
                 functionKeyword,
                 identifer,
                 openParentheses,
@@ -121,13 +117,13 @@ namespace Minsk.CodeAnalysis.Parsing
             var identifier = MatchToken(TokenKind.Identifier);
             var typeClause = ParseTypeClause();
 
-            return new ParameterSyntax(identifier, typeClause);
+            return new ParameterSyntax(syntaxTree, identifier, typeClause);
         }
 
         private GlobalStatementSyntax ParseGlobalStatement()
         {
             var statement = ParseStatement();
-            return new GlobalStatementSyntax(statement);
+            return new GlobalStatementSyntax(syntaxTree, statement);
         }
 
         private Statement ParseStatement()
@@ -165,14 +161,14 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             // ToDo: want to walk up the tree to check in a loop
             var keyword = MatchToken(TokenKind.BreakKeyword);
-            return new BreakStatement(keyword);
+            return new BreakStatement(syntaxTree, keyword);
         }
 
         private Statement ParseContinueStatement()
         {
             // ToDo: want to walk up the tree to check in a loop
             var keyword = MatchToken(TokenKind.ContinueKeyword);
-            return new ContinueStatement(keyword);
+            return new ContinueStatement(syntaxTree, keyword);
         }
 
         private Statement ParseBlockStatement()
@@ -193,7 +189,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
             var closeBrace = MatchToken(TokenKind.CloseBrace);
 
-            return new BlockStatement(openBrace, expression.ToImmutable(), closeBrace);
+            return new BlockStatement(syntaxTree, openBrace, expression.ToImmutable(), closeBrace);
         }
 
         private Statement ParseConditionalStatement()
@@ -202,7 +198,7 @@ namespace Minsk.CodeAnalysis.Parsing
             var condition = ParseExpression();
             var statement = ParseStatement();
             var elseClause = ParseOptionalElseClause();
-            return new ConditionalStatement(ifKeyword, condition, statement, elseClause);
+            return new ConditionalStatement(syntaxTree, ifKeyword, condition, statement, elseClause);
         }
 
         private Statement ParseForToStatement()
@@ -216,7 +212,7 @@ namespace Minsk.CodeAnalysis.Parsing
             var body = ParseStatement();
 
             return new ForToStatement(
-                forKeyword, identifier, equals, lowerBound, toKeyword, upperBound, body);
+                syntaxTree, forKeyword, identifier, equals, lowerBound, toKeyword, upperBound, body);
         }
 
         private ElseClauseSyntax ParseOptionalElseClause()
@@ -226,14 +222,14 @@ namespace Minsk.CodeAnalysis.Parsing
 
             var elseKeyword = MatchToken(TokenKind.ElseKeyword);
             var elseStatement = ParseStatement();
-            return new ElseClauseSyntax(elseKeyword, elseStatement);
+            return new ElseClauseSyntax(syntaxTree, elseKeyword, elseStatement);
         }
 
         private Statement ParseExpressionStatement()
         {
             var expression = ParseExpression();
             // Note: Can prevent particular expressions from being valid statements
-            return new ExpressionStatement(expression);
+            return new ExpressionStatement(syntaxTree, expression);
         }
 
         private Statement ParseReturnStatement()
@@ -241,15 +237,15 @@ namespace Minsk.CodeAnalysis.Parsing
             var returnKeyword = MatchToken(TokenKind.ReturnKeyword);
 
             // Cheat
-            var keywordLine = source.LineIndexOf(returnKeyword.Span.Start);
-            var currentLine = source.LineIndexOf(PeekToken(0).Span.Start);
+            var keywordLine = source.LineIndexOf(returnKeyword.Location.Span.Start);
+            var currentLine = source.LineIndexOf(PeekToken(0).Location.Span.Start);
             var isEoF = Current == TokenKind.EoF;
             var isCloseBrace = Current == TokenKind.CloseBrace;
             var sameLine = keywordLine == currentLine;
 
             var expression = sameLine && !isEoF && !isCloseBrace ? ParseExpression() : null;
 
-            return new ReturnStatement(returnKeyword, expression);
+            return new ReturnStatement(syntaxTree, returnKeyword, expression);
         }
 
         private Statement ParseVariableDeclarationStatement()
@@ -260,7 +256,7 @@ namespace Minsk.CodeAnalysis.Parsing
             var equals = MatchToken(TokenKind.Equals);
             var expression = ParseExpression();
 
-            return new VariableDeclarationStatement(keyword, identifier, optionalTypeClause, equals, expression);
+            return new VariableDeclarationStatement(syntaxTree, keyword, identifier, optionalTypeClause, equals, expression);
         }
 
         private TypeClauseSyntax ParseOptionalTypeClause()
@@ -275,7 +271,7 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             var colon = MatchToken(TokenKind.Colon);
             var identifier = MatchToken(TokenKind.Identifier);
-            return new TypeClauseSyntax(colon, identifier);
+            return new TypeClauseSyntax(syntaxTree, colon, identifier);
         }
 
         private Statement ParseWhileStatement()
@@ -283,7 +279,7 @@ namespace Minsk.CodeAnalysis.Parsing
             var keyword = MatchToken(TokenKind.WhileKeyword);
             var condition = ParseExpression();
             var body = ParseStatement();
-            return new WhileStatement(keyword, condition, body);
+            return new WhileStatement(syntaxTree, keyword, condition, body);
         }
 
         private Expression ParseExpression()
@@ -304,7 +300,7 @@ namespace Minsk.CodeAnalysis.Parsing
             var identifierToken = MatchToken(TokenKind.Identifier);
             var equalsToken = MatchToken(TokenKind.Equals);
             var expression = ParseExpression();
-            return new AssignmentExpression(identifierToken, equalsToken, expression);
+            return new AssignmentExpression(syntaxTree, identifierToken, equalsToken, expression);
         }
 
         private Expression ParsePrecedenceExpression(int parentPrecedence = 0)
@@ -328,7 +324,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 var operatorToken = MatchBinaryOperatorToken();
                 var right = ParsePrecedenceExpression(binaryPrecendence);
 
-                left = new BinaryExpression(left, operatorToken, right);
+                left = new BinaryExpression(syntaxTree, left, operatorToken, right);
             }
 
             return left;
@@ -338,7 +334,7 @@ namespace Minsk.CodeAnalysis.Parsing
         {
             var operatorToken = MatchUnaryOperatorToken();
             var operand = ParsePrecedenceExpression(parentPrecedence);
-            return new UnaryExpression(operatorToken, operand);
+            return new UnaryExpression(syntaxTree, operatorToken, operand);
         }
 
         private Expression ParsePrimaryExpression()
@@ -370,7 +366,7 @@ namespace Minsk.CodeAnalysis.Parsing
             var left = NextToken();
             var expression = ParseExpression();
             var right = MatchToken(TokenKind.CloseParenthesis);
-            return new ParenthesizedExpression(left, expression, right);
+            return new ParenthesizedExpression(syntaxTree, left, expression, right);
         }
 
         private Expression ParseBooleanLiteral()
@@ -380,7 +376,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 ? MatchToken(TokenKind.TrueKeyword)
                 : MatchToken(TokenKind.FalseKeyword);
 
-            return new LiteralExpression(token, isTrue);
+            return new LiteralExpression(syntaxTree, token, isTrue);
         }
 
         private Expression ParseNameOrCallExpression()
@@ -394,7 +390,7 @@ namespace Minsk.CodeAnalysis.Parsing
         private Expression ParseNameExpression()
         {
             var identifierToken = MatchToken(TokenKind.Identifier);
-            return new NameExpression(identifierToken);
+            return new NameExpression(syntaxTree, identifierToken);
         }
 
         private Expression ParseCallExpression()
@@ -404,7 +400,7 @@ namespace Minsk.CodeAnalysis.Parsing
             var arguments = ParseArguments();
             var closeParens = MatchToken(TokenKind.CloseParenthesis);
 
-            return new CallExpression(identifier, openParens, arguments, closeParens);
+            return new CallExpression(syntaxTree, identifier, openParens, arguments, closeParens);
         }
 
         private SeparatedSyntaxList<Expression> ParseArguments()
@@ -433,13 +429,13 @@ namespace Minsk.CodeAnalysis.Parsing
         private Expression ParseNumberLiteral()
         {
             var numberToken = MatchToken(TokenKind.Number);
-            return new LiteralExpression(numberToken);
+            return new LiteralExpression(syntaxTree, numberToken);
         }
 
         private Expression ParseStringLiteral()
         {
             var stringToken = MatchToken(TokenKind.String);
-            return new LiteralExpression(stringToken);
+            return new LiteralExpression(syntaxTree, stringToken);
         }
 
         private LexToken PeekToken(int offset)
@@ -470,7 +466,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 PeekToken(0),
                 $"Expected '{tokenKind}' but was '{PeekToken(0).Text}'");
 
-            return new LexToken(tokenKind, PeekToken(0).Span, null, null, isMissing: true);
+            return new LexToken(tokenKind, PeekToken(0).Location, null, null, isMissing: true);
         }
 
         private LexToken MatchTokenFrom(params TokenKind[] tokenKinds)
@@ -482,7 +478,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 PeekToken(0),
                 $"Expected one of {string.Join(',', tokenKinds.Select(k => $"'{k}'"))}, but was '{PeekToken(0).Text}'");
 
-            return new LexToken(tokenKinds[0], PeekToken(0).Span, null, null);
+            return new LexToken(tokenKinds[0], PeekToken(0).Location, null, null);
         }
 
         private LexToken MatchBinaryOperatorToken()
@@ -494,7 +490,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 PeekToken(0),
                 $"Expected binary operator but was '{PeekToken(0).Text}'");
 
-            return new LexToken(TokenKind.Plus, PeekToken(0).Span, null, null);
+            return new LexToken(TokenKind.Plus, PeekToken(0).Location, null, null);
         }
 
         private LexToken MatchUnaryOperatorToken()
@@ -506,7 +502,7 @@ namespace Minsk.CodeAnalysis.Parsing
                 PeekToken(0),
                 $"Expected unary operator but was '{PeekToken(0).Text}'");
 
-            return new LexToken(TokenKind.Plus, PeekToken(0).Span, null, null);
+            return new LexToken(TokenKind.Plus, PeekToken(0).Location, null, null);
         }
 
         private LexToken NextToken()

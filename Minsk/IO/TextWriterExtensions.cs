@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
@@ -95,97 +96,60 @@ namespace Minsk.IO
             writer.ResetColor();
         }
 
-        public static void WriteDiagnostics(
-            this TextWriter writer,
-            IEnumerable<Diagnostic> diagnostics,
-            SourceText source)
+        public static void WriteDiagnostics(this TextWriter writer, IEnumerable<Diagnostic> diagnostics)
         {
-            foreach (var diagnostic in diagnostics)
+            foreach (var diagnostic in diagnostics.Where(d => d.Location.Source == null))
             {
-                var lineIndex = source.LineIndexOf(diagnostic.Span.Start);
+                var messageColor = diagnostic.IsWarning ? ConsoleColor.DarkYellow : ConsoleColor.DarkRed;
+                writer.SetForeground(messageColor);
+                writer.WriteLine(diagnostic.Message);
+                writer.ResetColor();
+            }
+
+            foreach (var diagnostic in diagnostics.Where(d => d.Location.Source != null)
+                                                  .OrderBy(d => d.Location.FileName)
+                                                  .ThenBy(d => d.Location.Span.Start)
+                                                  .ThenBy(d => d.Location.Span.Length))
+            {
+                var source = diagnostic.Location.Source;
+                var fileName = diagnostic.Location.FileName;
+                var startLine = diagnostic.Location.StartLine + 1;
+                var startCharacter = diagnostic.Location.StartCharacter + 1;
+                var endLine = diagnostic.Location.EndLine + 1;
+                var endCharacter = diagnostic.Location.EndCharacter + 1;
+
+                var span = diagnostic.Location.Span;
+                var lineIndex = source.LineIndexOf(span.Start);
                 var line = source.Lines[lineIndex];
 
-                var lineNumber = lineIndex + 1;
-                var lineCharacter = diagnostic.Span.Start - line.Start + 1;
+                writer.WriteLine();
 
-                var prefix = source.ToString(line.Start, diagnostic.Span.Start - line.Start);
-                var error = source.ToString(diagnostic.Span.Start, diagnostic.Span.Length);
-                var suffix = source.ToString(diagnostic.Span.End, line.End - diagnostic.Span.End);
-
-                writer.SetForeground(ConsoleColor.DarkRed);
-
-                if (!string.IsNullOrWhiteSpace(source.FileName))
-                    writer.Write($"{source.FileName} ");
-                writer.Write($"({lineNumber}, {lineCharacter}): ");
+                var messageColor = diagnostic.IsWarning ? ConsoleColor.DarkYellow : ConsoleColor.DarkRed;
+                writer.SetForeground(messageColor);
+                writer.Write($"{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): ");
                 writer.WriteLine(diagnostic);
                 writer.ResetColor();
+
+                var prefixSpan = TextSpan.FromBounds(line.Start, span.Start);
+                var suffixSpan = TextSpan.FromBounds(span.End, line.End);
+
+                var prefix = source.ToString(prefixSpan);
+                var error = source.ToString(span);
+                var suffix = source.ToString(suffixSpan);
 
                 writer.Write("    ");
                 writer.Write(prefix);
 
                 writer.SetForeground(ConsoleColor.DarkRed);
                 writer.Write(error);
+                writer.ResetColor();
 
-                writer.ResetColor();
-                writer.WriteLine(suffix);
-                writer.ResetColor();
+                writer.Write(suffix);
+
+                writer.WriteLine();
             }
+
+            writer.WriteLine();
         }
-
-        //public static void WriteDiagnostics(this TextWriter writer, IEnumerable<Diagnostic> diagnostics)
-        //{
-        //    foreach (var diagnostic in diagnostics.Where(d => d.Location.Text == null))
-        //    {
-        //        var messageColor = diagnostic.IsWarning ? ConsoleColor.DarkYellow : ConsoleColor.DarkRed;
-        //        writer.SetForeground(messageColor);
-        //        writer.WriteLine(diagnostic.Message);
-        //        writer.ResetColor();
-        //    }
-
-        //    foreach (var diagnostic in diagnostics.Where(d => d.Location.Text != null)
-        //                                          .OrderBy(d => d.Location.FileName)
-        //                                          .ThenBy(d => d.Location.Span.Start)
-        //                                          .ThenBy(d => d.Location.Span.Length))
-        //    {
-        //        var text = diagnostic.Location.Text;
-        //        var fileName = diagnostic.Location.FileName;
-        //        var startLine = diagnostic.Location.StartLine + 1;
-        //        var startCharacter = diagnostic.Location.StartCharacter + 1;
-        //        var endLine = diagnostic.Location.EndLine + 1;
-        //        var endCharacter = diagnostic.Location.EndCharacter + 1;
-
-        //        var span = diagnostic.Location.Span;
-        //        var lineIndex = text.GetLineIndex(span.Start);
-        //        var line = text.Lines[lineIndex];
-
-        //        writer.WriteLine();
-
-        //        var messageColor = diagnostic.IsWarning ? ConsoleColor.DarkYellow : ConsoleColor.DarkRed;
-        //        writer.SetForeground(messageColor);
-        //        writer.Write($"{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): ");
-        //        writer.WriteLine(diagnostic);
-        //        writer.ResetColor();
-
-        //        var prefixSpan = TextSpan.FromBounds(line.Start, span.Start);
-        //        var suffixSpan = TextSpan.FromBounds(span.End, line.End);
-
-        //        var prefix = text.ToString(prefixSpan);
-        //        var error = text.ToString(span);
-        //        var suffix = text.ToString(suffixSpan);
-
-        //        writer.Write("    ");
-        //        writer.Write(prefix);
-
-        //        writer.SetForeground(ConsoleColor.DarkRed);
-        //        writer.Write(error);
-        //        writer.ResetColor();
-
-        //        writer.Write(suffix);
-
-        //        writer.WriteLine();
-        //    }
-
-        //    writer.WriteLine();
-        //}
     }
 }

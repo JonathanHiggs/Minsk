@@ -250,7 +250,7 @@ namespace Minsk.Interactive
                 Console.WriteLine();
 
             var result = compilation.Evaluate(variables);
-            Console.Out.WriteDiagnostics(result.Diagnostics, syntaxTree.Source);
+            Console.Out.WriteDiagnostics(result.Diagnostics);
 
             if (!result.Diagnostics.Any())
             {

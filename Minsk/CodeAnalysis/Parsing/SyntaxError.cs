@@ -2,16 +2,16 @@ using System;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
+using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Parsing
 {
     public class SyntaxError : Diagnostic
     {
-        public SyntaxError(LexToken token, string message)
-            : base(token.Span, message)
+        public SyntaxError(LexToken token, TextLocation location, string message)
+            : base(location, message)
         {
-            Token = token
-                ?? throw new ArgumentNullException(nameof(token));
+            Token = token ?? throw new ArgumentNullException(nameof(token));
         }
 
         // ToDo: Add SyntexErrorKind ErrorKind
@@ -20,7 +20,6 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public LexToken Token { get; }
 
-        public override string ToString()
-            => $"SyntaxError  {Message}";
+        public override string ToString() => $"SyntaxError  {Message}";
     }
 }

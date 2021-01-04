@@ -7,16 +7,17 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class BinaryExpression : Expression
     {
-        public BinaryExpression(Expression left, LexToken operatorToken, Expression right)
+        public BinaryExpression(
+            SyntaxTree syntaxTree,
+            Expression left,
+            LexToken operatorToken,
+            Expression right
+        )
+            : base(syntaxTree)
         {
-            Left = left
-                ?? throw new ArgumentNullException(nameof(left));
-
-            OperatorToken = operatorToken
-                ?? throw new ArgumentNullException(nameof(operatorToken));
-
-            Right = right
-                ?? throw new ArgumentNullException(nameof(right));
+            Left = left ?? throw new ArgumentNullException(nameof(left));
+            OperatorToken = operatorToken ?? throw new ArgumentNullException(nameof(operatorToken));
+            Right = right ?? throw new ArgumentNullException(nameof(right));
 
             Left.Parent = this;
             Right.Parent = this;

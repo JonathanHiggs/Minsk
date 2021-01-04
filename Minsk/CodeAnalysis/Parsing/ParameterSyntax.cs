@@ -6,10 +6,13 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class ParameterSyntax : SyntaxNode
     {
-        public ParameterSyntax(LexToken identifier, TypeClauseSyntax type)
+        public ParameterSyntax(SyntaxTree syntaxTree, LexToken identifier, TypeClauseSyntax type)
+            : base(syntaxTree)
         {
             Identifier = identifier;
             Type = type;
+
+            Type.Parent = this;
         }
 
         public LexToken Identifier { get; }

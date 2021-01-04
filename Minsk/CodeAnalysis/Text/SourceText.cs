@@ -108,5 +108,8 @@ namespace Minsk.CodeAnalysis.Text
         }
 
         #endregion Parse Lines
+
+        internal TextLocation Span(int start, int length)
+            => new TextLocation(this, new TextSpan(start, length));
     }
 }

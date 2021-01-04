@@ -9,13 +9,23 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public abstract class SyntaxNode : Node<SyntaxNode, SyntaxKind>
     {
+        protected SyntaxNode(SyntaxTree syntaxTree)
+        {
+            SyntaxTree = syntaxTree;
+        }
+
         public abstract string Text { get; }
 
-        public TextSpan Span => TextSpan.FromBounds(FirstToken.Span.Start, LastToken.Span.End);
+        public TextSpan Span
+            => TextSpan.FromBounds(FirstToken.Location.Span.Start, LastToken.Location.Span.End);
+
+        public TextLocation Location => new TextLocation(SyntaxTree.Source, Span);
 
         public abstract LexToken FirstToken { get; }
 
         public abstract LexToken LastToken { get; }
+
+        public SyntaxTree SyntaxTree { get; }
 
         protected override string PrettyPrintText() => Text;
 

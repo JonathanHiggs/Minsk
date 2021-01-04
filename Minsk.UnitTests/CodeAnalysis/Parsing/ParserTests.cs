@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
 using Minsk.CodeAnalysis.Text;
@@ -19,10 +20,12 @@ namespace Minsk.UnitTests.CodeAnalysis.Parsing
         public void Constructor_WithNullDiagnosticsBag_ThrowsArgumentNull()
         {
             // Arrange
+            var diagnostics = new DiagnosticBag();
             var source = SourceText.From("");
+            var syntaxTree = new SyntaxTree(source, diagnostics);
 
             // Act
-            TestDelegate ctor = () => new Parser(source, null);
+            TestDelegate ctor = () => new Parser(syntaxTree, source, null);
 
             // Assert
             Assert.That(ctor, Throws.ArgumentNullException);

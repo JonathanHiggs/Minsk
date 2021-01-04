@@ -8,13 +8,19 @@ namespace Minsk.CodeAnalysis.Parsing
     public sealed class BlockStatement : Statement
     {
         public BlockStatement(
+            SyntaxTree syntaxTree,
             LexToken openBraceToken,
             ImmutableArray<Statement> statements,
-            LexToken closeBraceToken)
+            LexToken closeBraceToken
+        )
+            : base(syntaxTree)
         {
             OpenBraceToken = openBraceToken;
             Statements = statements;
             CloseBraceToken = closeBraceToken;
+
+            foreach (var statement in Statements)
+                statement.Parent = this;
         }
 
         public LexToken OpenBraceToken { get; }

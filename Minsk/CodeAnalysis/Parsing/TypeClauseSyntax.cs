@@ -7,7 +7,8 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class TypeClauseSyntax : SyntaxNode
     {
-        public TypeClauseSyntax(LexToken colonToken, LexToken identifier)
+        public TypeClauseSyntax(SyntaxTree syntaxTree, LexToken colonToken, LexToken identifier)
+            : base(syntaxTree)
         {
             ColonToken = colonToken;
             Identifier = identifier;

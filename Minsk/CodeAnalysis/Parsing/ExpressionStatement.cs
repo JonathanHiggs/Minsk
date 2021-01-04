@@ -6,9 +6,12 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class ExpressionStatement : Statement
     {
-        public ExpressionStatement(Expression expression)
+        public ExpressionStatement(SyntaxTree syntaxTree, Expression expression)
+            : base(syntaxTree)
         {
             Expression = expression;
+
+            Expression.Parent = this;
         }
 
         public Expression Expression { get; }

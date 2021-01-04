@@ -305,7 +305,7 @@ namespace Minsk.CodeAnalysis.Binding
             var variableType = type ?? initializer.Type;
             var variable = BindVariable(node, node.Identifier, variableType, isReadOnly);
 
-            var convertedInitializer = BindConversion(node.Initializer.Span, node, initializer, variableType);
+            var convertedInitializer = BindConversion(node.Initializer.Location, node, initializer, variableType);
 
             return new BoundVariableDeclarationStatement(variable, convertedInitializer);
         }
@@ -406,7 +406,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             var type = variable?.Type ?? TypeSymbol.Error;
 
-            var convertedExpression = BindConversion(node.Span, node, expression, type);
+            var convertedExpression = BindConversion(node.Location, node, expression, type);
 
             return new BoundAssignmentExpression(variable, convertedExpression);
         }
@@ -429,10 +429,7 @@ namespace Minsk.CodeAnalysis.Binding
             if (op is null)
             {
                 // ToDo: move into the call, and check whether left or right is a BoundNameExpression
-                Report.UndefinedOperator(
-                    node,
-                    opToken.Span,
-                    $"Binary operator '{opToken.Kind}' is not defined for types {left.Type} and {right.Type}");
+                Report.UndefinedOperator(node, opToken, left.Type, right.Type);
 
                 return new BoundErrorExpression();
             }
@@ -529,10 +526,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             if (op is null)
             {
-                Report.UndefinedOperator(
-                    node,
-                    opToken.Span,
-                    $"Unary operator '{opToken.Kind}' is not defined for type {operand.Type}");
+                Report.UndefinedOperator(node, opToken, operand.Type);
 
                 return new BoundErrorExpression();
             }
@@ -546,11 +540,11 @@ namespace Minsk.CodeAnalysis.Binding
             bool allowExplicit = false)
         {
             var expression = BindExpression(node);
-            return BindConversion(node.Span, node, expression, toType, allowExplicit);
+            return BindConversion(node.Location, node, expression, toType, allowExplicit);
         }
 
         private BoundExpression BindConversion(
-            TextSpan span,
+            TextLocation location,
             SyntaxNode node,
             BoundExpression expression,
             TypeSymbol toType,
@@ -561,13 +555,13 @@ namespace Minsk.CodeAnalysis.Binding
             if (conversion.DoesNotExist)
             {
                 if (expression.Type.IsNotErrorType && toType.IsNotErrorType)
-                    Report.CannotConvert(node, span, expression.Type, toType);
+                    Report.CannotConvert(node, location, expression.Type, toType);
 
                 return new BoundErrorExpression();
             }
 
             if (conversion.IsExplicit && !allowExplicit)
-                Report.CannotImplicitlyConvert(node, span, expression.Type, toType);
+                Report.CannotImplicitlyConvert(node, location, expression.Type, toType);
 
             if (conversion.IsIdentity)
                 return expression;

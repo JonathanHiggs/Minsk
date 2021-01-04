@@ -44,7 +44,7 @@ namespace Minsk.Compiler
             }
             else
             {
-                Console.Out.WriteDiagnostics(result.Diagnostics, syntaxTree.Source);
+                Console.Out.WriteDiagnostics(result.Diagnostics);
             }
         }
     }

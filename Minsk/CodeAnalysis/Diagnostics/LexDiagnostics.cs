@@ -13,18 +13,19 @@ namespace Minsk.CodeAnalysis.Diagnostics
         internal LexDiagnostics(DiagnosticBag bag)
             => this.bag = bag ?? throw new ArgumentNullException(nameof(bag));
 
-        public void InvalidNumber(TextSpan span, string text, string message)
-            => bag.Report(new LexError(LexErrorKind.InvalidNumber, span, text, message));
 
-        public void InvalidCharacters(TextSpan span, string text, string message)
-            => bag.Report(new LexError(LexErrorKind.InvalidCharacter, span, text, message));
+        public void InvalidNumber(TextLocation location, string text, string message)
+            => bag.Report(new LexError(LexErrorKind.InvalidNumber, location, text, message));
 
-        public void UnexpectedNullTerminator(TextSpan span, string text)
+        public void InvalidCharacters(TextLocation location, string text, string message)
+            => bag.Report(new LexError(LexErrorKind.InvalidCharacter, location, text, message));
+
+        public void UnexpectedNullTerminator(TextLocation location, string text)
             => bag.Report(new LexError(
-                LexErrorKind.UnexpectedNullTerminator, span, text, "Unexpected null terminator"));
+                LexErrorKind.UnexpectedNullTerminator, location, text, "Unexpected null terminator"));
 
-        public void UnterminatedString(TextSpan span, string text)
+        public void UnterminatedString(TextLocation location, string text)
             => bag.Report(new LexError(
-                LexErrorKind.UnterminatedString, span, text, "Unterminated string"));
+                LexErrorKind.UnterminatedString, location, text, "Unterminated string"));
     }
 }

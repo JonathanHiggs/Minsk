@@ -6,10 +6,13 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class ReturnStatement : Statement
     {
-        public ReturnStatement(LexToken returnKeyword, Expression expression)
+        public ReturnStatement(SyntaxTree syntaxTree, LexToken returnKeyword, Expression expression)
+            : base(syntaxTree)
         {
             ReturnKeyword = returnKeyword;
             Expression = expression;
+
+            Expression.Parent = this;
         }
 
         public LexToken ReturnKeyword { get; }

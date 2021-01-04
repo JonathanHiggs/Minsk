@@ -10,21 +10,21 @@ namespace Minsk.CodeAnalysis.Lexing
 {
     public sealed class Lexer
     {
-        private readonly DiagnosticBag diagnostics;
         private readonly SourceText source;
+        private readonly DiagnosticBag diagnostics;
+        private readonly LexCursor cursor;
 
-        private LexCursor cursor = new LexCursor();
         private int position => cursor.End;
 
         public Lexer(SourceText source, DiagnosticBag diagnostics)
         {
+            this.source = source
+                ?? throw new ArgumentNullException(nameof(source));
+
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
-            this.source = source;
+            cursor = new LexCursor(source);
         }
 
         public static IEnumerable<LexToken> Lex(SourceText source, DiagnosticBag diagnostics = null)
@@ -154,7 +154,7 @@ namespace Minsk.CodeAnalysis.Lexing
                     case '\0':
                     case '\r':
                     case '\n':
-                        diagnostics.Lex.UnterminatedString(TextSpan.From(cursor.Start, 1), CurrentText);
+                        diagnostics.Lex.UnterminatedString(source.Span(cursor.Start, 1), CurrentText);
                         done = true;
                         break;
 
@@ -235,13 +235,13 @@ namespace Minsk.CodeAnalysis.Lexing
             return new LexToken(kind, Consume(numberOfCharsConsumed), tokenText, value);
         }
 
-        private TextSpan Consume(int numberOfChars = 0)
+        private TextLocation Consume(int numberOfChars = 0)
         {
             // ToDo: remove when LexCursor takes in the SourceText
             var span = cursor.Consume(numberOfChars);
             if (span.End > source.Length)
                 span = new TextSpan(span.Start, source.Length - span.Start);
-            return span;
+            return new TextLocation(source, span);
         }
 
         private char Current => (position >= source.Length) ? '\0' : source[position];

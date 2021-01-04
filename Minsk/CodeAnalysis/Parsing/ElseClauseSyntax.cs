@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 
 using Minsk.CodeAnalysis.Lexing;
@@ -7,10 +6,13 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class ElseClauseSyntax : SyntaxNode
     {
-        public ElseClauseSyntax(LexToken elseKeyword, Statement statement)
+        public ElseClauseSyntax(SyntaxTree syntaxTree, LexToken elseKeyword, Statement statement)
+            : base(syntaxTree)
         {
             ElseKeyword = elseKeyword;
             Statement = statement;
+
+            Statement.Parent = this;
         }
 
         public LexToken ElseKeyword { get; }

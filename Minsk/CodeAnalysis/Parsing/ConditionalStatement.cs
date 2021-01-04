@@ -6,19 +6,34 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class ConditionalStatement : Statement
     {
-        public ConditionalStatement(LexToken ifToken, Expression condition, Statement thenStatement)
-        {
-            IfKeyword = ifToken;
-            Condition = condition;
-            ThenStatement = thenStatement;
-        }
-        
-        public ConditionalStatement(LexToken ifToken, Expression condition, Statement thenStatement, ElseClauseSyntax elseNode)
+        public ConditionalStatement(
+            SyntaxTree syntaxTree,
+            LexToken ifToken,
+            Expression condition,
+            Statement thenStatement
+        )
+            : this(syntaxTree, ifToken, condition, thenStatement, null)
+        { }
+
+        public ConditionalStatement(
+            SyntaxTree syntaxTree,
+            LexToken ifToken,
+            Expression condition,
+            Statement thenStatement,
+            ElseClauseSyntax elseNode
+        )
+            : base(syntaxTree)
         {
             IfKeyword = ifToken;
             Condition = condition;
             ThenStatement = thenStatement;
             ElseClause = elseNode;
+
+            Condition.Parent = this;
+            ThenStatement.Parent = this;
+
+            if (ElseClause is not null)
+                ElseClause.Parent = this;
         }
 
         public LexToken IfKeyword { get; }
@@ -44,6 +59,7 @@ namespace Minsk.CodeAnalysis.Parsing
 
         public override LexToken FirstToken => IfKeyword;
 
-        public override LexToken LastToken => ElseClause is not null ? ElseClause.LastToken : ThenStatement.LastToken;
+        public override LexToken LastToken
+            => ElseClause?.LastToken ?? ThenStatement.LastToken;
     }
 }

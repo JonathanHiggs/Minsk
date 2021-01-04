@@ -7,7 +7,8 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class NameExpression : Expression
     {
-        public NameExpression(LexToken identifierToken)
+        public NameExpression(SyntaxTree syntaxTree, LexToken identifierToken)
+            : base(syntaxTree)
         {
             IdentifierToken = identifierToken;
         }

@@ -7,8 +7,8 @@ namespace Minsk.CodeAnalysis.Lexing
 {
     public class LexError : Diagnostic
     {
-        public LexError(LexErrorKind errorKind, TextSpan span, string text, string message)
-            : base(span, message)
+        public LexError(LexErrorKind errorKind, TextLocation location, string text, string message)
+            : base(location, message)
         {
             ErrorKind = errorKind;
             Text = text ?? throw new ArgumentNullException(nameof(text));
@@ -20,7 +20,6 @@ namespace Minsk.CodeAnalysis.Lexing
 
         public string Text { get; }
 
-        public override string ToString()
-            => $"LexingError  {Message}";
+        public override string ToString() => $"LexingError  {Message}";
     }
 }

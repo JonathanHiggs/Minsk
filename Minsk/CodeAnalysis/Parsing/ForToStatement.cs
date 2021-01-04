@@ -7,13 +7,16 @@ namespace Minsk.CodeAnalysis.Parsing
     public sealed class ForToStatement : Statement
     {
         public ForToStatement(
+            SyntaxTree syntaxTree,
             LexToken forKeyword,
             LexToken identifier,
             LexToken equals,
             Expression lowerBound,
             LexToken toKeyword,
             Expression upperBound,
-            Statement body)
+            Statement body
+        )
+            : base(syntaxTree)
         {
             ForKeyword = forKeyword;
             Identifier = identifier;
@@ -22,6 +25,10 @@ namespace Minsk.CodeAnalysis.Parsing
             ToKeyword = toKeyword;
             UpperBound = upperBound;
             Body = body;
+
+            LowerBound.Parent = this;
+            UpperBound.Parent = this;
+            Body.Parent = this;
         }
 
         public LexToken ForKeyword { get; }

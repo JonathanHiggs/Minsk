@@ -6,9 +6,11 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class GlobalStatementSyntax : MemberSyntax
     {
-        public GlobalStatementSyntax(Statement statement)
+        public GlobalStatementSyntax(SyntaxTree syntaxTree, Statement statement)
+            : base(syntaxTree)
         {
             Statement = statement;
+            Statement.Parent = this;
         }
 
         public Statement Statement { get; }

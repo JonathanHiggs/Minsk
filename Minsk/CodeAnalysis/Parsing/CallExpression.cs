@@ -7,15 +7,21 @@ namespace Minsk.CodeAnalysis.Parsing
     public sealed class CallExpression : Expression
     {
         public CallExpression(
+            SyntaxTree syntaxTree,
             LexToken identifier,
             LexToken openParens,
             SeparatedSyntaxList<Expression> arguments,
-            LexToken closeParens)
+            LexToken closeParens
+        )
+            : base(syntaxTree)
         {
             Identifier = identifier;
             OpenParens = openParens;
             Arguments = arguments;
             CloseParens = closeParens;
+
+            foreach (var argument in Arguments)
+                argument.Parent = this;
         }
 
         public LexToken Identifier { get; }

@@ -7,7 +7,8 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class ContinueStatement : Statement
     {
-        public ContinueStatement(LexToken keyword)
+        public ContinueStatement(SyntaxTree syntaxTree, LexToken keyword)
+            : base(syntaxTree)
         {
             Keyword = keyword;
         }
