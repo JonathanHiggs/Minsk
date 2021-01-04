@@ -13,7 +13,7 @@ namespace Minsk.CodeAnalysis.Parsing
             LexToken openParentheses,
             SeparatedSyntaxList<ParameterSyntax> parameters,
             LexToken closeParentheses,
-            TypeClauseSyntax typeClause,
+            TypeClauseSyntax optionalTypeClause,
             Statement body
         )
             : base(syntaxTree)
@@ -23,13 +23,15 @@ namespace Minsk.CodeAnalysis.Parsing
             OpenParentheses = openParentheses;
             Parameters = parameters;
             CloseParentheses = closeParentheses;
-            TypeClause = typeClause;
+            OptionalTypeClause = optionalTypeClause;
             Body = body;
 
             foreach (var parameter in Parameters)
                 parameter.Parent = this;
 
-            TypeClause.Parent = this;
+            if (OptionalTypeClause is not null)
+                OptionalTypeClause.Parent = this;
+
             Body.Parent = this;
         }
 
@@ -38,7 +40,7 @@ namespace Minsk.CodeAnalysis.Parsing
         public LexToken OpenParentheses { get; }
         public SeparatedSyntaxList<ParameterSyntax> Parameters { get; }
         public LexToken CloseParentheses { get; }
-        public TypeClauseSyntax TypeClause { get; }
+        public TypeClauseSyntax OptionalTypeClause { get; }
         public Statement Body { get; }
 
         public override string Text => Identifier.Text;

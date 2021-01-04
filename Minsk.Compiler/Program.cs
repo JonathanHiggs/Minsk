@@ -4,6 +4,7 @@ using System.Linq;
 
 using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Parsing;
+using Minsk.CodeAnalysis.Text;
 using Minsk.IO;
 
 namespace Minsk.Compiler
@@ -33,8 +34,8 @@ namespace Minsk.Compiler
             }
 
             var text = File.ReadAllText(path);
-
-            var syntaxTree = SyntaxTree.Parse(text);
+            var source = new SourceText(text, path);
+            var syntaxTree = SyntaxTree.Parse(source);
             var compilation = Compilation.Compile(syntaxTree);
             var result = compilation.Evaluate();
 

@@ -118,7 +118,7 @@ namespace Minsk.CodeAnalysis.Binding
                 }
             }
 
-            var returnType = BindTypeClause(node.TypeClause) ?? TypeSymbol.Void;
+            var returnType = BindTypeClause(node.OptionalTypeClause) ?? TypeSymbol.Void;
 
             var function = new FunctionSymbol(name, parameters.ToImmutable(), returnType, node);
             if (!scope.TryDeclareFunction(function))
