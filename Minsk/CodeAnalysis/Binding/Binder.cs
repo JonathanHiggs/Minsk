@@ -40,18 +40,30 @@ namespace Minsk.CodeAnalysis.Binding
 
         public static BoundGlobalScope BindGlobalScope(
             BoundGlobalScope previous,
-            CompilationUnit compilationUnit,
+            SyntaxTree syntaxTree)
+            => BindGlobalScope(previous, new SyntaxTree[] { syntaxTree }, syntaxTree.Diagnostics);
+
+        public static BoundGlobalScope BindGlobalScope(
+            BoundGlobalScope previous,
+            IEnumerable<SyntaxTree> syntaxTrees,
             DiagnosticBag diagnostics)
         {
             var parentScope = CreateParentScope(previous);
             var binder = new Binder(diagnostics, parentScope, function: null);
 
-            foreach (var function in compilationUnit.Members.OfType<FunctionDeclaration>())
+            var functionDeclarations =
+                syntaxTrees.SelectMany(t => t.Root.Members)
+                           .OfType<FunctionDeclaration>();
+
+            foreach (var function in functionDeclarations)
                 binder.BindFunctionDeclaration(function);
 
             var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+            var globalStatements =
+                syntaxTrees.SelectMany(t => t.Root.Members)
+                           .OfType<GlobalStatementSyntax>();
 
-            foreach (var globalStatement in compilationUnit.Members.OfType<GlobalStatementSyntax>())
+            foreach (var globalStatement in globalStatements)
             {
                 var statement = binder.BindStatement(globalStatement.Statement);
                 statements.Add(statement);

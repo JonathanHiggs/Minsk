@@ -92,7 +92,7 @@ namespace Minsk.UnitTests.CodeAnalysis
         {
             // Arrange
             var tree = SyntaxTree.Parse(testCase.Code);
-            var compilation = new Compilation(tree);
+            var compilation = new Compilation(tree.Diagnostics, tree);
             var variables = new Dictionary<VariableSymbol, object>();
 
             // Apriori
@@ -111,7 +111,7 @@ namespace Minsk.UnitTests.CodeAnalysis
         {
             // Arrange
             var tree = SyntaxTree.Parse(testCase.Code);
-            var compilation = new Compilation(tree);
+            var compilation = new Compilation(tree.Diagnostics, tree);
             var variables = new Dictionary<VariableSymbol, object>();
 
             // Apriori
@@ -184,7 +184,7 @@ namespace Minsk.UnitTests.CodeAnalysis
         {
             // Arrange
             var tree = SyntaxTree.Parse(annotatedText.Text);
-            var bound = Binder.BindGlobalScope(null, tree.Root, tree.Diagnostics);
+            var bound = Binder.BindGlobalScope(null, tree);
             var diagnostics = bound.Diagnostics.ToList();
 
             // Assert

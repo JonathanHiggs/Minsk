@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.IO;
 
 namespace Minsk.CodeAnalysis.Text
 {
@@ -15,6 +16,12 @@ namespace Minsk.CodeAnalysis.Text
 
         public static SourceText From(string text, string fileName = "")
             => new SourceText(text, fileName);
+
+        public static SourceText Load(string path)
+        {
+            var text = File.ReadAllText(path);
+            return new SourceText(text, path);
+        }
 
         public string FileName { get; }
 

@@ -17,28 +17,38 @@ namespace Minsk.CodeAnalysis
     {
         private BoundGlobalScope globalScope;
 
-        public Compilation(SyntaxTree syntaxTree)
-            : this(null, syntaxTree)
+        public Compilation(SyntaxTree tree)
+            : this(tree.Diagnostics, tree)
         { }
 
-        private Compilation(Compilation previous, SyntaxTree syntaxTree)
+        public Compilation(DiagnosticBag diagnostics, params SyntaxTree[] syntaxTrees)
+            : this(diagnostics, null, syntaxTrees)
+        { }
+
+        private Compilation(DiagnosticBag diagnostics, Compilation previous, SyntaxTree[] syntaxTrees)
         {
+            Diagnostics = diagnostics;
             Previous = previous;
-            SyntaxTree = syntaxTree;
+            SyntaxTrees = syntaxTrees.ToImmutableArray();
         }
 
         public static Compilation CreateScript(SyntaxTree syntaxTree)
-            => new Compilation(null, syntaxTree);
+            => new Compilation(syntaxTree.Diagnostics, null, syntaxTree);
 
         public static Compilation CreateScript(Compilation previous, SyntaxTree syntaxTree)
-            => new Compilation(previous, syntaxTree);
+            => new Compilation(syntaxTree.Diagnostics, previous, new SyntaxTree[] { syntaxTree });
 
         public static Compilation Compile(SyntaxTree syntaxTree)
-            => new Compilation(null, syntaxTree);
+            => new Compilation(syntaxTree.Diagnostics, null, syntaxTree);
+
+        public static Compilation Compile(DiagnosticBag diagnostics, IEnumerable<SyntaxTree> syntaxTrees)
+            => new Compilation(diagnostics, syntaxTrees.ToArray());
+
+        public DiagnosticBag Diagnostics { get; }
 
         public Compilation Previous { get; }
 
-        public SyntaxTree SyntaxTree { get; }
+        public ImmutableArray<SyntaxTree> SyntaxTrees { get; }
 
         internal BoundGlobalScope GlobalScope
         {
@@ -46,7 +56,7 @@ namespace Minsk.CodeAnalysis
             {
                 if (globalScope is null)
                 {
-                    var globalScope = Binder.BindGlobalScope(Previous?.GlobalScope, SyntaxTree.Root, SyntaxTree.Diagnostics);
+                    var globalScope = Binder.BindGlobalScope(Previous?.GlobalScope, SyntaxTrees, Diagnostics);
                     Interlocked.CompareExchange(ref this.globalScope, globalScope, null);
                 }
                 return globalScope;
@@ -57,7 +67,7 @@ namespace Minsk.CodeAnalysis
             => Enumerable.Concat<Symbol>(GlobalScope.Functions, GlobalScope.Variables);
 
         public Compilation ContinueWith(SyntaxTree syntaxTree)
-            => new Compilation(this, syntaxTree);
+            => new Compilation(syntaxTree.Diagnostics, this, new SyntaxTree[] { syntaxTree });
 
         public EvaluationResult Evaluate()
             => Evaluate(new Dictionary<VariableSymbol, object>());
