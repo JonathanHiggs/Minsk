@@ -70,14 +70,6 @@ namespace Minsk.Interactive
 
             foreach (var line in submissionDocument)
             {
-                if (cursorTop + lineCount >= Console.WindowHeight)
-                {
-                    Console.SetCursorPosition(0, Console.WindowHeight - 1);
-                    Console.WriteLine();
-                    if (cursorTop > 0)
-                        cursorTop--;
-                }
-
                 Console.SetCursorPosition(0, cursorTop + lineCount);
                 Console.ForegroundColor = ConsoleColor.Green;
 

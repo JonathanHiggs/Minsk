@@ -15,8 +15,6 @@ namespace Minsk.Compiler
     {
         public static void Main(string[] args)
         {
-            args = new string[] { "D:\\dev\\lang\\minsk\\samples\\multi-file" };
-
             if (args.Length == 0)
             {
                 Console.Error.WriteLine("usage: mkc <source-paths>");
@@ -58,7 +56,6 @@ namespace Minsk.Compiler
 
         private static (IEnumerable<string> FilePaths, IEnumerable<string> ErrorPaths) GetFilePaths(IEnumerable<string> paths)
         {
-            var search = new Stack<string>(paths);
             var results = new SortedSet<string>();
             var errors = new List<string>();
 
