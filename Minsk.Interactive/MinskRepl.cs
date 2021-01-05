@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 
 using Minsk.CodeAnalysis;
-using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
 using Minsk.CodeAnalysis.Symbols;
@@ -159,6 +158,15 @@ namespace Minsk.Interactive
             Console.WriteLine(showProgram ? "Showing bound tree" : "Not showing bound tree");
         }
 
+        [MetaCommand("save", "Saves the previous submissions")]
+        private void EvaluateSave()
+        {
+            foreach (var submission in SubmissionHistory)
+                SaveSubmission(submission);
+
+            Console.WriteLine($"Saved {SubmissionHistory.Count()} submissions");
+        }
+
         [MetaCommand("load", "Loads a script file")]
         private void EvaluateLoad(string path)
         {
@@ -233,7 +241,7 @@ namespace Minsk.Interactive
         protected override void EvaluateSubmittion(string text)
         {
             var syntaxTree = SyntaxTree.Parse(text);
-            Compilation compilation = Compilation.CreateScript(syntaxTree);
+            Compilation compilation = Compilation.CreateScript(syntaxTree, previous);
 
             if (showTree)
                 syntaxTree.Root.PrettyPrint(Console.Out);
@@ -242,6 +250,7 @@ namespace Minsk.Interactive
             {
                 if (showTree)
                     Console.WriteLine();
+
 
                 compilation.EmitTree(Console.Out);
             }
@@ -262,8 +271,6 @@ namespace Minsk.Interactive
                 }
 
                 previous = compilation;
-
-                //SaveSubmission(text);
             }
         }
 

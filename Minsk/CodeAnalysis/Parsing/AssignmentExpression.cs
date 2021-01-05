@@ -8,13 +8,13 @@ namespace Minsk.CodeAnalysis.Parsing
     {
         public AssignmentExpression(
             SyntaxTree syntaxTree,
-            LexToken identifierToken,
+            LexToken identifier,
             LexToken equalsToken,
             Expression expression
         )
             : base(syntaxTree)
         {
-            IdentifierToken = identifierToken;
+            Identifier = identifier;
             EqualsToken = equalsToken;
             Expression = expression;
 
@@ -24,9 +24,9 @@ namespace Minsk.CodeAnalysis.Parsing
         public override SyntaxKind Kind
             => SyntaxKind.AssignmentExpression;
 
-        public override string Text => $"{IdentifierToken.Text} {EqualsToken.Text}";
+        public override string Text => $"{Identifier.Text} {EqualsToken.Text}";
 
-        public LexToken IdentifierToken { get; }
+        public LexToken Identifier { get; }
         public LexToken EqualsToken { get; }
         public Expression Expression { get; }
 
@@ -34,7 +34,7 @@ namespace Minsk.CodeAnalysis.Parsing
         { get { yield return Expression; } }
 
         public override LexToken FirstToken
-            => IdentifierToken;
+            => Identifier;
 
         public override LexToken LastToken
             => Expression.LastToken;

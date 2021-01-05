@@ -48,8 +48,15 @@ namespace Minsk.CodeAnalysis
         public DiagnosticBag Diagnostics { get; }
 
         public Compilation Previous { get; }
+
         public bool IsScript { get; }
+
         public ImmutableArray<SyntaxTree> SyntaxTrees { get; }
+
+        public ImmutableArray<FunctionSymbol> Functions => GlobalScope.Functions;
+
+        public ImmutableArray<VariableSymbol> Variables => GlobalScope.Variables;
+
 
         internal BoundGlobalScope GlobalScope
         {
@@ -79,32 +86,44 @@ namespace Minsk.CodeAnalysis
 
 
         public IEnumerable<Symbol> Symbols
-            => GlobalScope.Functions.Cast<Symbol>()
-                .Concat(GlobalScope.Variables)
-                .Concat(Program.AllFunctions().Select(f => f.Symbol));
+        {
+            get
+            {
+                var submission = this;
+                var seenSymbolNames = new HashSet<string>();
 
-        public Compilation ContinueWith(SyntaxTree syntaxTree)
-            => throw new NotImplementedException();
+                foreach (var builtin in BuiltinFunctions.All)
+                    yield return builtin;
+
+                while (submission is not null)
+                {
+                    foreach (var function in submission.Functions)
+                        if (seenSymbolNames.Add(function.Name))
+                            yield return function;
+
+                    foreach (var variable in submission.Variables)
+                        if (seenSymbolNames.Add(variable.Name))
+                            yield return variable;
+
+                    submission = submission.Previous;
+                }
+            }
+        }
 
         public EvaluationResult Evaluate()
             => Evaluate(new Dictionary<VariableSymbol, object>());
 
         public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
-        {
-            // Side effects on a property access... yay!
-            var diagnostics = GlobalScope.Diagnostics;
-            if (diagnostics.Any())
-                return new EvaluationResult(null, diagnostics.ToImmutableArray());
+        {;
+            if (GlobalScope.Diagnostics.Any())
+                return new EvaluationResult(null, GlobalScope.Diagnostics.ToImmutableArray());
 
-            // Side effects on a property access... yay x2!
-            var program = Program;
+            //EmitControlFlowGraph(program);
 
-            EmitControlFlowGraph(program);
+            if (Program.Diagnostics.Any())
+                return new EvaluationResult(null, Program.Diagnostics.ToImmutableArray());
 
-            if (program.Diagnostics.Any())
-                return new EvaluationResult(null, diagnostics.ToImmutableArray());
-
-            var evaluator = new Evaluator(program, variables);
+            var evaluator = new Evaluator(Program, variables);
             var value = evaluator.Evaluate();
 
             return new EvaluationResult(value, ImmutableArray<Diagnostic>.Empty);
@@ -130,8 +149,7 @@ namespace Minsk.CodeAnalysis
 
         public void EmitTree(FunctionSymbol function, TextWriter writer)
         {
-            var program = Program;
-            var tree = program.Functions[function];
+            var tree = Program.Functions[function];
 
             function.WriteTo(writer);
             writer.WriteLine();
@@ -140,15 +158,13 @@ namespace Minsk.CodeAnalysis
 
         public void EmitTree(TextWriter writer)
         {
-            var program = Program;
-
-            if (program.Statement.Statements.Any())
+            if (Program.Statement.Statements.Any())
             {
-                program.WriteTo(writer);
+                Program.WriteTo(writer);
             }
             else
             {
-                foreach (var function in program.Functions)
+                foreach (var function in Program.Functions)
                 {
                     if (!GlobalScope.Functions.Contains(function.Key))
                         continue;

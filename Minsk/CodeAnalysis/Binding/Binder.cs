@@ -81,8 +81,8 @@ namespace Minsk.CodeAnalysis.Binding
                 statements.Add(statement);
             }
 
-            var functions = binder.scope.DeclaredFunctions;
-            var variables = binder.scope.DeclaredVariables;
+            var functions = binder.scope.Functions.ToImmutableArray();
+            var variables = binder.scope.Variables.ToImmutableArray();
 
             return new BoundGlobalScope(previous, diagnostics, functions, variables, statements);
         }
@@ -94,6 +94,13 @@ namespace Minsk.CodeAnalysis.Binding
             DiagnosticBag diagnostics)
         {
             var parentScope = CreateParentScope(globalScope);
+
+            if (globalScope.Diagnostics.Any())
+                return new BoundProgram(
+                    globalScope.Diagnostics,
+                    previousProgram,
+                    ImmutableDictionary<FunctionSymbol, BoundBlockStatement>.Empty,
+                    null);
 
             var functionBodies
                 = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
@@ -147,6 +154,7 @@ namespace Minsk.CodeAnalysis.Binding
         private static BoundScope CreateParentScope(BoundGlobalScope globalScope)
         {
             var stack = new Stack<BoundGlobalScope>();
+
             while (globalScope is not null)
             {
                 stack.Push(globalScope);
@@ -157,7 +165,6 @@ namespace Minsk.CodeAnalysis.Binding
             while (stack.Any())
             {
                 globalScope = stack.Pop();
-
                 scope = new BoundScope(scope);
 
                 foreach (var function in globalScope.Functions)
@@ -434,17 +441,27 @@ namespace Minsk.CodeAnalysis.Binding
 
         private BoundExpression BindAssignmentExpression(AssignmentExpression node)
         {
-            var name = node.IdentifierToken.Text;
+            var name = node.Identifier.Text;
             var expression = BindExpression(node.Expression);
 
             if (expression is BoundErrorExpression)
                 return new BoundErrorExpression();
 
-            var (success, variable) = scope.TryLookupVariable(name);
-
+            var (success, symbol) = scope.TryLookupSymbol(name);
             if (!success)
+            {
                 Report.UndeclaredIdentifier(node);
-            else if (variable.IsReadOnly)
+                return new BoundErrorExpression();
+            }
+
+            var variable = symbol as VariableSymbol;
+            if (variable is null)
+            {
+                Report.NotAVariable(node, node.Identifier.Location, symbol);
+                return new BoundErrorExpression();
+            }
+
+            if (variable.IsReadOnly)
                 Report.CannotAssignToReadOnlyVariable(node);
 
             var type = variable?.Type ?? TypeSymbol.Error;
@@ -491,10 +508,17 @@ namespace Minsk.CodeAnalysis.Binding
             foreach (var argument in node.Arguments)
                 boundArguments.Add(BindExpression(argument));
 
-            var (success, function) = scope.TryLookupFunction(node.Identifier.Text);
+            var (success, symbol) = scope.TryLookupSymbol(node.Identifier.Text);
             if (!success)
             {
                 Report.UndefinedFunction(node);
+                return new BoundErrorExpression();
+            }
+
+            var function = symbol as FunctionSymbol;
+            if (function is null)
+            {
+                Report.NotAFunction(node, symbol);
                 return new BoundErrorExpression();
             }
 
@@ -540,11 +564,17 @@ namespace Minsk.CodeAnalysis.Binding
             if (string.IsNullOrEmpty(name))
                 return new BoundErrorExpression();
 
-            var (found, variable) = scope.TryLookupVariable(name);
-
-            if (!found)
+            var (success, symbol) = scope.TryLookupSymbol(name);
+            if (!success)
             {
                 Report.UndeclaredIdentifier(node);
+                return new BoundErrorExpression();
+            }
+
+            var variable = symbol as VariableSymbol;
+            if (variable is null)
+            {
+                Report.NotAVariable(node, node.IdentifierToken.Location, symbol);
                 return new BoundErrorExpression();
             }
 

@@ -13,6 +13,10 @@ namespace Minsk.CodeAnalysis
     {
         private readonly BoundProgram program;
         private readonly Dictionary<VariableSymbol, object> globals;
+
+        private readonly Dictionary<FunctionSymbol, BoundBlockStatement> functions
+            = new Dictionary<FunctionSymbol, BoundBlockStatement>();
+
         private readonly Stack<Dictionary<VariableSymbol, object>> stack
             = new Stack<Dictionary<VariableSymbol, object>>();
 
@@ -25,6 +29,19 @@ namespace Minsk.CodeAnalysis
             this.program = program ?? throw new ArgumentNullException(nameof(program));
 
             globals = globalVariables;
+
+            var current = program;
+            while (current is not null)
+            {
+                foreach (var kv in current.Functions)
+                {
+                    var function = kv.Key;
+                    var body = kv.Value;
+                    functions.Add(function, body);
+                }
+
+                current = current.Previous;
+            }
         }
 
         public object Evaluate()
@@ -200,10 +217,7 @@ namespace Minsk.CodeAnalysis
 
             stack.Push(locals);
 
-            var (body, success) = program.TryLookupFunction(node.Function);
-            if (!success)
-                throw new Exception($"A fFunction named '{node.Function.Name}' was not found");
-
+            var body = functions[node.Function];
             var result = EvaluateStatement(body);
 
             stack.Pop();

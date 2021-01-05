@@ -41,6 +41,8 @@ namespace Minsk.Interactive
             }
         }
 
+        protected IEnumerable<string> SubmissionHistory => submissionHistory;
+
         public void Run()
         {
             while (true)
@@ -288,7 +290,6 @@ namespace Minsk.Interactive
         private void HandleControlEnter(ObservableCollection<string> document, SubmissionView view)
         {
             done = true;
-            //InsertLine(document, view);
         }
 
         private void HandleTyping(ObservableCollection<string> document, SubmissionView view, string text)

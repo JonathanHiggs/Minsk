@@ -30,8 +30,8 @@ namespace Minsk.CodeAnalysis.Parsing
                         assignment.EqualsToken.Text,
                         assignment.Kind.ToString(),
                         new TerminalVisualNode(
-                            assignment.IdentifierToken.Text.ToString(),
-                            assignment.IdentifierToken.Kind.ToString(),
+                            assignment.Identifier.Text.ToString(),
+                            assignment.Identifier.Kind.ToString(),
                             settings),
                         assignment.Expression.ToVisualTree(settings),
                         settings);
