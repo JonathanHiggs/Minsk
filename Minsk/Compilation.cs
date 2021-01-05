@@ -18,37 +18,37 @@ namespace Minsk.CodeAnalysis
         private BoundGlobalScope globalScope;
         private BoundProgram program;
 
-        public Compilation(SyntaxTree tree)
-            : this(tree.Diagnostics, tree)
-        { }
-
-        public Compilation(DiagnosticBag diagnostics, params SyntaxTree[] syntaxTrees)
-            : this(diagnostics, null, syntaxTrees)
-        { }
-
-        private Compilation(DiagnosticBag diagnostics, Compilation previous, SyntaxTree[] syntaxTrees)
+        private Compilation(
+            DiagnosticBag diagnostics,
+            IEnumerable<SyntaxTree> syntaxTrees,
+            Compilation previous = null,
+            bool isScript = false)
         {
             Diagnostics = diagnostics;
             Previous = previous;
+            IsScript = isScript;
             SyntaxTrees = syntaxTrees.ToImmutableArray();
         }
 
+        public static Compilation Create(SyntaxTree syntaxTree)
+            => new Compilation(syntaxTree.Diagnostics, new[] { syntaxTree }, previous: null, isScript: false);
+
+        public static Compilation Create(DiagnosticBag diagnostics, IEnumerable<SyntaxTree> syntaxTrees)
+            => new Compilation(diagnostics, syntaxTrees, previous: null, isScript: false);
+
+        public static Compilation Empty
+            => new Compilation(new DiagnosticBag(), Enumerable.Empty<SyntaxTree>(), previous: null, isScript: false);
+
         public static Compilation CreateScript(SyntaxTree syntaxTree)
-            => new Compilation(syntaxTree?.Diagnostics ?? new DiagnosticBag(), null, syntaxTree);
+            => new Compilation(syntaxTree.Diagnostics, new[] { syntaxTree }, previous: null, isScript: true);
 
-        public static Compilation CreateScript(Compilation previous, SyntaxTree syntaxTree)
-            => new Compilation(syntaxTree.Diagnostics, previous, new SyntaxTree[] { syntaxTree });
-
-        public static Compilation Compile(SyntaxTree syntaxTree)
-            => new Compilation(syntaxTree.Diagnostics, null, syntaxTree);
-
-        public static Compilation Compile(DiagnosticBag diagnostics, IEnumerable<SyntaxTree> syntaxTrees)
-            => new Compilation(diagnostics, syntaxTrees.ToArray());
+        public static Compilation CreateScript(SyntaxTree syntaxTree, Compilation previous)
+            => new Compilation(syntaxTree.Diagnostics, new[] { syntaxTree }, previous: previous, isScript: true);
 
         public DiagnosticBag Diagnostics { get; }
 
         public Compilation Previous { get; }
-
+        public bool IsScript { get; }
         public ImmutableArray<SyntaxTree> SyntaxTrees { get; }
 
         internal BoundGlobalScope GlobalScope
@@ -57,7 +57,7 @@ namespace Minsk.CodeAnalysis
             {
                 if (globalScope is null)
                 {
-                    var globalScope = Binder.BindGlobalScope(Previous?.GlobalScope, SyntaxTrees, Diagnostics);
+                    var globalScope = Binder.BindGlobalScope(IsScript, Previous?.GlobalScope, SyntaxTrees, Diagnostics);
                     Interlocked.CompareExchange(ref this.globalScope, globalScope, null);
                 }
                 return globalScope;
@@ -70,7 +70,7 @@ namespace Minsk.CodeAnalysis
             {
                 if (program is null)
                 {
-                    var program = Binder.BindProgram(Previous?.Program, GlobalScope, Diagnostics);
+                    var program = Binder.BindProgram(IsScript, Previous?.Program, GlobalScope, Diagnostics);
                     Interlocked.CompareExchange(ref this.program, program, null);
                 }
                 return program;
@@ -84,7 +84,7 @@ namespace Minsk.CodeAnalysis
                 .Concat(Program.AllFunctions().Select(f => f.Symbol));
 
         public Compilation ContinueWith(SyntaxTree syntaxTree)
-            => new Compilation(syntaxTree.Diagnostics, this, new SyntaxTree[] { syntaxTree });
+            => throw new NotImplementedException();
 
         public EvaluationResult Evaluate()
             => Evaluate(new Dictionary<VariableSymbol, object>());

@@ -45,6 +45,37 @@
             }
         },
         {
+            "label": "mkc-file",
+            "command": "dotnet",
+            "type": "process",
+            "options": {
+                "cwd": "${workspaceFolder}/samples"
+            },
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/Minsk.Compiler/Minsk.Compiler.csproj",
+                "--",
+                "${file}"
+            ],
+            "presentation": {
+                "focus": true,
+                "clear": true
+            },
+            "problemMatcher": {
+                "owner": "minsk",
+                "fileLocation": "absolute",
+                "pattern": [
+                    {
+                        "regexp": "^(.+)\\((\\d+,\\d+,\\d+,\\d+)\\):\\s+(.+)$",
+                        "file": 1,
+                        "location": 2,
+                        "message": 3
+                    }
+                ]
+            }
+        },
+        {
             "label": "mki",
             "command": "dotnet",
             "type": "process",

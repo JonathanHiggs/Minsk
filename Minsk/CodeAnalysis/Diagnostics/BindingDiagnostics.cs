@@ -92,5 +92,8 @@ namespace Minsk.CodeAnalysis.Diagnostics
 
         public void MissingReturnExpression(ReturnStatement node)
             => Error(node, $"Missing return expression");
+
+        public void InvalidExpressionStatement(Statement node)
+            => Error(node, $"Expression is invalid; only assignment and call expressions can be used as a statement");
     }
 }

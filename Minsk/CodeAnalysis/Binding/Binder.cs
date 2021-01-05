@@ -16,18 +16,23 @@ namespace Minsk.CodeAnalysis.Binding
     {
         private readonly DiagnosticBag diagnostics;
         private readonly FunctionSymbol function;
-
+        private readonly bool isScript;
         private BoundScope scope;
         private int labelCounter = 1;
         private Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> loopStack
             = new Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)>();
 
-        public Binder(DiagnosticBag diagnostics, BoundScope parent, FunctionSymbol function)
+        public Binder(
+            DiagnosticBag diagnostics,
+            BoundScope parent,
+            FunctionSymbol function,
+            bool isScript)
         {
             this.diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
             this.function = function;
+            this.isScript = isScript;
 
             scope = new BoundScope(parent);
 
@@ -39,17 +44,24 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
         public static BoundGlobalScope BindGlobalScope(
+            bool isScript,
             BoundGlobalScope previous,
-            SyntaxTree syntaxTree)
-            => BindGlobalScope(previous, new SyntaxTree[] { syntaxTree }, syntaxTree.Diagnostics);
+            SyntaxTree syntaxTree
+        )
+            => BindGlobalScope(
+                isScript,
+                previous,
+                new SyntaxTree[] { syntaxTree },
+                syntaxTree.Diagnostics);
 
         public static BoundGlobalScope BindGlobalScope(
+            bool isScript,
             BoundGlobalScope previous,
             IEnumerable<SyntaxTree> syntaxTrees,
             DiagnosticBag diagnostics)
         {
             var parentScope = CreateParentScope(previous);
-            var binder = new Binder(diagnostics, parentScope, function: null);
+            var binder = new Binder(diagnostics, parentScope, function: null, isScript);
 
             var functionDeclarations =
                 syntaxTrees.SelectMany(t => t.Root.Members)
@@ -65,7 +77,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             foreach (var globalStatement in globalStatements)
             {
-                var statement = binder.BindStatement(globalStatement.Statement);
+                var statement = binder.BindGlobalStatement(globalStatement.Statement);
                 statements.Add(statement);
             }
 
@@ -76,6 +88,7 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
         public static BoundProgram BindProgram(
+            bool isScript,
             BoundProgram previousProgram,
             BoundGlobalScope globalScope,
             DiagnosticBag diagnostics)
@@ -87,7 +100,7 @@ namespace Minsk.CodeAnalysis.Binding
 
             foreach(var function in globalScope.Functions)
             {
-                var binder = new Binder(diagnostics, parentScope, function);
+                var binder = new Binder(diagnostics, parentScope, function, isScript);
                 var body = binder.BindStatement(function.Declaration.Body);
                 var loweredBody = Lowerer.Lower(body);
 
@@ -167,7 +180,31 @@ namespace Minsk.CodeAnalysis.Binding
             return scope;
         }
 
-        private BoundStatement BindStatement(Statement node)
+        private BoundStatement BindGlobalStatement(Statement node)
+            => BindStatement(node, true);
+
+        private BoundStatement BindStatement(Statement node, bool isGlobal = false)
+        {
+            var result = BindStatementInternal(node);
+
+            if (!isScript || !isGlobal)
+            {
+                if (result is BoundExpressionStatement es)
+                {
+                    var isAllowedExpression
+                        = es.Expression.Kind == BoundNodeKind.ErrorExpression
+                        || es.Expression.Kind == BoundNodeKind.AssignmentExpression
+                        || es.Expression.Kind == BoundNodeKind.CallExpression;
+
+                    if (!isAllowedExpression)
+                        Report.InvalidExpressionStatement(node);
+                }
+            }
+
+            return result;
+        }
+
+        private BoundStatement BindStatementInternal(Statement node)
         {
             return node.Kind switch {
                 SyntaxKind.BlockStatement

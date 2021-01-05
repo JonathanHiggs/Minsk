@@ -41,7 +41,7 @@ namespace Minsk.Compiler
                 filePaths.Select(path => SourceText.Load(path))
                      .Select(source => SyntaxTree.Parse(source, diagnostics));
 
-            var compilation = Compilation.Compile(diagnostics, syntaxTrees);
+            var compilation = Compilation.Create(diagnostics, syntaxTrees);
             var result = compilation.Evaluate();
 
             if (!result.Diagnostics.Any())

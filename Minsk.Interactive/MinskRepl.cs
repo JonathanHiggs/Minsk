@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 using Minsk.CodeAnalysis;
+using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Lexing;
 using Minsk.CodeAnalysis.Parsing;
 using Minsk.CodeAnalysis.Symbols;
@@ -14,7 +15,6 @@ namespace Minsk.Interactive
 {
     internal sealed class MinskRepl : Repl
     {
-        private static readonly Compilation emptyCompilation = Compilation.CreateScript(null);
         private Compilation previous;
 
         private bool loadingSubmission;
@@ -179,7 +179,7 @@ namespace Minsk.Interactive
         [MetaCommand("ls", "Lists all symbols")]
         private void EvaluateLs()
         {
-            var compilation = previous ?? emptyCompilation;
+            var compilation = previous ?? Compilation.Empty;
             var symbols = compilation.Symbols.OrderBy(s => s.Kind).ThenBy(s => s.Name);
 
             foreach (var symbol in symbols)
@@ -192,7 +192,7 @@ namespace Minsk.Interactive
         [MetaCommand("dump", "Shows the bound tree for a given function")]
         private void EvaluateDump(string functionName)
         {
-            var compilation = previous ?? emptyCompilation;
+            var compilation = previous ?? Compilation.Empty;
             var symbol = compilation.Symbols.OfType<FunctionSymbol>().SingleOrDefault(f => f.Name == functionName);
 
             if (symbol is null)
@@ -233,7 +233,7 @@ namespace Minsk.Interactive
         protected override void EvaluateSubmittion(string text)
         {
             var syntaxTree = SyntaxTree.Parse(text);
-            Compilation compilation = Compilation.CreateScript(previous, syntaxTree);
+            Compilation compilation = Compilation.CreateScript(syntaxTree);
 
             if (showTree)
                 syntaxTree.Root.PrettyPrint(Console.Out);

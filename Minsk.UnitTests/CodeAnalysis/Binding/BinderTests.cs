@@ -30,7 +30,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Binding
         {
             // Arrange
             var tree = SyntaxTree.Parse(code);
-            var compilation = new Compilation(tree);
+            var compilation = Compilation.Create(tree);
 
             // Apriori
             Assert.That(tree.Diagnostics, Is.Empty);
