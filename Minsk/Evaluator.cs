@@ -200,8 +200,11 @@ namespace Minsk.CodeAnalysis
 
             stack.Push(locals);
 
-            var statement = program.Functions[node.Function];
-            var result = EvaluateStatement(statement);
+            var (body, success) = program.TryLookupFunction(node.Function);
+            if (!success)
+                throw new Exception($"A fFunction named '{node.Function.Name}' was not found");
+
+            var result = EvaluateStatement(body);
 
             stack.Pop();
 

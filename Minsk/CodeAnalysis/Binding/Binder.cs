@@ -76,6 +76,7 @@ namespace Minsk.CodeAnalysis.Binding
         }
 
         public static BoundProgram BindProgram(
+            BoundProgram previousProgram,
             BoundGlobalScope globalScope,
             DiagnosticBag diagnostics)
         {
@@ -84,28 +85,21 @@ namespace Minsk.CodeAnalysis.Binding
             var functionBodies
                 = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
 
-            var scope = globalScope;
-
-            while (scope != null)
+            foreach(var function in globalScope.Functions)
             {
-                foreach(var function in scope.Functions)
-                {
-                    var binder = new Binder(diagnostics, parentScope, function);
-                    var body = binder.BindStatement(function.Declaration.Body);
-                    var loweredBody = Lowerer.Lower(body);
+                var binder = new Binder(diagnostics, parentScope, function);
+                var body = binder.BindStatement(function.Declaration.Body);
+                var loweredBody = Lowerer.Lower(body);
 
-                    if (function.ReturnType.IsNotVoidType && !ControlFlowGraph.AllPathsReturn(loweredBody))
-                        binder.Report.AllPathsMustReturn(function);
+                if (function.ReturnType.IsNotVoidType && !ControlFlowGraph.AllPathsReturn(loweredBody))
+                    binder.Report.AllPathsMustReturn(function);
 
-                    functionBodies.Add(function, loweredBody);
-                }
-
-                scope = scope.Previous;
+                functionBodies.Add(function, loweredBody);
             }
 
             var statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
 
-            return new BoundProgram(diagnostics, functionBodies.ToImmutable(), statement);
+            return new BoundProgram(diagnostics, previousProgram, functionBodies.ToImmutable(), statement);
         }
 
         private void BindFunctionDeclaration(FunctionDeclaration node)

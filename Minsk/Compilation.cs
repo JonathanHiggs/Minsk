@@ -16,6 +16,7 @@ namespace Minsk.CodeAnalysis
     public sealed class Compilation
     {
         private BoundGlobalScope globalScope;
+        private BoundProgram program;
 
         public Compilation(SyntaxTree tree)
             : this(tree.Diagnostics, tree)
@@ -33,7 +34,7 @@ namespace Minsk.CodeAnalysis
         }
 
         public static Compilation CreateScript(SyntaxTree syntaxTree)
-            => new Compilation(syntaxTree.Diagnostics, null, syntaxTree);
+            => new Compilation(syntaxTree?.Diagnostics ?? new DiagnosticBag(), null, syntaxTree);
 
         public static Compilation CreateScript(Compilation previous, SyntaxTree syntaxTree)
             => new Compilation(syntaxTree.Diagnostics, previous, new SyntaxTree[] { syntaxTree });
@@ -63,8 +64,24 @@ namespace Minsk.CodeAnalysis
             }
         }
 
+        internal BoundProgram Program
+        {
+            get
+            {
+                if (program is null)
+                {
+                    var program = Binder.BindProgram(Previous?.Program, GlobalScope, Diagnostics);
+                    Interlocked.CompareExchange(ref this.program, program, null);
+                }
+                return program;
+            }
+        }
+
+
         public IEnumerable<Symbol> Symbols
-            => Enumerable.Concat<Symbol>(GlobalScope.Functions, GlobalScope.Variables);
+            => GlobalScope.Functions.Cast<Symbol>()
+                .Concat(GlobalScope.Variables)
+                .Concat(Program.AllFunctions().Select(f => f.Symbol));
 
         public Compilation ContinueWith(SyntaxTree syntaxTree)
             => new Compilation(syntaxTree.Diagnostics, this, new SyntaxTree[] { syntaxTree });
@@ -74,11 +91,13 @@ namespace Minsk.CodeAnalysis
 
         public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
+            // Side effects on a property access... yay!
             var diagnostics = GlobalScope.Diagnostics;
             if (diagnostics.Any())
                 return new EvaluationResult(null, diagnostics.ToImmutableArray());
 
-            var program = Binder.BindProgram(GlobalScope, diagnostics);
+            // Side effects on a property access... yay x2!
+            var program = Program;
 
             EmitControlFlowGraph(program);
 
@@ -111,7 +130,7 @@ namespace Minsk.CodeAnalysis
 
         public void EmitTree(FunctionSymbol function, TextWriter writer)
         {
-            var program = Binder.BindProgram(GlobalScope, new DiagnosticBag());
+            var program = Program;
             var tree = program.Functions[function];
 
             function.WriteTo(writer);
@@ -121,7 +140,7 @@ namespace Minsk.CodeAnalysis
 
         public void EmitTree(TextWriter writer)
         {
-            var program = Binder.BindProgram(GlobalScope, new DiagnosticBag());
+            var program = Program;
 
             if (program.Statement.Statements.Any())
             {
