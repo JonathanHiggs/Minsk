@@ -11,29 +11,24 @@ namespace Minsk.CodeAnalysis.Binding
         public BoundProgram(
             DiagnosticBag diagnostics,
             BoundProgram previous,
-            ImmutableDictionary<FunctionSymbol, BoundBlockStatement> functions,
-            BoundBlockStatement statement)
+            FunctionSymbol mainFunction,
+            FunctionSymbol scriptFunction,
+            ImmutableDictionary<FunctionSymbol, BoundBlockStatement> functions)
         {
             Diagnostics = diagnostics;
             Previous = previous;
+            MainFunction = mainFunction;
+            ScriptFunction = scriptFunction;
             Functions = functions;
-            Statement = statement;
         }
 
         public DiagnosticBag Diagnostics { get; }
         public BoundProgram Previous { get; }
+        public FunctionSymbol MainFunction { get; }
+        public FunctionSymbol ScriptFunction { get; }
         public ImmutableDictionary<FunctionSymbol, BoundBlockStatement> Functions { get; }
-        public BoundBlockStatement Statement { get; }
 
-        public override IEnumerable<BoundNode> Children
-        {
-            get
-            {
-                foreach (var function in Functions)
-                    yield return function.Value;
-                yield return Statement;
-            }
-        }
+        public override IEnumerable<BoundNode> Children => Functions.Values;
 
         public override BoundNodeKind Kind => BoundNodeKind.Program;
 

@@ -12,21 +12,26 @@ namespace Minsk.CodeAnalysis.Binding
         public BoundGlobalScope(
             BoundGlobalScope previous,
             DiagnosticBag diagnostics,
+            FunctionSymbol mainFunction,
+            FunctionSymbol scriptFunction,
             IEnumerable<FunctionSymbol> functions,
             IEnumerable<VariableSymbol> variables,
             IEnumerable<BoundStatement> statements
-        )
-            : this(
-                  previous,
-                  diagnostics,
-                  functions.ToImmutableArray(),
-                  variables.ToImmutableArray(),
-                  statements.ToImmutableArray())
+        ) : this(
+            previous,
+            diagnostics,
+            mainFunction,
+            scriptFunction,
+            functions.ToImmutableArray(),
+            variables.ToImmutableArray(),
+            statements.ToImmutableArray())
         { }
 
         public BoundGlobalScope(
             BoundGlobalScope previous,
             DiagnosticBag diagnostics,
+            FunctionSymbol mainFunction,
+            FunctionSymbol scriptFunction,
             ImmutableArray<FunctionSymbol> functions,
             ImmutableArray<VariableSymbol> variables,
             ImmutableArray<BoundStatement> statements)
@@ -36,6 +41,8 @@ namespace Minsk.CodeAnalysis.Binding
             Diagnostics = diagnostics
                 ?? throw new ArgumentNullException(nameof(diagnostics));
 
+            MainFunction = mainFunction;
+            ScriptFunction = scriptFunction;
             Functions = functions;
             Variables = variables;
             Statements = statements;
@@ -43,6 +50,10 @@ namespace Minsk.CodeAnalysis.Binding
 
         public BoundGlobalScope Previous { get; }
         public DiagnosticBag Diagnostics { get; }
+
+        public FunctionSymbol MainFunction { get; }
+        public FunctionSymbol ScriptFunction { get; }
+
         public ImmutableArray<FunctionSymbol> Functions { get; }
         public ImmutableArray<VariableSymbol> Variables { get; }
         public ImmutableArray<BoundStatement> Statements { get; }

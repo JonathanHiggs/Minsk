@@ -63,11 +63,20 @@ namespace Minsk.CodeAnalysis.Diagnostics
         public void AllPathsMustReturn(FunctionSymbol node)
             => Error(node.Declaration, $"All code paths must return a value");
 
+        public void MultipleMainFunctions(FunctionDeclaration node)
+            => Error(node, "Multiple 'Main' functions declared");
+
         public void VariableRedeclaration(SyntaxNode node, LexToken identifierToken)
             => Error(node, $"Variable {identifierToken.Text} already declared");
 
         public void VariableRedeclaration(ForToStatement node)
             => Error(node, $"Variable {node.Identifier.Text} already declared");
+
+        internal void CannotMixMainAndGlobalStatements(FunctionDeclaration node)
+            => Error(node, node.Identifier.Location, $"Cannot mix a main function and global statements");
+
+        public void CannotMixMainAndGlobalStatements(GlobalStatementSyntax node)
+            => Error(node, $"Cannot mix a main function and global statements");
 
         public void ParameterAlreadyDeclared(ParameterSyntax node)
             => Error(node, $"A parameter with the name '{node.Identifier.Text}' was already declared");
@@ -76,10 +85,19 @@ namespace Minsk.CodeAnalysis.Diagnostics
             => Error(node, "Expression must return a value");
 
         public void SymbolAlreadyDeclared(FunctionDeclaration node)
-            => Error(node, $"A symbol with the name '{node.Identifier.Text}' was already declared");
+            => Error(node, node.Identifier.Location, $"A symbol with the name '{node.Identifier.Text}' was already declared");
+
+        public void MultipleGlobalStatementFiles(GlobalStatementSyntax node)
+            => Error(node, $"Only a single file may have global statements");
 
         public void InvalidBreak(BreakStatement node)
             => Error(node, $"Invalid break statement; not in a loop");
+
+        public void MainCannotHaveParameters(FunctionDeclaration node)
+            => Error(node, new TextLocation(node.SyntaxTree.Source, node.OpenParentheses.Location.Span.To(node.CloseParentheses.Location.Span)), $"Main method cannot have parameters");
+
+        public void MainMustBeVoid(FunctionDeclaration node)
+            => Error(node, node.OptionalTypeClause.Location, $"Main method must be void");
 
         public void InvalidContinue(ContinueStatement node)
             => Error(node, $"Invalid continue statement; not in a loop");

@@ -65,7 +65,6 @@ namespace Minsk.CodeAnalysis.Symbols
 
             if (ReturnType.IsNotVoidType)
             {
-                writer.WriteSpace();
                 writer.WritePunctuation(TokenKind.Colon);
                 writer.WriteSpace();
                 ReturnType.WriteTo(writer);

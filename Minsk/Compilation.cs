@@ -53,6 +53,8 @@ namespace Minsk.CodeAnalysis
 
         public ImmutableArray<SyntaxTree> SyntaxTrees { get; }
 
+        public FunctionSymbol MainFunction => GlobalScope.MainFunction;
+
         public ImmutableArray<FunctionSymbol> Functions => GlobalScope.Functions;
 
         public ImmutableArray<VariableSymbol> Variables => GlobalScope.Variables;
@@ -118,8 +120,6 @@ namespace Minsk.CodeAnalysis
             if (GlobalScope.Diagnostics.Any())
                 return new EvaluationResult(null, GlobalScope.Diagnostics.ToImmutableArray());
 
-            //EmitControlFlowGraph(program);
-
             if (Program.Diagnostics.Any())
                 return new EvaluationResult(null, Program.Diagnostics.ToImmutableArray());
 
@@ -129,13 +129,10 @@ namespace Minsk.CodeAnalysis
             return new EvaluationResult(value, ImmutableArray<Diagnostic>.Empty);
         }
 
-        internal void EmitControlFlowGraph(BoundProgram program)
+        public void EmitControlFlowGraph(FunctionSymbol function)
         {
-            var cfgStatement = program.Statement.Statements.Any()
-                ? program.Statement
-                : program.Functions.Any()
-                    ? program.Functions.Last().Value
-                    : null;
+            var cfgStatement =
+                program.Functions.SingleOrDefault(kvp => kvp.Key.Name == function.Name).Value;
 
             var cfg = ControlFlowGraph.Create(cfgStatement);
 
@@ -158,21 +155,12 @@ namespace Minsk.CodeAnalysis
 
         public void EmitTree(TextWriter writer)
         {
-            if (Program.Statement.Statements.Any())
+            foreach (var function in Program.Functions)
             {
-                Program.WriteTo(writer);
-            }
-            else
-            {
-                foreach (var function in Program.Functions)
-                {
-                    if (!GlobalScope.Functions.Contains(function.Key))
-                        continue;
-
-                    function.Key.WriteTo(writer);
-                    writer.WriteLine();
-                    function.Value.WriteTo(writer);
-                }
+                function.Key.WriteTo(writer);
+                writer.WriteLine();
+                function.Value.WriteTo(writer);
+                writer.WriteLine();
             }
         }
     }

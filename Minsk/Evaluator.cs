@@ -48,7 +48,15 @@ namespace Minsk.CodeAnalysis
         {
             var locals = new Dictionary<VariableSymbol, object>();
             stack.Push(locals);
-            return EvaluateStatement(program.Statement);
+
+            var entryPoint = program.MainFunction ?? program.ScriptFunction;
+
+            if (entryPoint is null)
+                return null;
+
+            var statement = program.Functions[entryPoint];
+
+            return EvaluateStatement(statement);
         }
 
         private object EvaluateStatement(BoundBlockStatement body)

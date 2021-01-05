@@ -201,7 +201,9 @@ namespace Minsk.Interactive
         private void EvaluateDump(string functionName)
         {
             var compilation = previous ?? Compilation.Empty;
-            var symbol = compilation.Symbols.OfType<FunctionSymbol>().SingleOrDefault(f => f.Name == functionName);
+            var symbol = compilation.Symbols
+                                    .OfType<FunctionSymbol>()
+                                    .SingleOrDefault(f => f.Name == functionName);
 
             if (symbol is null)
             {
@@ -212,6 +214,25 @@ namespace Minsk.Interactive
             }
 
             compilation.EmitTree(symbol, Console.Out);
+        }
+
+        [MetaCommand("cfg", "Creates the control flow graph for the given function")]
+        private void EvaluateCfg(string functionName)
+        {
+            var compilation = previous ?? Compilation.Empty;
+            var symbol = compilation.Symbols
+                                    .OfType<FunctionSymbol>()
+                                    .SingleOrDefault(f => f.Name == functionName);
+
+            if (symbol is null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"error: function '{functionName}' does not exist");
+                Console.ResetColor();
+                return;
+            }
+
+            compilation.EmitControlFlowGraph(symbol);
         }
 
         protected override bool IsCompleteSubmission(string text)

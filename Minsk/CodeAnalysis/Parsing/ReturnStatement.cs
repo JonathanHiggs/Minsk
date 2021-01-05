@@ -6,26 +6,33 @@ namespace Minsk.CodeAnalysis.Parsing
 {
     public sealed class ReturnStatement : Statement
     {
-        public ReturnStatement(SyntaxTree syntaxTree, LexToken returnKeyword, Expression expression)
+        public ReturnStatement(SyntaxTree syntaxTree, LexToken returnKeyword, Expression optionalExpression)
             : base(syntaxTree)
         {
             ReturnKeyword = returnKeyword;
-            Expression = expression;
+            OptionalExpression = optionalExpression;
 
-            Expression.Parent = this;
+            if (OptionalExpression is not null)
+                OptionalExpression.Parent = this;
         }
 
         public LexToken ReturnKeyword { get; }
-        public Expression Expression { get; }
+        public Expression OptionalExpression { get; }
 
         public override string Text => string.Empty;
 
         public override LexToken FirstToken => ReturnKeyword;
 
-        public override LexToken LastToken => Expression.LastToken;
+        public override LexToken LastToken => OptionalExpression.LastToken;
 
         public override IEnumerable<SyntaxNode> Children
-        { get { yield return Expression; } }
+        {
+            get
+            {
+                if (OptionalExpression is not null)
+                    yield return OptionalExpression;
+            }
+        }
 
         public override SyntaxKind Kind => SyntaxKind.ReturnStatement;
     }

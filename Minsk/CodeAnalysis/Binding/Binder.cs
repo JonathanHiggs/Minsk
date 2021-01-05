@@ -60,6 +60,8 @@ namespace Minsk.CodeAnalysis.Binding
             IEnumerable<SyntaxTree> syntaxTrees,
             DiagnosticBag diagnostics)
         {
+            var Report = diagnostics.Binding;   // Odour remover
+
             var parentScope = CreateParentScope(previous);
             var binder = new Binder(diagnostics, parentScope, function: null, isScript);
 
@@ -84,7 +86,70 @@ namespace Minsk.CodeAnalysis.Binding
             var functions = binder.scope.Functions.ToImmutableArray();
             var variables = binder.scope.Variables.ToImmutableArray();
 
-            return new BoundGlobalScope(previous, diagnostics, functions, variables, statements);
+            FunctionSymbol mainFunction = null;
+            FunctionSymbol scriptFunction = null;
+
+            if (isScript)
+            {
+                if (globalStatements.Any())
+                    scriptFunction = "$eval".ReturnsAny();
+            }
+            else
+            {
+                var mainFunctions = functions.Where(f => f.Name == "Main").ToImmutableArray();
+                if (mainFunctions.Length > 1)
+                {
+                    foreach (var main in mainFunctions)
+                        Report.MultipleMainFunctions(main.Declaration);
+                }
+
+                static GlobalStatementSyntax FirstGlobalStatement(SyntaxTree tree)
+                    => tree.Root.Members.OfType<GlobalStatementSyntax>().FirstOrDefault();
+
+                if (mainFunctions.Length > 0 && globalStatements.Any())
+                {
+                    var firstGlobalInEachTree =
+                        syntaxTrees.Select(FirstGlobalStatement).Where(s => s is not null);
+
+                    foreach (var main in mainFunctions)
+                        Report.CannotMixMainAndGlobalStatements(main.Declaration);
+
+                    foreach (var statement in firstGlobalInEachTree)
+                        Report.CannotMixMainAndGlobalStatements(statement);
+                }
+
+                if (mainFunctions.Length == 0 && globalStatements.Any())
+                {
+                    static (SyntaxTree SyntaxTree, GlobalStatementSyntax GlobalStatement) Pair(SyntaxTree tree)
+                        => (tree, FirstGlobalStatement(tree));
+
+                    var syntaxTreesWithGlobalStatement =
+                        syntaxTrees.Select(Pair).Where(kv => kv.GlobalStatement is not null);
+
+                    if (syntaxTreesWithGlobalStatement.Count() > 1)
+                    {
+                        foreach (var pair in syntaxTreesWithGlobalStatement)
+                            Report.MultipleGlobalStatementFiles(pair.GlobalStatement);
+                    }
+                }
+
+                if (mainFunctions.Length == 1)
+                {
+                    mainFunction = mainFunctions[0];
+
+                    if (mainFunction.ReturnType.IsNotVoidType)
+                        Report.MainMustBeVoid(mainFunction.Declaration);
+
+                    if (mainFunction.Parameters.Any())
+                        Report.MainCannotHaveParameters(mainFunction.Declaration);
+                }
+                else
+                {
+
+                }
+            }
+
+            return new BoundGlobalScope(previous, diagnostics, mainFunction, scriptFunction, functions, variables, statements);
         }
 
         public static BoundProgram BindProgram(
@@ -99,8 +164,9 @@ namespace Minsk.CodeAnalysis.Binding
                 return new BoundProgram(
                     globalScope.Diagnostics,
                     previousProgram,
-                    ImmutableDictionary<FunctionSymbol, BoundBlockStatement>.Empty,
-                    null);
+                    globalScope.MainFunction,
+                    globalScope.ScriptFunction,
+                    ImmutableDictionary<FunctionSymbol, BoundBlockStatement>.Empty);
 
             var functionBodies
                 = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
@@ -117,9 +183,39 @@ namespace Minsk.CodeAnalysis.Binding
                 functionBodies.Add(function, loweredBody);
             }
 
-            var statement = Lowerer.Lower(new BoundBlockStatement(globalScope.Statements));
+            BoundBlockStatement statement;
+            var statements = globalScope.Statements;
 
-            return new BoundProgram(diagnostics, previousProgram, functionBodies.ToImmutable(), statement);
+            if (globalScope.MainFunction is not null && globalScope.Statements.Any())
+            {
+                statement = Lowerer.Lower(new BoundBlockStatement(statements));
+                functionBodies.Add(globalScope.MainFunction, statement);
+            }
+            else if (globalScope.ScriptFunction is not null)
+            {
+                if (statements.Length == 1
+                    && statements[0] is BoundExpressionStatement expressionStatement
+                    && expressionStatement.Expression.Type.IsNotVoidType)
+                {
+                    statements =
+                        statements.SetItem(0, new BoundReturnStatement(expressionStatement.Expression));
+                }
+                else
+                {
+                    var nullValue = new BoundLiteralExpression("");
+                    statements = statements.Add(new BoundReturnStatement(nullValue));
+                }
+
+                statement = Lowerer.Lower(new BoundBlockStatement(statements));
+                functionBodies.Add(globalScope.ScriptFunction, statement);
+            }
+
+            return new BoundProgram(
+                diagnostics,
+                previousProgram,
+                globalScope.MainFunction,
+                globalScope.ScriptFunction,
+                functionBodies.ToImmutable());
         }
 
         private void BindFunctionDeclaration(FunctionDeclaration node)
@@ -321,7 +417,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         private BoundStatement BindReturnStatement(ReturnStatement node)
         {
-            var expression = node.Expression is not null ? BindExpression(node.Expression) : null;
+            var expression = node.OptionalExpression is not null ? BindExpression(node.OptionalExpression) : null;
 
             if (function is null)
             {
@@ -339,7 +435,7 @@ namespace Minsk.CodeAnalysis.Binding
                     if (expression is null)
                         Report.MissingReturnExpression(node);
                     else
-                        expression = BindConversion(node.Expression, function.ReturnType);
+                        expression = BindConversion(node.OptionalExpression, function.ReturnType);
                 }
             }
 

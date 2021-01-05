@@ -338,7 +338,19 @@ namespace Minsk.CodeAnalysis.Binding
 
         private static void WriteProgram(BoundProgram node, IndentedTextWriter writer)
         {
-            node.Statement.WriteTo(writer);
+            foreach (var function in node.Functions)
+            {
+                var unindent = writer.Indent > 0;
+                if (unindent)
+                    writer.Indent--;
+
+                writer.WritePunctuation(function.Key.Name);
+                writer.WritePunctuation(TokenKind.Colon);
+                writer.WriteLine();
+
+                WriteBlockStatement(function.Value, writer);
+                writer.WriteLine();
+            }
         }
 
         private static void WriteUnaryExpression(BoundUnaryExpression node, IndentedTextWriter writer)
