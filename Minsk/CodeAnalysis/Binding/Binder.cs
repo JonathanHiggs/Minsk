@@ -528,21 +528,15 @@ namespace Minsk.CodeAnalysis.Binding
                 return new BoundErrorExpression();
             }
 
-            var hasError = false;
-
             for (var i = 0; i < function.Parameters.Length; i++)
             {
                 var parameter = function.Parameters[i];
                 var argument = boundArguments[i];
+                var argumentNode = node.Arguments[i];
+                var argumentLocation = argumentNode.Location;
 
-                if (argument.Type != parameter.Type)
-                {
-                    Report.ArgumentTypeMismatch(node.Arguments[i], argument.Type, parameter);
-                }
+                boundArguments[i] = BindConversion(argumentLocation, argumentNode, argument, parameter.Type);
             }
-
-            if (hasError)
-                return new BoundErrorExpression();
 
             return new BoundCallExpression(function, boundArguments.ToImmutable());
         }
@@ -665,6 +659,7 @@ namespace Minsk.CodeAnalysis.Binding
         {
             return name switch
             {
+                "any"       => TypeSymbol.Any,
                 "bool"      => TypeSymbol.Bool,
                 "int"       => TypeSymbol.Int,
                 "string"    => TypeSymbol.String,

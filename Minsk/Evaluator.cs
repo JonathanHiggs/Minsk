@@ -233,8 +233,8 @@ namespace Minsk.CodeAnalysis
             }
             else if (node.Function == BuiltinFunctions.Print)
             {
-                var value = (string)EvaluateExpression(node.Arguments[0]);
-                Console.WriteLine(value);
+                var value = EvaluateExpression(node.Arguments[0]);
+                Console.WriteLine(value.ToString());
                 return null;
             }
             else if (node.Function == BuiltinFunctions.Rand)
@@ -252,7 +252,9 @@ namespace Minsk.CodeAnalysis
         {
             var value = EvaluateExpression(node.Expression);
 
-            if (node.Type == TypeSymbol.Bool)
+            if (node.Type == TypeSymbol.Any)
+                return value;
+            else if (node.Type == TypeSymbol.Bool)
                 return Convert.ToBoolean(value);
             else if (node.Type == TypeSymbol.Int)
                 return Convert.ToInt32(value);

@@ -7,7 +7,7 @@ namespace Minsk.CodeAnalysis.Symbols
 {
     internal static class BuiltinFunctions
     {
-        public static readonly FunctionSymbol Print = "Print".WithParameters("text".OfType<string>());
+        public static readonly FunctionSymbol Print = "Print".WithParameters("text".OfAnyType());
 
         public static readonly FunctionSymbol Input = "Input".Returns<string>();
 
@@ -30,6 +30,9 @@ namespace Minsk.CodeAnalysis.Symbols
 
         private static ParameterSymbol OfType<T>(this string name)
             => new ParameterSymbol(name, TypeSymbol.From<T>());
+
+        private static ParameterSymbol OfAnyType(this string name)
+            => new ParameterSymbol(name, TypeSymbol.Any);
 
         private static FunctionSymbol Returns<T>(this string name)
             => new FunctionSymbol(name, TypeSymbol.From<T>(), null, isBuiltin: true);

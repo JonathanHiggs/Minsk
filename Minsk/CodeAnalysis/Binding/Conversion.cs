@@ -37,11 +37,16 @@ namespace Minsk.CodeAnalysis.Binding
         public bool IsExplicit { get; }
         public bool IsNotExplicit => !IsExplicit;
 
-
         public static Conversion Classify(TypeSymbol from, TypeSymbol to)
         {
             if (from == to)
                 return Identity;
+
+            if (from.IsNotVoidType && to.IsAnyType)
+                return Implicit;
+
+            if (from.IsAnyType && to.IsNotVoidType)
+                return Explicit;
 
             if (from == TypeSymbol.Bool || from == TypeSymbol.Int)
             {
