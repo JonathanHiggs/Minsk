@@ -105,8 +105,8 @@ namespace Minsk.CodeAnalysis.Diagnostics
         public void InvalidReturnType(ReturnStatement node, TypeSymbol expected, TypeSymbol actual)
             => Error(node, $"Invalid return type; expected '{expected}' but was '{actual}'");
 
-        public void UnexpectedReturnStatement(ReturnStatement node)
-            => Error(node, $"Unexpected return statement");
+        public void InvalidReturnStatement(ReturnStatement node)
+            => Error(node, node.ReturnKeyword.Location, $"Invalid return in global statements");
 
         public void MissingReturnExpression(ReturnStatement node)
             => Error(node, $"Missing return expression");

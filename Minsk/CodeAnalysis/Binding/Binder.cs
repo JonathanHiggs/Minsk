@@ -421,7 +421,15 @@ namespace Minsk.CodeAnalysis.Binding
 
             if (function is null)
             {
-                Report.UnexpectedReturnStatement(node);
+                if (isScript)
+                {
+                    if (expression is null)
+                        expression = new BoundLiteralExpression("");
+                }
+                else if (expression is not null)
+                {
+                    Report.InvalidReturnStatement(node);
+                }
             }
             else
             {
