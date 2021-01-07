@@ -9,7 +9,7 @@
         }
 
 
-        public static TextLocation Empty => new TextLocation(SourceText.Empty, TextSpan.From(0, 0));
+        public static TextLocation Empty => new TextLocation(null, TextSpan.From(0, 0));
 
 
         public SourceText Source { get; }

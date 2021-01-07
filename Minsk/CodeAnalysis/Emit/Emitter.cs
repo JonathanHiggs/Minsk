@@ -108,6 +108,12 @@ namespace Minsk.CodeAnalysis.Emit
             string name,
             string[] parameterTypeNames)
         {
+            if (typeDefinition is null)
+            {
+                Report.MethodNotFound(name);
+                return (null, null);
+            }
+
             var methods = typeDefinition.Methods.Where(m => m.Name == name);
 
             if (!methods.Any())
@@ -154,7 +160,10 @@ namespace Minsk.CodeAnalysis.Emit
                        .ToArray();
 
             if (foundTypes.Length == 0)
+            {
                 Report.RequiredTypeNotFound(metadataName);
+                return (null, null);
+            }
             else if (foundTypes.Length > 1)
                 Report.RequiredTypeAmbiguous(metadataName, foundTypes);
 
