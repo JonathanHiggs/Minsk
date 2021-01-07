@@ -14,6 +14,10 @@ namespace Minsk.CodeAnalysis.Text
             Lines = ParseLines(this, text);
         }
 
+
+        public static SourceText Empty => new SourceText(string.Empty, string.Empty);
+
+
         public static SourceText From(string text, string fileName = "")
             => new SourceText(text, fileName);
 

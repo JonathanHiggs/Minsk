@@ -8,6 +8,10 @@
             Span = span;
         }
 
+
+        public static TextLocation Empty => new TextLocation(SourceText.Empty, TextSpan.From(0, 0));
+
+
         public SourceText Source { get; }
         public TextSpan Span { get; }
 

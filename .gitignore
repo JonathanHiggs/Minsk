@@ -305,8 +305,7 @@ __pycache__/
 OpenCover/
 
 
-# Cake
-/Codebase/Pigeon/Pigeon/tools
-
-
+# Project specific
 /Build/
+samples/**/*.dll
+samples/**/*.exe

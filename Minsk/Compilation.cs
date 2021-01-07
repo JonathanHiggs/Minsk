@@ -7,6 +7,7 @@ using System.Threading;
 
 using Minsk.CodeAnalysis.Binding;
 using Minsk.CodeAnalysis.Diagnostics;
+using Minsk.CodeAnalysis.Emit;
 using Minsk.CodeAnalysis.Lowering;
 using Minsk.CodeAnalysis.Parsing;
 using Minsk.CodeAnalysis.Symbols;
@@ -127,6 +128,11 @@ namespace Minsk.CodeAnalysis
             var value = evaluator.Evaluate();
 
             return new EvaluationResult(value, ImmutableArray<Diagnostic>.Empty);
+        }
+
+        public EmitResult Emit(string moduleName, IEnumerable<string> references, string outputPath)
+        {
+            return Emitter.Emit(Program, moduleName, references, outputPath);
         }
 
         public void EmitControlFlowGraph(FunctionSymbol function)

@@ -4,6 +4,7 @@
     {
         LexError,
         SyntaxError,
-        BindError
+        BindError,
+        EmitError
     }
 }
