@@ -11,43 +11,48 @@ using Mono.Cecil.Cil;
 
 namespace Minsk.CodeAnalysis.Emit
 {
-    internal class Emitter
+    internal sealed class Emitter
     {
+        private readonly string moduleName;
+        private readonly string[] references;
+        private readonly string outputPath;
         private readonly DiagnosticBag diagnostics;
 
         private readonly List<AssemblyDefinition> assemblyReferences = new List<AssemblyDefinition>();
 
-        private AssemblyDefinition assemblyDefinition;
+        private readonly AssemblyDefinition assemblyDefinition;
+        private readonly Dictionary<TypeSymbol, (TypeDefinition Definition, TypeReference Reference)> knownTypes;
 
-        private Emitter(DiagnosticBag diagnostics)
+        private readonly List<(TypeSymbol Type, string MetadataName)> builtinTypes
+            = new List<(TypeSymbol Type, string MetadataName)> {
+                (TypeSymbol.Any,    "System.Object"),
+                (TypeSymbol.Bool,   "System.Boolean"),
+                (TypeSymbol.Int,    "System.Int32"),
+                (TypeSymbol.String, "System.String"),
+                (TypeSymbol.Void,   "System.Void"),
+            };
+
+        private Emitter(
+            string moduleName,
+            IEnumerable<string> references,
+            string outputPath,
+            DiagnosticBag diagnostics)
         {
+            // Save parameters
+            if (string.IsNullOrWhiteSpace(moduleName))
+                throw new ArgumentException(nameof(moduleName));
+            this.moduleName = moduleName;
+
+            this.references = references?.ToArray()
+                ?? throw new ArgumentNullException(nameof(references));
+
+            if (string.IsNullOrWhiteSpace(outputPath))
+                throw new ArgumentException(nameof(outputPath));
+            this.outputPath = outputPath;
+
             this.diagnostics = diagnostics;
-        }
 
-        private EmitDiagnostics Report => diagnostics.Emit;
-
-
-        public static EmitResult Emit(
-            BoundProgram boundProgram,
-            string moduleName,
-            IEnumerable<string> references,
-            string outputPath)
-        {
-            var diagnostics = boundProgram.Diagnostics;
-            var emitter = new Emitter(diagnostics);
-            return emitter.EmitAssembly(moduleName, references, outputPath);
-        }
-
-        public EmitResult EmitAssembly(
-            string moduleName,
-            IEnumerable<string> references,
-            string outputPath)
-        {
-            var assemblyNameDefinition = new AssemblyNameDefinition(moduleName, new Version(1, 0));
-
-            assemblyDefinition = AssemblyDefinition.CreateAssembly(
-                assemblyNameDefinition, moduleName, ModuleKind.Console);
-
+            // Read referenced assemblies
             foreach (var reference in references)
             {
                 try
@@ -61,32 +66,52 @@ namespace Minsk.CodeAnalysis.Emit
                 }
             }
 
-            var builtinTypes = new List<(TypeSymbol Type, string MetadataName)> {
-                (TypeSymbol.Any,    "System.Object"),
-                (TypeSymbol.Bool,   "System.Boolean"),
-                (TypeSymbol.Int,    "System.Int32"),
-                (TypeSymbol.String, "System.String"),
-                (TypeSymbol.Void,   "System.Void"),
-            };
+            var assemblyName = new AssemblyNameDefinition(moduleName, new Version(1, 0));
 
-            var knownTypes = new Dictionary<TypeSymbol, TypeReference>();
+            assemblyDefinition = AssemblyDefinition.CreateAssembly(
+                assemblyName, moduleName, ModuleKind.Console);
 
-            foreach (var (type, metadataName) in builtinTypes)
-            {
-                var resolvedType = ResolveType(type, metadataName);
-                knownTypes.Add(type, resolvedType.Reference);
-            }
+            knownTypes = builtinTypes.ToDictionary(
+                item => item.Type,
+                item => ResolveType(item.Type, item.MetadataName));
+        }
 
+        private EmitDiagnostics Report => diagnostics.Emit;
+
+
+        public static EmitResult Emit(
+            BoundProgram boundProgram,
+            string moduleName,
+            IEnumerable<string> references,
+            string outputPath)
+        {
+            var emitter = new Emitter(
+                moduleName,
+                references,
+                outputPath,
+                boundProgram.Diagnostics);
+
+            return emitter.EmitAssembly(boundProgram);
+        }
+
+        public EmitResult EmitAssembly(BoundProgram boundProgram)
+        {
             var consoleType = ResolveType("System.Console");
             var consoleType_WriteLine = ResolveMethod(consoleType.Definition, "WriteLine", new[] { "System.String" });
 
             if (diagnostics.Any())
                 return new EmitResult(diagnostics);
 
-            var typeDefinition = new TypeDefinition("", "Program", TypeAttributes.Abstract | TypeAttributes.Sealed, knownTypes[TypeSymbol.Any]);
+            var objectType = knownTypes[TypeSymbol.Any].Reference;
+            var typeDefinition = new TypeDefinition(
+                "",
+                "Program",
+                TypeAttributes.Abstract | TypeAttributes.Sealed,
+                objectType);
+
             assemblyDefinition.MainModule.Types.Add(typeDefinition);
 
-            var voidType = knownTypes[TypeSymbol.Void];
+            var voidType = knownTypes[TypeSymbol.Void].Reference;
             var main = new MethodDefinition("Main", MethodAttributes.Static | MethodAttributes.Private, voidType);
             typeDefinition.Methods.Add(main);
 
