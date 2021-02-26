@@ -65,7 +65,8 @@ namespace Minsk.Compiler
             var diagnostics = new DiagnosticBag();
             var syntaxTrees =
                 filePaths.Select(path => SourceText.Load(path))
-                     .Select(source => SyntaxTree.Parse(source, diagnostics));
+                    .Select(source => SyntaxTree.Parse(source, diagnostics))
+                    .ToList();
 
             var compilation = Compilation.Create(diagnostics, syntaxTrees);
             //var result = compilation.Evaluate();

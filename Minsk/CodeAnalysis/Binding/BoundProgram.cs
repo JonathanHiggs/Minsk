@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 using Minsk.CodeAnalysis.Diagnostics;
 using Minsk.CodeAnalysis.Symbols;
@@ -27,6 +28,9 @@ namespace Minsk.CodeAnalysis.Binding
         public FunctionSymbol MainFunction { get; }
         public FunctionSymbol ScriptFunction { get; }
         public ImmutableDictionary<FunctionSymbol, BoundBlockStatement> Functions { get; }
+
+        public IEnumerable<(FunctionSymbol Symbol, BoundBlockStatement Body)> FunctionDefinitions
+            => Functions.Select(kvp => (kvp.Key, kvp.Value));
 
         public override IEnumerable<BoundNode> Children => Functions.Values;
 

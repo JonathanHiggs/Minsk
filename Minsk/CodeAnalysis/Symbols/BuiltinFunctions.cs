@@ -6,7 +6,8 @@ namespace Minsk.CodeAnalysis.Symbols
 {
     internal static class BuiltinFunctions
     {
-        public static readonly FunctionSymbol Print = "Print".WithParameters("text".OfAnyType());
+        //public static readonly FunctionSymbol Print = "Print".WithParameters("text".OfAnyType());
+        public static readonly FunctionSymbol Print = "Print".WithParameters("text".OfType<string>());
 
         public static readonly FunctionSymbol Input = "Input".Returns<string>();
 

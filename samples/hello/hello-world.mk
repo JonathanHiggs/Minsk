@@ -1,4 +1,1 @@
-let greeting = "Hello"
-let name = "World"
-
-Print(greeting + ", " + name + "!")
+Print("Hello World")

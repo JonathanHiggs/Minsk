@@ -131,6 +131,11 @@ namespace Minsk.CodeAnalysis.Binding
                         foreach (var pair in syntaxTreesWithGlobalStatement)
                             Report.MultipleGlobalStatementFiles(pair.GlobalStatement);
                     }
+                    else
+                    {
+                        mainFunction = new FunctionSymbol(
+                            "main", ImmutableArray<ParameterSymbol>.Empty, TypeSymbol.Void, null);
+                    }
                 }
 
                 if (mainFunctions.Length == 1)
