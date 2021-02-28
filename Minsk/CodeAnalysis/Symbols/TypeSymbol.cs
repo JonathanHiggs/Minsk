@@ -14,10 +14,13 @@ namespace Minsk.CodeAnalysis.Symbols
         public static readonly TypeSymbol Void      = new TypeSymbol("void", isInternalType: true, isVoidType: true);
         public static readonly TypeSymbol String    = new TypeSymbol("string", isInternalType: true);
 
+        public static readonly TypeSymbol Random    = new TypeSymbol("System.Random", isInternalType: true);
+
+
         private TypeSymbol(
-            string name, 
-            bool isInternalType = false, 
-            bool isErrorType = false, 
+            string name,
+            bool isInternalType = false,
+            bool isErrorType = false,
             bool isVoidType = false,
             bool isAnyType = false
         )

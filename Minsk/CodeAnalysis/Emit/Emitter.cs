@@ -19,12 +19,37 @@ namespace Minsk.CodeAnalysis.Emit
         private readonly string outputPath;
         private readonly DiagnosticBag diagnostics;
 
+        private readonly MethodReference objectEquals;
+        private readonly MethodReference consoleReadLine;
+        private readonly MethodReference consoleWriteLine;
+        private readonly MethodReference stringConcat2;
+        private readonly MethodReference stringConcat3;
+        private readonly MethodReference stringConcat4;
+        private readonly MethodReference stringConcatArray;
+        private readonly MethodReference convertToBoolean;
+        private readonly MethodReference convertToInt32;
+        private readonly MethodReference convertToString;
+        private readonly TypeReference random;
+        private readonly MethodReference randomConstructor;
+        private readonly MethodReference randomNext;
+        private readonly AssemblyDefinition assemblyDefinition;
+
+        private readonly Dictionary<TypeSymbol, (TypeDefinition Definition, TypeReference Reference)> knownTypes
+            = new Dictionary<TypeSymbol, (TypeDefinition Definition, TypeReference Reference)>();
+
+        private readonly Dictionary<FunctionSymbol, MethodDefinition> methods
+            = new Dictionary<FunctionSymbol, MethodDefinition>();
+
+        private readonly Dictionary<VariableSymbol, VariableDefinition> locals
+            = new Dictionary<VariableSymbol, VariableDefinition>();
+
+        private readonly Dictionary<BoundLabel, int> labels = new Dictionary<BoundLabel, int>();
+
+        private readonly List<(int InstructionIndex, BoundLabel Target)> fixups
+            = new List<(int InstructionIndex, BoundLabel Target)>();
+
         private readonly List<AssemblyDefinition> assemblyReferences = new List<AssemblyDefinition>();
 
-        private readonly AssemblyDefinition assemblyDefinition;
-        private readonly Dictionary<TypeSymbol, (TypeDefinition Definition, TypeReference Reference)> knownTypes;
-        private readonly (TypeDefinition Definition, TypeReference Reference) consoleType;
-        private readonly (MethodDefinition Definition, MethodReference Reference) consoleType_WriteLine;
         private readonly List<(TypeSymbol Type, string MetadataName)> builtinTypes
             = new List<(TypeSymbol Type, string MetadataName)> {
                 (TypeSymbol.Any,    "System.Object"),
@@ -34,7 +59,9 @@ namespace Minsk.CodeAnalysis.Emit
                 (TypeSymbol.Void,   "System.Void"),
             };
 
-        private Dictionary<FunctionSymbol, MethodDefinition> methods;
+        private TypeDefinition typeDefinition;
+        //private FieldDefinition randomFieldDefinition;
+
 
         private Emitter(
             string moduleName,
@@ -75,12 +102,37 @@ namespace Minsk.CodeAnalysis.Emit
             assemblyDefinition = AssemblyDefinition.CreateAssembly(
                 assemblyName, moduleName, ModuleKind.Console);
 
-            knownTypes = builtinTypes.ToDictionary(
-                item => item.Type,
-                item => ResolveType(item.Type, item.MetadataName));
+            foreach (var (typeSymbol, metadataName) in builtinTypes)
+            {
+                var (definition, reference) = ResolveType(typeSymbol, metadataName);
+                knownTypes.Add(typeSymbol, (definition, reference));
+            }
 
-            consoleType = ResolveType("System.Console");
-            consoleType_WriteLine = ResolveMethod(consoleType.Definition, "WriteLine", new[] { "System.String" });
+            objectEquals = ResolveMethod("System.Object", "Equals", "System.Object", "System.Object");
+            consoleReadLine = ResolveMethod("System.Console", "ReadLine");
+            consoleWriteLine = ResolveMethod("System.Console", "WriteLine", "System.Object");
+            stringConcat2 = ResolveMethod("System.String", "Concat", "System.String", "System.String");
+            stringConcat3 = ResolveMethod("System.String", "Concat", "System.String", "System.String", "System.String");
+            stringConcat4 = ResolveMethod("System.String", "Concat", "System.String", "System.String", "System.String", "System.String");
+            stringConcatArray = ResolveMethod("System.String", "Concat", "System.String[]");
+            convertToBoolean = ResolveMethod("System.Convert", "ToBoolean", "System.Object");
+            convertToInt32 = ResolveMethod("System.Convert", "ToInt32", "System.Object");
+            convertToString = ResolveMethod("System.Convert", "ToString", "System.Object");
+            (_, random) = ResolveType(TypeSymbol.Random, "System.Random");
+            randomConstructor = ResolveMethod("System.Random", ".ctor");
+            randomNext = ResolveMethod("System.Random", "Next", "System.Int32");
+
+            var objectType = knownTypes[TypeSymbol.Any].Reference;
+
+            if (objectType != null)
+            {
+                typeDefinition = new TypeDefinition(
+                    "",
+                    "Program",
+                    TypeAttributes.Abstract | TypeAttributes.Sealed,
+                    objectType);
+                assemblyDefinition.MainModule.Types.Add(typeDefinition);
+            }
         }
 
         private EmitDiagnostics Report => diagnostics.Emit;
@@ -105,17 +157,6 @@ namespace Minsk.CodeAnalysis.Emit
         {
             if (diagnostics.Any())
                 return new EmitResult(diagnostics);
-
-            var objectType = knownTypes[TypeSymbol.Any].Reference;
-            var typeDefinition = new TypeDefinition(
-                "",
-                "Program",
-                TypeAttributes.Abstract | TypeAttributes.Sealed,
-                objectType);
-
-            assemblyDefinition.MainModule.Types.Add(typeDefinition);
-
-            methods = new Dictionary<FunctionSymbol, MethodDefinition>(program.Functions.Count);
 
             foreach (var (function, body) in program.FunctionDefinitions)
                 EmitFunction(typeDefinition, function);
@@ -186,7 +227,6 @@ namespace Minsk.CodeAnalysis.Emit
             default:
                 throw new NotImplementedException(
                     $"EmitStatement not implemented for {node.Kind.ToString()}");
-                break;
             }
         }
 
@@ -260,7 +300,6 @@ namespace Minsk.CodeAnalysis.Emit
             default:
                 throw new NotImplementedException(
                     $"EmitExpression not implemented for {node.Kind.ToString()}");
-                break;
             }
         }
 
@@ -284,7 +323,7 @@ namespace Minsk.CodeAnalysis.Emit
 
             if (node.Function == BuiltinFunctions.Print)
             {
-                ilProcessor.Emit(OpCodes.Call, consoleType_WriteLine.Definition);
+                ilProcessor.Emit(OpCodes.Call, consoleWriteLine);
             }
             else if (node.Function == BuiltinFunctions.Input)
             {
@@ -341,6 +380,56 @@ namespace Minsk.CodeAnalysis.Emit
         private void EmitVariableExpression(ILProcessor ilProcessor, BoundVariableExpression node)
         {
             throw new NotImplementedException();
+        }
+
+        private MethodReference ResolveMethod(string type, string methodName, params string[] parameterTypes)
+        {
+            var foundTypes = assemblyReferences
+                .SelectMany(a => a.Modules)
+                .SelectMany(m => m.Types)
+                .Where(t => t.FullName == type)
+                .ToArray();
+
+            if (foundTypes.Length == 1)
+            {
+                var foundType = foundTypes[0];
+                var methods = foundType.Methods.Where(m => m.Name == methodName);
+
+                foreach (var method in methods)
+                {
+                    if (method.Parameters.Count != parameterTypes.Length)
+                        continue;
+
+                    var allParametersMatch = true;
+
+                    for (var i = 0; i < parameterTypes.Length; i++)
+                    {
+                        if (method.Parameters[i].ParameterType.FullName != parameterTypes[i])
+                        {
+                            allParametersMatch = false;
+                            break;
+                        }
+                    }
+
+                    if (!allParametersMatch)
+                        continue;
+
+                    return assemblyDefinition.MainModule.ImportReference(method);
+                }
+
+                Report.MethodWithParametersNotFound(methodName, parameterTypes);
+                return null;
+            }
+            else if (foundTypes.Length == 0)
+            {
+                Report.MethodWithParametersNotFound(methodName, parameterTypes);
+            }
+            else
+            {
+                Report.MethodWithParametersNotFound(methodName, parameterTypes);
+            }
+
+            return null;
         }
 
         private (MethodDefinition Definition, MethodReference Reference) ResolveMethod(
