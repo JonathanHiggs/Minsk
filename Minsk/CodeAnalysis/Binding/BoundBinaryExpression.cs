@@ -36,5 +36,11 @@ namespace Minsk.CodeAnalysis.Binding
 
         protected override string PrettyPrintText()
             => $"{Type.Name}.{Op.Kind}";
+
+        public bool OperandTypesAre(TypeSymbol type)
+            => Left.Type == type && Right.Type == type;
+
+        public bool OperandTypesAre(TypeSymbol left, TypeSymbol right)
+            => Left.Type == left && Right.Type == right;
     }
 }

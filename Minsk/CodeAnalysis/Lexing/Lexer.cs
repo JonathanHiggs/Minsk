@@ -77,7 +77,7 @@ namespace Minsk.CodeAnalysis.Lexing
                 case '&':
                 {
                     if (Next == '&')
-                        return EmitToken(TokenKind.AmpersandAmperand, 2);
+                        return EmitToken(TokenKind.AmpersandAmpersand, 2);
                     return EmitToken(TokenKind.Ampersand, 1);
                 }
 

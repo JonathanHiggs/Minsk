@@ -59,7 +59,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         private static BoundBinaryOperator[] operators = {
             // Logical
-            From(Token.AmpersandAmperand,   Op.LogicalAnd,      TypeSymbol.Bool),
+            From(Token.AmpersandAmpersand,   Op.LogicalAnd,      TypeSymbol.Bool),
             From(Token.PipePipe,            Op.LogicalOr,       TypeSymbol.Bool),
 
             From(Token.EqualsEquals,        Op.Equals,          TypeSymbol.Int,     TypeSymbol.Bool),

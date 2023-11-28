@@ -22,7 +22,7 @@ namespace Minsk.CodeAnalysis.Lexing
                 case TokenKind.Bang:
                 case TokenKind.BangEquals:
                 case TokenKind.Ampersand:
-                case TokenKind.AmpersandAmperand:
+                case TokenKind.AmpersandAmpersand:
                 case TokenKind.Equals:
                 case TokenKind.EqualsEquals:
                 case TokenKind.Pipe:

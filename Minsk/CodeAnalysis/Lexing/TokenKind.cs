@@ -19,7 +19,7 @@ namespace Minsk.CodeAnalysis.Lexing
         [Description("!")]          Bang,
         [Description("!=")]         BangEquals,
         [Description("&")]          Ampersand,
-        [Description("&&")]         AmpersandAmperand,
+        [Description("&&")]         AmpersandAmpersand,
         [Description("=")]          Equals,
         [Description("==")]         EqualsEquals,
         [Description("|")]          Pipe,

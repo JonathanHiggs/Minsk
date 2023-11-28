@@ -49,7 +49,7 @@ namespace Minsk.CodeAnalysis.Parsing
                     return 3;
 
                 case TokenKind.Ampersand:
-                case TokenKind.AmpersandAmperand:
+                case TokenKind.AmpersandAmpersand:
                     return 2;
 
                 case TokenKind.Pipe:

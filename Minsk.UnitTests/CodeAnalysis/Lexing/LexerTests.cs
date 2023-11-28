@@ -121,7 +121,7 @@ namespace Minsk.UnitTests.CodeAnalysis.Lexing
                 (TokenKind.ForwardSlash,        "/"),
                 (TokenKind.Bang,                "!"),
                 (TokenKind.BangEquals,          "!="),
-                (TokenKind.AmpersandAmperand,   "&&"),
+                (TokenKind.AmpersandAmpersand,   "&&"),
                 (TokenKind.Equals,              "="),
                 (TokenKind.EqualsEquals,        "=="),
                 (TokenKind.Less,                "<"),
